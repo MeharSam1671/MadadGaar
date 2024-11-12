@@ -41,8 +41,10 @@ class _HomeState extends State<Home> {
             "MadadGaar \n An Ambulance Calling System",
             textAlign: TextAlign.center,
             style: TextStyle(
-              fontSize: 25 * MediaQuery.of(context).textScaleFactor, // Scaled text size
+              fontSize: 25 *
+                  MediaQuery.of(context).textScaleFactor, // Scaled text size
               fontWeight: FontWeight.bold,
+              color: Colors.white
             ),
           ),
         ),
@@ -58,13 +60,13 @@ class _HomeState extends State<Home> {
                   actions: [
                     TextButton(
                       onPressed: () {
-                        Navigator.pop(context); // Close the dialog
+                        Navigator.pop(context);
                       },
                       child: Text("No"),
                     ),
                     TextButton(
                       onPressed: () {
-                        Navigator.pushNamed(context, "/maps"); // Close the dialog
+                        Navigator.pushNamed(context, "/maps");
                       },
                       child: Text("Yes"),
                     ),
@@ -74,20 +76,19 @@ class _HomeState extends State<Home> {
             );
           },
           style: ElevatedButton.styleFrom(
-            minimumSize: Size(
-              MediaQuery.of(context).size.width / 2,
-              MediaQuery.of(context).size.width / 2,
-            ), // Set the minimum size for a circle
-            shape: CircleBorder(), // Make the button circular
-            backgroundColor: Colors.red, // Set the background color to red
+            shape: CircleBorder(), backgroundColor: Colors.red, // Make the button circular
+            padding: EdgeInsets.all(60), // Make button background transparent
+            shadowColor: Colors.black,
+            elevation: 15// Disable default shadow
           ),
-          child: Image.asset("assets/call.gif", height: 40, color: Colors.white),
+          child:
+              Image.asset("assets/call.gif", height: 40, color: Colors.white),
         ),
         SizedBox(height: MediaQuery.of(context).size.height * 0.02),
 
         // Wrap the following content in an Expanded widget to fill available space
         Expanded(
-          child: ListView(
+          child: Column(
             children: [
               Padding(
                 padding: const EdgeInsets.symmetric(vertical: 1.0),

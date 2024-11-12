@@ -2,6 +2,7 @@
     <!-- Add these permissions -->
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
     <application
         android:label="madadgaar"
         android:name="${applicationName}"
@@ -10,7 +11,7 @@
         <!-- Add this meta-data tag -->
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyD9x-4bG_dummyKeyForExampleOnly_1234567890" />
+            android:value="AIzaSyDBzTEqblBXW1GbjRz4BwgpbXkLYLjyy40" />
 
         <activity
             android:name=".MainActivity"

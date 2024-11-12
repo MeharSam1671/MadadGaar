@@ -15,7 +15,7 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   int _currentIndex = 0; // Track the selected index
   final TextEditingController _searchController = TextEditingController();
-
+  Color primaryColor = Color(0xFFE0F7FA);
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -43,7 +43,14 @@ class _MyAppState extends State<MyApp> {
             ),
           ],
         ),
-        body: _currentIndex == 0 ? Home() : Profile(), // Render Home or Profile
+        body: Container(
+            decoration: BoxDecoration(gradient: LinearGradient(
+              colors: [Colors.red, Colors.blue], // Red and Blue colors for the gradient
+              begin: Alignment.bottomLeft, // Starting point of the gradient
+              end: Alignment.topRight, // Ending point of the gradient
+              stops: [0.1, 1.0], // Control how the colors blend
+            )),
+            child: _currentIndex == 0 ? Home() : Profile()), // Render Home or Profile
         bottomNavigationBar: BottomNavigationBar(
           items: [
             BottomNavigationBarItem(
