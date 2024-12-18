@@ -9,9 +9,8 @@ class Maps extends StatefulWidget {
 
 class _MapsState extends State<Maps> {
   late GoogleMapController mapController;
-  LatLng _center = const LatLng(32.361063, 74.207813); // Default location
+  LatLng _center = const LatLng(0.0, 0.0); // Default location
   bool _isMapReady = false;
-
 
   @override
   void initState() {
@@ -19,39 +18,34 @@ class _MapsState extends State<Maps> {
     _initializeLocation();
   }
 
-  Future<void> _initializeLocation() async {
+  void _initializeLocation() async {
+    int value = 0;
     try {
-      Position position = await getCurrentLocation();
-      setState(() {
-        _center = LatLng(position.latitude, position.longitude);
-        _isMapReady = true; // Indicate that the map is ready to be displayed
-      });
+      while (true) {
+        print("Position $value");
+        value++;
+
+        // Attempt to get the current location
+        Position position = await getCurrentLocation();
+
+        // Update the state with the new location
+        setState(() {
+          _center = LatLng(position.latitude, position.longitude);
+          _isMapReady = true;
+        });
+
+        // Delay for 1 second before the next iteration
+        await Future.delayed(Duration(seconds: 1));
+      }
     } catch (e) {
-      // Handle error (e.g., show a dialog with error message)
+      // Handle the error
       print('Error getting location: $e');
     }
   }
+
+
   void _onMapCreated(GoogleMapController controller) {
     mapController = controller;
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Google Maps'),
-      ),
-      body: GoogleMap(
-        onMapCreated: _onMapCreated,
-        initialCameraPosition: CameraPosition(
-          target: _center,
-          zoom: 15.0,
-        ),
-        markers: {
-          Marker(markerId: MarkerId('1'), position: _center)
-        },
-      ),
-    );
   }
 
   Future<Position> getCurrentLocation() async {
@@ -85,5 +79,31 @@ class _MapsState extends State<Maps> {
     return await Geolocator.getCurrentPosition();
   }
 
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Google Maps'),
+      ),
+      body: _isMapReady
+          ? GoogleMap(
+        onMapCreated: _onMapCreated,
+        initialCameraPosition: CameraPosition(
+          target: _center,
+          zoom: 15.0, // Adjust zoom level as needed
+        ),
+        myLocationEnabled: true, // Enable the built-in blue dot for current location
+        myLocationButtonEnabled: true, // Show the location button
+      )
+          : const Center(
+        child: CircularProgressIndicator(),
+      ),
+    );
+  }
 
+  @override
+  void dispose() {
+    mapController.dispose();
+    super.dispose();
+  }
 }
