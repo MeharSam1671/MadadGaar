@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:madadgaar/login/signup/signup.dart';
-import 'Home.dart'; // Ensure this file exists
+import 'Home/Home.dart'; // Ensure this file exists
 import 'Maps.dart';
 import 'Profile.dart';
+import 'Profile/profile.dart';
 import 'login/signup/login.dart'; // Ensure this file exists
 
 void main() {
@@ -25,7 +26,10 @@ class _MyAppState extends State<MyApp> {
       routes: {
         "/maps": (context) => Maps(), // Corrected the syntax for route definition
         "/Home": (context) => Home(), // Corrected the syntax for route definition
-        "/Signup": (context) => SignupScreen(), // Corrected the syntax for route definition
+        "/Signup": (context) => SignupScreen(),
+
+        '/showProfile': (context) => ProfileScreen(),
+        '/LoginProfile': (context) => LoginScreen(),// Corrected the syntax for route definition
       },
       home:  Home(),// Render Home or Profile
     );

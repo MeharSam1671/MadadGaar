@@ -1,11 +1,32 @@
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Maps extends StatefulWidget {
   @override
   _MapsState createState() => _MapsState();
 }
+
+Future<void> _pushLocationToFirestore(Position position) async {
+  try {
+    // Get the Firestore instance
+    final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+
+    // Push the user's location to Firestore
+    await _firestore.collection('users').doc('user_id') // Replace with actual user ID
+        .set({
+      'latitude': position.latitude,
+      'longitude': position.longitude,
+      'timestamp': FieldValue.serverTimestamp(),
+    });
+
+    print('Location updated successfully');
+  } catch (e) {
+    print('Error pushing location to Firestore: $e');
+  }
+}
+
 
 class _MapsState extends State<Maps> {
   late GoogleMapController mapController;

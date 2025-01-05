@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-import '../../Home.dart';
+import '../../Home/Home.dart';
 
 class SignupScreen extends StatefulWidget {
   const SignupScreen({super.key});
