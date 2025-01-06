@@ -245,8 +245,8 @@ class _HomeState extends State<Home> {
                 ),
               ),
               DraggableScrollableSheet(
-                initialChildSize: 0.4,  // initial height (0.0 to 1.0, where 1.0 is full screen)
-                minChildSize: 0.4,      // minimum height (0.0 to 1.0)
+                initialChildSize: 0.35,  // initial height (0.0 to 1.0, where 1.0 is full screen)
+                minChildSize: 0.35,      // minimum height (0.0 to 1.0)
                 maxChildSize: 1,      // maximum height (0.0 to 1.0)
                 builder: (context, scrollController) {
                   return Container(
