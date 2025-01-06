@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:madadgaar/ChatAi/chataiscreen.dart';
 import 'package:madadgaar/login/signup/signup.dart';
 import 'Home/Home.dart'; // Ensure this file exists
 import 'Maps.dart';
@@ -26,6 +27,7 @@ class _MyAppState extends State<MyApp> {
       routes: {
         "/maps": (context) => Maps(), // Corrected the syntax for route definition
         "/Home": (context) => Home(), // Corrected the syntax for route definition
+        "/ChatAI": (context) => ChatAIScreen(), // Corrected the syntax for route definition
         "/Signup": (context) => SignupScreen(),
 
         '/showProfile': (context) => ProfileScreen(),

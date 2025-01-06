@@ -51,13 +51,13 @@ class _SignupScreenState extends State<SignupScreen> {
                     borderRadius: BorderRadius.circular(40),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.1),
+                        color: Colors.black.withOpacity(0.9),
                         blurRadius: 10,
                         offset: Offset(0, 5),
                       ),
                     ],
                   ),
-                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 30),
+                  padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 30),
                   child: Column(
                     mainAxisSize: MainAxisSize.min, // Adapts to content height
                     crossAxisAlignment: CrossAxisAlignment.center,
@@ -199,7 +199,7 @@ class _SignupScreenState extends State<SignupScreen> {
                           "Passwords do not match",
                           style: TextStyle(color: Colors.red, fontSize: 14),
                         ),
-                      SizedBox(height: 30),
+                      SizedBox(height: 10,),
 
                       // Signup Button
                       ElevatedButton(
@@ -215,7 +215,7 @@ class _SignupScreenState extends State<SignupScreen> {
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.blue,
-                          padding: EdgeInsets.symmetric(vertical: 15, horizontal: 60),
+                          padding: EdgeInsets.symmetric(vertical: 15, horizontal: 100),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(10),
                           ),
@@ -225,24 +225,14 @@ class _SignupScreenState extends State<SignupScreen> {
                           style: TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
-                            color: Colors.black,
+                            color: Colors.white,
                           ),
                         ),
                       ),
 
                       SizedBox(height: 20),
                       // Login with Google Button
-                      TextButton(onPressed: (){}, child:
-                      Container(
-                          decoration: BoxDecoration(color: Colors.black,borderRadius: BorderRadius.circular(10),),
 
-                          child: ListTile(title: Text("Signup with Google",style: TextStyle(fontSize: 12,color: Colors.white),),leading: Image.asset("assets/google.png",height: 25,),)),
-
-                        //Image.asset("assets/google.png"),
-
-
-                      ),
-                      SizedBox(height: 20),
                       // Sign-in Link
                       TextButton(
                         onPressed: () {

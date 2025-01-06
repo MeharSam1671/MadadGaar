@@ -8,45 +8,66 @@ class LoginScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return  Scaffold(
+    return Scaffold(
         body: Container(
-          height: MediaQuery.of(context).size.height,
-          width: MediaQuery.of(context).size.width,
+      height: MediaQuery.of(context).size.height,
+      width: MediaQuery.of(context).size.width,
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [
+            Colors.red,
+            Colors.blue
+          ], // Red and Blue colors for the gradient
+          begin: Alignment.bottomLeft, // Starting point of the gradient
+          end: Alignment.topRight, // Ending point of the gradient
+          stops: [0.1, 1.0], // Control how the colors blend
+        ),
+      ),
+      child: Center(
+        child: Container(
+          height: MediaQuery.of(context).size.height / 1.5,
+          width: MediaQuery.of(context).size.width / 1.2,
           decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: [Colors.red, Colors.blue], // Red and Blue colors for the gradient
-              begin: Alignment.bottomLeft, // Starting point of the gradient
-              end: Alignment.topRight, // Ending point of the gradient
-              stops: [0.1, 1.0], // Control how the colors blend
-
-            ),
-          ),
-          child: Center(
-            child: Container(
-              height: MediaQuery.of(context).size.height / 1.5,
-              width: MediaQuery.of(context).size.width / 1.2,
-
-              decoration: BoxDecoration(color: Colors.white,
-              borderRadius: BorderRadius.circular(40), // Rounded corners for the container
+            color: Colors.white,
+            borderRadius:
+                BorderRadius.circular(40),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.9),
+                blurRadius: 10,
+                offset: Offset(0, 5),
               ),
-              padding: EdgeInsets.symmetric(horizontal: 40),
-              child: Column(
+            ],// Rounded corners for the container
+          ),
+          padding: EdgeInsets.symmetric(horizontal: 40),
+          child: SingleChildScrollView(
+            child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  Text("Login",style: TextStyle(fontSize: 24,color: Colors.black),),
-                  SizedBox(height: 40,),
+                  SizedBox(
+                    height: 40,
+                  ),
+                  Text(
+                    "Login",
+                    style: TextStyle(fontSize: 24, color: Colors.black),
+                  ),
+                  SizedBox(
+                    height: 20,
+                  ),
                   // Username TextField
                   TextField(
                     decoration: InputDecoration(
                       hintText: "Enter username",
                       hintStyle: TextStyle(color: Colors.black),
                       border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(10), // Rounded borders
+                        borderRadius:
+                            BorderRadius.circular(10), // Rounded borders
                         borderSide: BorderSide(color: Colors.black),
                       ),
                       filled: true,
-                      fillColor: Colors.black.withOpacity(0.1), // Light background color for input
+                      fillColor: Colors.black
+                          .withOpacity(0.1), // Light background color for input
                     ),
                     style: TextStyle(color: Colors.black),
                   ),
@@ -58,11 +79,13 @@ class LoginScreen extends StatelessWidget {
                       hintText: "Enter Password",
                       hintStyle: TextStyle(color: Colors.black),
                       border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(10), // Rounded borders
+                        borderRadius:
+                            BorderRadius.circular(10), // Rounded borders
                         borderSide: BorderSide(color: Colors.black),
                       ),
                       filled: true,
-                      fillColor: Colors.black.withOpacity(0.1), // Light background color for input
+                      fillColor: Colors.black
+                          .withOpacity(0.1), // Light background color for input
                     ),
                     style: TextStyle(color: Colors.black),
                   ),
@@ -74,37 +97,54 @@ class LoginScreen extends StatelessWidget {
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.blue, // Button color
-                      padding: EdgeInsets.symmetric(vertical: 15, horizontal: 60),
+                      padding: EdgeInsets.only(top: 16,bottom: 16,left: 151,right: 151),
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10), // Rounded button
+                        borderRadius:
+                        BorderRadius.circular(50), // Rounded button
                       ),
                     ),
                     child: Text(
                       "Login",
-                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold,color: Colors.black),
+                      style: TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white),
                     ),
                   ),
                   SizedBox(height: 20),
-                  TextButton(onPressed: (){}, child:
-                      Container(
-                          decoration: BoxDecoration(color: Colors.black,borderRadius: BorderRadius.circular(10),),
 
-                          child: ListTile(title: Text("Login with Google",style: TextStyle(fontSize: 12,color: Colors.white),),leading: Image.asset("assets/google.png",height: 25,),)),
+                  ElevatedButton(
+                    onPressed: () {},
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Image.asset(
+                          "assets/google.png",
+                          height: 25,
+                          width: 25, // Add width for proper aspect ratio
+                          fit: BoxFit.contain, // Ensures image fits within the specified size
+                        ),
+                        SizedBox(width: 10,),
+                        Text(
+                            "Login with Google",
+                            style: TextStyle(fontSize: 10, color: Colors.white),
+                          ),
 
-                      //Image.asset("assets/google.png"),
-
+                      ],
+                    ),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.black, // Button color
+                      padding: EdgeInsets.only(top: 16,bottom: 16),
 
                     ),
-
-                  // Sign-up link
+                  ),
                   TextButton(onPressed: (){
-                    Navigator.pushReplacement(context,MaterialPageRoute(builder:(context) => SignupScreen()));
-                  }, child: Text("Don't have an account? Signup"))
-                ],
-              ),
-            ),
+                    Navigator.pushNamed(context, "/Signup");
+                  }, child: Text("Not Signup?/Signup from here"))
+                ]),
           ),
         ),
-    );
+      ),
+    ));
   }
 }
