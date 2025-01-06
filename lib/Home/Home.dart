@@ -156,15 +156,18 @@ class _HomeState extends State<Home> {
   void _startAnimation() {
     // Toggle gradient direction every 2 seconds
     Future.delayed(Duration(seconds: 2), () {
-      setState(() {
-        beginAlignment = beginAlignment == Alignment.topRight
-            ? Alignment.topRight
-            : Alignment.centerLeft;
-        endAlignment = endAlignment == Alignment.bottomRight
-            ? Alignment.centerLeft
-            : Alignment.bottomRight;
-      });
-      _startAnimation();
+      if (mounted) {
+        setState(() {
+          // Toggle between two different gradients
+          beginAlignment = beginAlignment == Alignment.topRight
+              ? Alignment.bottomLeft
+              : Alignment.topRight;
+          endAlignment = endAlignment == Alignment.bottomRight
+              ? Alignment.topLeft
+              : Alignment.bottomRight;
+        });
+        _startAnimation(); // Repeat the animation
+      }
     });
   }
 
@@ -214,27 +217,16 @@ class _HomeState extends State<Home> {
                             }
                             else
                               {
-                                showDialog(
-                                    context: context,
-                                    builder: (_) => AlertDialog(
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(15),
-                                      ),
-                                      title: const Text(
-                                        "You are using this App without Signin.Would you Like To Signin first?",
-                                        style: TextStyle(fontWeight: FontWeight.bold),
-                                      ),
-                                      actions: [
-                                        TextButton(
-                                          onPressed: () => Navigator.pushNamed(context,"/LoginProfile"),
-                                          child: const Text("Yes"),
-                                        ),
-                                        TextButton(
-                                          onPressed: () {Navigator.pop(context);},
-                                          child: const Text("No"),
-                                        ),
-                                      ],
-                                    ));
+                                Future.delayed(Duration(milliseconds: 100), () {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text('You must log in to perform this action.'),
+                                      duration: Duration(seconds: 1),
+                                      behavior: SnackBarBehavior.floating, // Floating at the bottom
+                                      margin: EdgeInsets.all(16),
+                                    ),
+                                  );
+                                });
 
                               }
                           },
@@ -420,7 +412,16 @@ class _HomeState extends State<Home> {
                   Navigator.pushNamed(context, "/ChatAI");
                 }
                 else{
-                  Navigator.pushNamed(context, "/LoginProfile");
+                  Future.delayed(Duration(milliseconds: 100), () {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text('You must log in to perform this action.'),
+                        duration: Duration(seconds: 1),
+                        behavior: SnackBarBehavior.floating, // Floating at the bottom
+                        margin: EdgeInsets.all(16),
+                      ),
+                    );
+                  });
                 }
               },
                 child: Icon(Icons.chat_bubble,color: Colors.white,),

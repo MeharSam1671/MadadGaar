@@ -37,15 +37,18 @@ class _BlogsScreenState extends State<BlogsScreen> {
   void _startAnimation() {
     // Toggle gradient direction every 2 seconds
     Future.delayed(Duration(seconds: 2), () {
-      setState(() {
-        beginAlignment = beginAlignment == Alignment.topCenter
-            ? Alignment.topCenter
-            : Alignment.bottomCenter;
-        endAlignment = endAlignment == Alignment.bottomCenter
-            ? Alignment.topCenter
-            : Alignment.bottomCenter;
-      });
-      _startAnimation();
+      if (mounted) {
+        setState(() {
+          // Toggle between two different gradients
+          beginAlignment = beginAlignment == Alignment.topRight
+              ? Alignment.bottomLeft
+              : Alignment.topRight;
+          endAlignment = endAlignment == Alignment.bottomRight
+              ? Alignment.topLeft
+              : Alignment.bottomRight;
+        });
+        _startAnimation(); // Repeat the animation
+      }
     });
   }
 
@@ -63,139 +66,144 @@ class _BlogsScreenState extends State<BlogsScreen> {
           ),
         ),
         duration: Duration(seconds: 2),
-        child: Column(
-          children: [
-            SizedBox(height: 50),
-            ListTile(
-              leading: Text(
-                "Blogs",
-                style: TextStyle(fontSize: 20, color: Colors.white),
-              ),
-              trailing: IconButton(
-                icon: const Icon(
-                  Icons.search,
-                  color: Colors.white,
-                ),
-                onPressed: () {},
-              ),
-            ),
+        child: Stack(children: [
+          Column(
+            children: [
+              SizedBox(height: 50),
 
-            // Row with expanded children
-            Expanded(
-              child: SingleChildScrollView(
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: Container(
-                        margin: EdgeInsets.all(10),
-                        child: Card(
-                          elevation: 5,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(15), // Rounded corners
-                          ),
-                          child: Padding(
-                            padding: const EdgeInsets.all(16.0),
-                            child: Column(
-                              children: [
-                                Image.asset(
-                                  "assets/amb1.jpg",
-                                  height: 130,  // Set only height
-                                  width: double.infinity,  // Set width to fill available space
-                                  fit: BoxFit.cover,  // Ensure the aspect ratio is maintained
-                                ),
-                                Text(
-                                  "New Ambulance will be Introduced in future",
-                                  style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
-                                ),
-                                SizedBox(height: 10),
-                                Text(
-                                  "Our goal is to revolutionize ambulance services by integrating AI-powered systems, smart vehicle tracking,...", // Truncated text
-                                  style: TextStyle(fontSize: 12),
-                                  maxLines: 2,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                                GestureDetector(
-                                  onTap: () {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) => FullTextScreen(),
+
+              // Row with expanded children
+              Expanded(
+                child: SingleChildScrollView(
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: Container(
+                          margin: EdgeInsets.all(10),
+                          child: Card(
+                            elevation: 5,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(15), // Rounded corners
+                            ),
+                            child: Padding(
+                              padding: const EdgeInsets.all(16.0),
+                              child: Column(
+                                children: [
+                                  Image.asset(
+                                    "assets/amb1.jpg",
+                                    height: 130,  // Set only height
+                                    width: double.infinity,  // Set width to fill available space
+                                    fit: BoxFit.cover,  // Ensure the aspect ratio is maintained
+                                  ),
+                                  Text(
+                                    "New Ambulance will be Introduced in future",
+                                    style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+                                  ),
+                                  SizedBox(height: 10),
+                                  Text(
+                                    "Our goal is to revolutionize ambulance services by integrating AI-powered systems, smart vehicle tracking,...", // Truncated text
+                                    style: TextStyle(fontSize: 12),
+                                    maxLines: 2,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                  GestureDetector(
+                                    onTap: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => FullTextScreen(),
+                                        ),
+                                      );
+                                    },
+                                    child: Text(
+                                      "Show More",
+                                      style: TextStyle(
+                                        color: Colors.blue,
+                                        fontWeight: FontWeight.bold,
                                       ),
-                                    );
-                                  },
-                                  child: Text(
-                                    "Show More",
-                                    style: TextStyle(
-                                      color: Colors.blue,
-                                      fontWeight: FontWeight.bold,
                                     ),
                                   ),
-                                ),
-                              ],
+                                ],
+                              ),
                             ),
                           ),
                         ),
                       ),
-                    ),
-                    Expanded(
-                      child: Container(
-                        margin: EdgeInsets.all(10),
-                        child: Card(
-                          elevation: 5,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(15), // Rounded corners
-                          ),
-                          child: Padding(
-                            padding: const EdgeInsets.all(16.0),
-                            child: Column(
-                              children: [
-                                Image.asset(
-                                  "assets/amb1.jpg",
-                                  height: 130,  // Set only height
-                                  width: double.infinity,  // Set width to fill available space
-                                  fit: BoxFit.cover,  // Ensure the aspect ratio is maintained
-                                ),
-                                Text(
-                                  "New Ambulance will be Introduced in future",
-                                  style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
-                                ),
-                                SizedBox(height: 10),
-                                Text(
-                                  "Our goal is to revolutionize ambulance services by integrating AI-powered systems, smart vehicle tracking,...", // Truncated text
-                                  style: TextStyle(fontSize: 12),
-                                  maxLines: 2,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                                GestureDetector(
-                                  onTap: () {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) => FullTextScreen(),
+                      Expanded(
+                        child: Container(
+                          margin: EdgeInsets.all(10),
+                          child: Card(
+                            elevation: 5,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(15), // Rounded corners
+                            ),
+                            child: Padding(
+                              padding: const EdgeInsets.all(16.0),
+                              child: Column(
+                                children: [
+                                  Image.asset(
+                                    "assets/amb1.jpg",
+                                    height: 130,  // Set only height
+                                    width: double.infinity,  // Set width to fill available space
+                                    fit: BoxFit.cover,  // Ensure the aspect ratio is maintained
+                                  ),
+                                  Text(
+                                    "New Ambulance will be Introduced in future",
+                                    style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+                                  ),
+                                  SizedBox(height: 10),
+                                  Text(
+                                    "Our goal is to revolutionize ambulance services by integrating AI-powered systems, smart vehicle tracking,...", // Truncated text
+                                    style: TextStyle(fontSize: 12),
+                                    maxLines: 2,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                  GestureDetector(
+                                    onTap: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => FullTextScreen(),
+                                        ),
+                                      );
+                                    },
+                                    child: Text(
+                                      "Show More",
+                                      style: TextStyle(
+                                        color: Colors.blue,
+                                        fontWeight: FontWeight.bold,
                                       ),
-                                    );
-                                  },
-                                  child: Text(
-                                    "Show More",
-                                    style: TextStyle(
-                                      color: Colors.blue,
-                                      fontWeight: FontWeight.bold,
                                     ),
                                   ),
-                                ),
-                              ],
+                                ],
+                              ),
                             ),
                           ),
                         ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
-            ),
 
-          ],
-        ),
+            ],
+          ),
+          Positioned(
+
+            child: ListTile(
+            leading: Text(
+              "Blogs",
+              style: TextStyle(fontSize: 20, color: Colors.white),
+            ),
+            trailing: IconButton(
+              icon: const Icon(
+                Icons.search,
+                color: Colors.white,
+              ),
+              onPressed: () {},
+            ),
+          ),)
+        ],),
       ),
 
         bottomNavigationBar: BottomNavigationBar(
