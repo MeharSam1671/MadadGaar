@@ -56,191 +56,166 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: AnimatedContainer(
-        height: MediaQuery.of(context).size.height,
-        width: MediaQuery.of(context).size.width,
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: const [Colors.red, Colors.blue],
-            begin: beginAlignment,
-            end: endAlignment,
-          ),
-        ),
-        duration: const Duration(seconds: 2),
-        child: Center(
-          child: Container(
-            height: MediaQuery.of(context).size.height / 1.5,
-            width: MediaQuery.of(context).size.width / 1.2,
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(40),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.9),
-                  blurRadius: 10,
-                  offset: const Offset(0, 5),
+      body: Center(
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.all(18.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                const SizedBox(height: 40),
+                const Text("Login",
+                    style: TextStyle(fontSize: 24, color: Colors.black)),
+                const SizedBox(height: 20),
+                // Username TextField
+                TextField(
+                  controller: _emailController,
+                  decoration: InputDecoration(
+                    hintText: "Enter username",
+                    hintStyle: const TextStyle(color: Colors.black),
+                    border: OutlineInputBorder(
+                      borderRadius:
+                          BorderRadius.circular(10), // Rounded borders
+                      borderSide: const BorderSide(color: Colors.black),
+                    ),
+                    filled: true,
+                    fillColor: Colors.black.withOpacity(0.1),
+                    // Light background color for input
+                  ),
+                  style: const TextStyle(color: Colors.black),
                 ),
-              ], // Rounded corners for the container
-            ),
-            padding: const EdgeInsets.symmetric(horizontal: 40),
-            child: SingleChildScrollView(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  const SizedBox(height: 40),
-                  const Text("Login",
-                      style: TextStyle(fontSize: 24, color: Colors.black)),
-                  const SizedBox(height: 20),
-                  // Username TextField
-                  TextField(
-                    controller: _emailController,
-                    decoration: InputDecoration(
-                      hintText: "Enter username",
-                      hintStyle: const TextStyle(color: Colors.black),
-                      border: OutlineInputBorder(
-                        borderRadius:
-                            BorderRadius.circular(10), // Rounded borders
-                        borderSide: const BorderSide(color: Colors.black),
-                      ),
-                      filled: true,
-                      fillColor: Colors.black.withOpacity(0.1),
-                      // Light background color for input
+                const SizedBox(height: 20), // Space between input fields
+                // Password TextField
+                TextField(
+                  controller: _passwordController,
+                  obscureText: true, // To hide the password input
+                  decoration: InputDecoration(
+                    hintText: "Enter Password",
+                    hintStyle: const TextStyle(color: Colors.black),
+                    border: OutlineInputBorder(
+                      borderRadius:
+                          BorderRadius.circular(10), // Rounded borders
+                      borderSide: const BorderSide(color: Colors.black),
                     ),
-                    style: const TextStyle(color: Colors.black),
+                    filled: true,
+                    fillColor: Colors.black
+                        .withOpacity(0.1), // Light background color for input
                   ),
-                  const SizedBox(height: 20), // Space between input fields
-                  // Password TextField
-                  TextField(
-                    controller: _passwordController,
-                    obscureText: true, // To hide the password input
-                    decoration: InputDecoration(
-                      hintText: "Enter Password",
-                      hintStyle: const TextStyle(color: Colors.black),
-                      border: OutlineInputBorder(
-                        borderRadius:
-                            BorderRadius.circular(10), // Rounded borders
-                        borderSide: const BorderSide(color: Colors.black),
-                      ),
-                      filled: true,
-                      fillColor: Colors.black
-                          .withOpacity(0.1), // Light background color for input
-                    ),
-                    style: const TextStyle(color: Colors.black),
-                  ),
-                  const SizedBox(height: 30), // Space before the login button
-                  // Login Button
-                  ElevatedButton(
-                    onPressed: () async {
-                      String email = _emailController.text.trim();
-                      String password = _passwordController.text.trim();
+                  style: const TextStyle(color: Colors.black),
+                ),
+                const SizedBox(height: 30), // Space before the login button
+                // Login Button
+                ElevatedButton(
+                  onPressed: () async {
+                    String email = _emailController.text.trim();
+                    String password = _passwordController.text.trim();
 
-                      if (email.isEmpty || password.isEmpty) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                              content:
-                                  Text("Email and Password cannot be empty!")),
-                        );
-                        return;
-                      }
+                    if (email.isEmpty || password.isEmpty) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                            content:
+                                Text("Email and Password cannot be empty!")),
+                      );
+                      return;
+                    }
 
-                      try {
-                        // Sign in with Firebase Authentication
-                        UserCredential userCredential = await FirebaseAuth
-                            .instance
-                            .signInWithEmailAndPassword(
-                                email: email, password: password);
+                    try {
+                      // Sign in with Firebase Authentication
+                      UserCredential userCredential = await FirebaseAuth
+                          .instance
+                          .signInWithEmailAndPassword(
+                              email: email, password: password);
 
-                        // Fetch user details from Firestore
-                        DocumentSnapshot userDoc = await FirebaseFirestore
-                            .instance
-                            .collection('users')
-                            .doc(userCredential.user!.uid)
-                            .get();
+                      // Fetch user details from Firestore
+                      DocumentSnapshot userDoc = await FirebaseFirestore
+                          .instance
+                          .collection('users')
+                          .doc(userCredential.user!.uid)
+                          .get();
 
-                        if (userDoc.exists) {
-                          // Navigate to the next screen (e.g., Dashboard)
-                          if (context.mounted) {
-                            Navigator.pushReplacement(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => const Home()),
-                            );
-                          }
-                        } else {
-                          if (context.mounted) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                  content: Text(
-                                      "User does not exist in Firestore!")),
-                            );
-                          }
+                      if (userDoc.exists) {
+                        // Navigate to the next screen (e.g., Dashboard)
+                        if (context.mounted) {
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => const Home()),
+                          );
                         }
-                      } catch (e) {
+                      } else {
                         if (context.mounted) {
                           ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                                content: Text("Login failed: ${e.toString()}")),
+                            const SnackBar(
+                                content: Text(
+                                    "User does not exist in Firestore!")),
                           );
                         }
                       }
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.blue, // Button color
-                      padding: const EdgeInsets.symmetric(
-                          vertical: 16, horizontal: 50),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(50),
-                      ),
-                    ),
-                    child: const Text(
-                      "Login",
-                      style: TextStyle(
-                          fontSize: 13,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white),
+                    } catch (e) {
+                      if (context.mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                              content: Text("Login failed: ${e.toString()}")),
+                        );
+                      }
+                    }
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.blue, // Button color
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 0, horizontal: 50),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(50),
                     ),
                   ),
+                  child: const Text(
+                    "Login",
+                    style: TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white),
+                  ),
+                ),
 
-                  const SizedBox(height: 20),
-                  // Login with Google Button
-                  ElevatedButton(
-                    onPressed: () {},
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.black, // Button color
-                      padding: const EdgeInsets.symmetric(
-                          vertical: 16, horizontal: 50), // Consistent padding
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Image.asset(
-                          "assets/google.png",
-                          height: 25,
-                          width: 25, // Ensure proper aspect ratio
-                          fit: BoxFit.contain,
-                        ),
-                        const SizedBox(width: 10),
-                        const Text("Login with Google",
-                            style:
-                                TextStyle(fontSize: 10, color: Colors.white)),
-                      ],
-                    ),
+                const SizedBox(height: 20),
+                // Login with Google Button
+                ElevatedButton(
+                  onPressed: () {},
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.black, // Button color
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 0, horizontal: 50), // Consistent padding
                   ),
-                  const SizedBox(height: 10),
-                  TextButton(
-                    onPressed: () {
-                      Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => const SignupScreen()),
-                      );
-                    },
-                    child: const Text("Not Signup?/Signup from here"),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Image.asset(
+                        "assets/google.png",
+                        height: 25,
+                        width: 25, // Ensure proper aspect ratio
+                        fit: BoxFit.contain,
+                      ),
+                      const SizedBox(width: 10),
+                      const Text("Login with Google",
+                          style:
+                          TextStyle(fontSize: 10, color: Colors.white,)),
+                    ],
                   ),
-                  const SizedBox(height: 20),
-                ],
-              ),
+                ),
+                const SizedBox(height: 10),
+                TextButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const SignupScreen()),
+                    );
+                  },
+                  child: const Text("Not Signup?/Signup from here"),
+                ),
+                const SizedBox(height: 20),
+              ],
             ),
           ),
         ),

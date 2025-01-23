@@ -25,7 +25,7 @@ class _HomeState extends State<Home> {
   void initState() {
     super.initState();
     beginAlignment = Alignment.topRight;
-    endAlignment = Alignment.bottomRight;
+    endAlignment = Alignment.bottomLeft;
     _startAnimation();
     currentTime = _getCurrentTime();
     // Timer to update the current time every second
@@ -158,16 +158,16 @@ class _HomeState extends State<Home> {
 
   void _startAnimation() {
     // Toggle gradient direction every 2 seconds
-    Future.delayed(const Duration(seconds: 2), () {
+    Future.delayed(const Duration(seconds: 3), () {
       if (mounted) {
         setState(() {
           // Toggle between two different gradients
           beginAlignment = beginAlignment == Alignment.topRight
-              ? Alignment.bottomLeft
-              : Alignment.topRight;
-          endAlignment = endAlignment == Alignment.bottomRight
               ? Alignment.topLeft
-              : Alignment.bottomRight;
+              : Alignment.topRight;
+          endAlignment = endAlignment == Alignment.topLeft
+              ? Alignment.bottomRight
+              : Alignment.bottomLeft;
         });
         _startAnimation(); // Repeat the animation
       }
@@ -177,316 +177,328 @@ class _HomeState extends State<Home> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        body: Stack(
-          children: [
-            Stack(
-              children: [
-                Stack(
-                  children: [
-                    AnimatedContainer(
-                      height: MediaQuery.of(context).size.height,
-                      width: MediaQuery.of(context).size.width,
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          colors: const [Colors.red, Colors.blue],
-                          begin: beginAlignment,
-                          end: endAlignment,
-                        ),
-                      ),
-                      duration: const Duration(seconds: 2),
-                      child: Column(
-                        children: [
-                          const SizedBox(
-                            height: 50,
-                          ),
-                          Column(
-                            children: [
-                              SizedBox(
-                                  height: MediaQuery.of(context).size.height *
-                                      0.02),
-                              const Center(
-                                child: Text(
-                                  "Call Now",
-                                  textAlign: TextAlign.center,
-                                  style: TextStyle(
-                                    fontSize: 20,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.white,
-                                  ),
-                                ),
-                              ),
-                              SizedBox(
-                                  height: MediaQuery.of(context).size.height *
-                                      0.02),
-                              ElevatedButton(
-                                onPressed: () {
-                                  if (login) {
-                                    _showCustomDialog(context);
-                                  } else {
-                                    Future.delayed(
-                                        const Duration(milliseconds: 100), () {
-                                      if (context.mounted) {
-                                        ScaffoldMessenger.of(context)
-                                            .showSnackBar(
-                                          const SnackBar(
-                                            content: Text(
-                                                'You must log in to perform this action.'),
-                                            duration: Duration(seconds: 1),
-                                            behavior: SnackBarBehavior
-                                                .floating, // Floating at the bottom
-                                            margin: EdgeInsets.all(16),
-                                          ),
-                                        );
-                                      }
-                                    });
-                                  }
-                                },
-                                style: ElevatedButton.styleFrom(
-                                  shape: const CircleBorder(),
-                                  backgroundColor: Colors.red,
-                                  padding: const EdgeInsets.all(60),
-                                  elevation: 15,
-                                ),
-                                child: Image.asset("assets/call.gif",
-                                    height: 40, color: Colors.white),
-                              ),
-                            ],
-                          ),
-                        ],
+        body: Stack(children: [
+          Stack(
+            children: [
+              Stack(
+                children: [
+                  AnimatedContainer(
+                    height: MediaQuery.of(context).size.height,
+                    width: MediaQuery.of(context).size.width,
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: const [Colors.red, Colors.blue],
+                        begin: beginAlignment,
+                        end: endAlignment,
                       ),
                     ),
-                    DraggableScrollableSheet(
-                      initialChildSize:
-                          0.35, // initial height (0.0 to 1.0, where 1.0 is full screen)
-                      minChildSize: 0.35, // minimum height (0.0 to 1.0)
-                      maxChildSize: 1, // maximum height (0.0 to 1.0)
-                      builder: (context, scrollController) {
-                        return Container(
-                          decoration: const BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.only(
-                              topLeft: Radius.circular(20),
-                              topRight: Radius.circular(20),
+                    duration: const Duration(seconds: 2),
+                    child: SafeArea(child:
+                    Column(
+                      children: [
+                        const SizedBox(
+                          height: 50,
+                        ),
+                        Column(
+                          children: [
+                            SizedBox(
+                                height:
+                                    MediaQuery.of(context).size.height * 0.052),
+                            const Center(
+                              child: Text(
+                                "Call Now",
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
+                                ),
+                              ),
                             ),
-                          ),
-                          child: Stack(
-                            children: [
-                              // Scrollable content
-                              SingleChildScrollView(
-                                controller:
-                                    scrollController, // Attach scroll controller here
-                                child: Column(
-                                  children: [
-                                    const SizedBox(height: 60),
-                                    // First Card
-                                    Container(
-                                      margin: const EdgeInsets.all(10),
-                                      child: Card(
-                                        elevation: 5,
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(
-                                              15), // Rounded corners
+                            SizedBox(
+                                height:
+                                    MediaQuery.of(context).size.height * 0.052),
+                            ElevatedButton(
+                              onPressed: () {
+                                if (login) {
+                                  _showCustomDialog(context);
+                                } else {
+                                  Future.delayed(
+                                      const Duration(milliseconds: 100), () {
+                                    if (context.mounted) {
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(
+                                        const SnackBar(
+                                          content: Text(
+                                              'You must log in to perform this action.'),
+                                          duration: Duration(seconds: 1),
+                                          behavior: SnackBarBehavior
+                                              .floating, // Floating at the bottom
+                                          margin: EdgeInsets.all(16),
                                         ),
-                                        child: Padding(
-                                          padding: const EdgeInsets.all(16.0),
-                                          child: Column(
-                                            children: [
-                                              Image.asset(
-                                                "assets/amb1.jpg",
-                                                height: 130, // Set only height
-                                                width: double
-                                                    .infinity, // Set width to fill available space
-                                                fit: BoxFit
-                                                    .cover, // Ensure the aspect ratio is maintained
-                                              ),
-                                              const Text(
-                                                "New Ambulance will be Introduced in future",
-                                                style: TextStyle(
-                                                    fontSize: 20,
-                                                    fontWeight:
-                                                        FontWeight.bold),
-                                              ),
-                                              const SizedBox(height: 10),
-                                              const Text(
-                                                "Our goal is to revolutionize ambulance services by integrating AI-powered systems, smart vehicle tracking,...", // Truncated text
-                                                style: TextStyle(fontSize: 16),
-                                                maxLines: 2,
-                                                overflow: TextOverflow.ellipsis,
-                                              ),
-                                              GestureDetector(
-                                                onTap: () {
-                                                  Navigator.push(
-                                                    context,
-                                                    MaterialPageRoute(
-                                                      builder: (context) =>
-                                                          const FullTextScreen(),
-                                                    ),
-                                                  );
-                                                },
-                                                child: const Text(
-                                                  "Show More",
-                                                  style: TextStyle(
-                                                    color: Colors.blue,
-                                                    fontWeight: FontWeight.bold,
-                                                  ),
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                    const SizedBox(height: 20),
-                                    // First Card
-                                    Container(
-                                      margin: const EdgeInsets.all(10),
-                                      child: Card(
-                                        elevation: 5,
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(
-                                              15), // Rounded corners
-                                        ),
-                                        child: Padding(
-                                          padding: const EdgeInsets.all(16.0),
-                                          child: Column(
-                                            children: [
-                                              Image.asset(
-                                                "assets/amb1.jpg",
-                                                height: 130, // Set only height
-                                                width: double
-                                                    .infinity, // Set width to fill available space
-                                                fit: BoxFit
-                                                    .cover, // Ensure the aspect ratio is maintained
-                                              ),
-                                              const Text(
-                                                "New Ambulance will be Introduced in future",
-                                                style: TextStyle(
-                                                    fontSize: 20,
-                                                    fontWeight:
-                                                        FontWeight.bold),
-                                              ),
-                                              const SizedBox(height: 10),
-                                              const Text(
-                                                "Our goal is to revolutionize ambulance services by integrating AI-powered systems, smart vehicle tracking,...", // Truncated text
-                                                style: TextStyle(fontSize: 16),
-                                                maxLines: 2,
-                                                overflow: TextOverflow.ellipsis,
-                                              ),
-                                              GestureDetector(
-                                                onTap: () {
-                                                  Navigator.push(
-                                                    context,
-                                                    MaterialPageRoute(
-                                                      builder: (context) =>
-                                                          const FullTextScreen(),
-                                                    ),
-                                                  );
-                                                },
-                                                child: const Text(
-                                                  "Show More",
-                                                  style: TextStyle(
-                                                    color: Colors.blue,
-                                                    fontWeight: FontWeight.bold,
-                                                  ),
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                    // Repeat the cards as needed...
-                                  ],
-                                ),
+                                      );
+                                    }
+                                  });
+                                }
+                              },
+                              style: ElevatedButton.styleFrom(
+                                shape: const CircleBorder(),
+                                backgroundColor: Colors.red,
+                                padding: const EdgeInsets.all(60),
+                                elevation: 15,
                               ),
-
-                              // Fixed "Latest News" Text at the top
-                              Positioned(
-                                top: 0,
-                                // Adjust the left position as needed
-                                child: Container(
-                                  width: MediaQuery.of(context).size.width,
-                                  decoration: const BoxDecoration(
-                                    color: Colors.white,
-                                    borderRadius: BorderRadius.only(
-                                      topLeft: Radius.circular(20),
-                                      topRight: Radius.circular(20),
-                                    ),
-                                  ),
-                                  padding: const EdgeInsets.all(10),
-                                  child: const Center(
-                                    child: Text(
-                                      "Latest News",
-                                      style: TextStyle(
-                                          fontSize: 20,
-                                          fontWeight: FontWeight.bold),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        );
-                      },
+                              child: Image.asset("assets/call.gif",
+                                  height: 40, color: Colors.white),
+                            ),
+                          ],
+                        ),
+                      ],
                     )
-                  ],
-                ),
-                Positioned(
-                    bottom: 20,
-                    right: 16,
-                    child: FloatingActionButton(
-                      onPressed: () {
-                        if (login) {
-                          Navigator.pushNamed(context, "/ChatAI");
-                        } else {
-                          Future.delayed(const Duration(milliseconds: 100), () {
-                            if (context.mounted) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text(
-                                      'You must log in to perform this action.'),
-                                  duration: Duration(seconds: 1),
-                                  behavior: SnackBarBehavior
-                                      .floating, // Floating at the bottom
-                                  margin: EdgeInsets.all(16),
+                    ),
+                  ),
+                  SafeArea(
+                  child:
+                  DraggableScrollableSheet(
+                    initialChildSize:
+                        0.35, // initial height (0.0 to 1.0, where 1.0 is full screen)
+                    minChildSize: 0.35, // minimum height (0.0 to 1.0)
+                    maxChildSize: 1, // maximum height (0.0 to 1.0)
+                    builder: (context, scrollController) {
+                      return Container(
+                        decoration: const BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.only(
+                            topLeft: Radius.circular(20),
+                            topRight: Radius.circular(20),
+                          ),
+                        ),
+                        child: Stack(
+                          children: [
+                            // Scrollable content
+                            SingleChildScrollView(
+                              controller:
+                                  scrollController, // Attach scroll controller here
+                              child: Column(
+                                children: [
+                                  const SizedBox(height: 60),
+                                  // First Card
+                                  Container(
+                                    margin: const EdgeInsets.all(10),
+                                    child: Card(
+                                      elevation: 5,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(
+                                            15), // Rounded corners
+                                      ),
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(16.0),
+                                        child: Column(
+                                          children: [
+                                            Image.asset(
+                                              "assets/amb1.jpg",
+                                              height: 130, // Set only height
+                                              width: double
+                                                  .infinity, // Set width to fill available space
+                                              fit: BoxFit
+                                                  .cover, // Ensure the aspect ratio is maintained
+                                            ),
+                                            const Text(
+                                              "New Ambulance will be Introduced in future",
+                                              style: TextStyle(
+                                                  fontSize: 20,
+                                                  fontWeight: FontWeight.bold),
+                                            ),
+                                            const SizedBox(height: 10),
+                                            const Text(
+                                              "Our goal is to revolutionize ambulance services by integrating AI-powered systems, smart vehicle tracking,...", // Truncated text
+                                              style: TextStyle(fontSize: 16),
+                                              maxLines: 2,
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
+                                            GestureDetector(
+                                              onTap: () {
+                                                Navigator.push(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                    builder: (context) =>
+                                                        const FullTextScreen(),
+                                                  ),
+                                                );
+                                              },
+                                              child: const Text(
+                                                "Show More",
+                                                style: TextStyle(
+                                                  color: Colors.blue,
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(height: 20),
+                                  // First Card
+                                  Container(
+                                    margin: const EdgeInsets.all(10),
+                                    child: Card(
+                                      elevation: 5,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(
+                                            15), // Rounded corners
+                                      ),
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(16.0),
+                                        child: Column(
+                                          children: [
+                                            Image.asset(
+                                              "assets/amb1.jpg",
+                                              height: 130, // Set only height
+                                              width: double
+                                                  .infinity, // Set width to fill available space
+                                              fit: BoxFit
+                                                  .cover, // Ensure the aspect ratio is maintained
+                                            ),
+                                            const Text(
+                                              "New Ambulance will be Introduced in future",
+                                              style: TextStyle(
+                                                  fontSize: 20,
+                                                  fontWeight: FontWeight.bold),
+                                            ),
+                                            const SizedBox(height: 10),
+                                            const Text(
+                                              "Our goal is to revolutionize ambulance services by integrating AI-powered systems, smart vehicle tracking,...", // Truncated text
+                                              style: TextStyle(fontSize: 16),
+                                              maxLines: 2,
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
+                                            GestureDetector(
+                                              onTap: () {
+                                                Navigator.push(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                    builder: (context) =>
+                                                        const FullTextScreen(),
+                                                  ),
+                                                );
+                                              },
+                                              child: const Text(
+                                                "Show More",
+                                                style: TextStyle(
+                                                  color: Colors.blue,
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  // Repeat the cards as needed...
+                                ],
+                              ),
+                            ),
+
+                            // Fixed "Latest News" Text at the top
+                            Positioned(
+                              top: 0,
+                              // Adjust the left position as needed
+                              child: Container(
+                                width: MediaQuery.of(context).size.width,
+                                decoration: const BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.only(
+                                    topLeft: Radius.circular(20),
+                                    topRight: Radius.circular(20),
+                                  ),
                                 ),
-                              );
-                            }
-                          });
-                        }
-                      },
-                      backgroundColor: Colors.blueAccent,
-                      child: const Icon(
-                        Icons.chat_bubble,
-                        color: Colors.white,
-                      ),
-                    )),
-              ],
-            ),
-            Positioned(
-              child: ListTile(
-                leading: IconButton(
-                  icon: const Icon(
-                    Icons.person,
-                    color: Colors.white,
-                  ),
-                  onPressed: () {
-                    login
-                        ? Navigator.pushNamed(context, "/showProfile")
-                        : Navigator.pushNamed(context, "/LoginProfile");
-                  },
-                ),
-                trailing: IconButton(
-                  icon: const Icon(
-                    Icons.search,
-                    color: Colors.white,
-                  ),
-                  onPressed: () {},
-                ),
+                                padding: const EdgeInsets.all(10),
+                                child: const Center(
+                                  child: Text(
+                                    "Latest News",
+                                    style: TextStyle(
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.bold),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                  ),),
+                ],
               ),
-            )
-          ],
-        ),
+              Positioned(
+                  bottom: 20,
+                  right: 16,
+                  child: FloatingActionButton(
+                    onPressed: () {
+                      if (login) {
+                        Navigator.pushNamed(context, "/ChatAI");
+                      } else {
+                        Future.delayed(const Duration(milliseconds: 100), () {
+                          if (context.mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text(
+                                    'You must log in to perform this action.'),
+                                duration: Duration(seconds: 1),
+                                behavior: SnackBarBehavior
+                                    .floating, // Floating at the bottom
+                                margin: EdgeInsets.all(16),
+                              ),
+                            );
+                          }
+                        });
+                      }
+                    },
+                    backgroundColor: Colors.blueAccent,
+                    child: const Icon(
+                      Icons.chat_bubble,
+                      color: Colors.white,
+                    ),
+                  )),
+            ],
+          ),
+          SafeArea(
+            child: PreferredSize(
+              preferredSize: Size(MediaQuery.of(context).size.width, 60),
+              child: Container(
+                // Custom AppBar background color
+                padding: const EdgeInsets.symmetric(horizontal: 10),
+                child: Column(children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      IconButton(
+                        icon: const Icon(
+                          Icons.person,
+                          color: Colors.white,
+                        ),
+                        onPressed: () {
+                          login
+                              ? Navigator.pushNamed(context, "/showProfile")
+                              : Navigator.pushNamed(
+                                  context, "/LoginProfile");
+                        },
+                      ),
+                      IconButton(
+                        icon: const Icon(
+                          Icons.search,
+                          color: Colors.white,
+                        ),
+                        onPressed: () {},
+                      ),
+                    ],
+                  ),
+                ]),
+              )),
+          )
+        ]),
         bottomNavigationBar: BottomNavigationBar(
           selectedItemColor: Colors.black,
           unselectedItemColor:
