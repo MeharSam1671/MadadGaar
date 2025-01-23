@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class ChatAIScreen extends StatefulWidget {
-  const ChatAIScreen({Key? key}) : super(key: key);
+  const ChatAIScreen({super.key});
 
   @override
   State<ChatAIScreen> createState() => _ChatAIScreenState();
@@ -15,7 +15,8 @@ class _ChatAIScreenState extends State<ChatAIScreen> {
     if (_controller.text.trim().isNotEmpty) {
       setState(() {
         _messages.add(_controller.text.trim());
-        _messages.add("Response: ${_controller.text.trim()}"); // Placeholder response
+        _messages.add(
+            "Response: ${_controller.text.trim()}"); // Placeholder response
       });
       _controller.clear();
     }
@@ -36,10 +37,12 @@ class _ChatAIScreenState extends State<ChatAIScreen> {
               itemBuilder: (context, index) {
                 final isUserMessage = index % 2 == 0; // Alternate messages
                 return Align(
-                  alignment:
-                  isUserMessage ? Alignment.centerRight : Alignment.centerLeft,
+                  alignment: isUserMessage
+                      ? Alignment.centerRight
+                      : Alignment.centerLeft,
                   child: Container(
-                    margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+                    margin:
+                        const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
                       color: isUserMessage ? Colors.blue : Colors.grey[300],
@@ -58,7 +61,6 @@ class _ChatAIScreenState extends State<ChatAIScreen> {
           ),
           Container(
             padding: const EdgeInsets.all(10),
-
             child: Row(
               children: [
                 Expanded(

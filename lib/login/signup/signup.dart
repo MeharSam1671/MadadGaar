@@ -110,7 +110,9 @@ class _SignupScreenState extends State<SignupScreen> {
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                SizedBox(height: 40,),
+                const SizedBox(
+                  height: 40,
+                ),
                 const Text(
                   "Signup",
                   style: TextStyle(fontSize: 24, color: Colors.black),
@@ -249,47 +251,48 @@ class _SignupScreenState extends State<SignupScreen> {
                 const SizedBox(height: 10),
                 // Signup Button
                 ElevatedButton(
-                      onPressed:
-                          isLoading ? null : () async => await signUp(context),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.blue,
-                        padding: const EdgeInsets.symmetric(
-                            vertical: 15, horizontal: 100),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                      ),
-                      child: isLoading
-                          ? const Row(
-                              children: [
-                                CircularProgressIndicator.adaptive(),
-                                SizedBox(
-                                  width: 10,
-                                ),
-                                Text(
-                                  "Saving details...",
-                                  style: TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.white,
-                                  ),
-                                ),
-                              ],
-                            )
-                          : Text(
-                              isSuccessful ? "Saved" : "Signup",
-                              style: const TextStyle(
+                  onPressed:
+                      isLoading ? null : () async => await signUp(context),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.blue,
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 15, horizontal: 100),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                  child: isLoading
+                      ? const Row(
+                          children: [
+                            CircularProgressIndicator.adaptive(),
+                            SizedBox(
+                              width: 10,
+                            ),
+                            Text(
+                              "Saving details...",
+                              style: TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold,
                                 color: Colors.white,
                               ),
                             ),
-                    ),
-                    const SizedBox(height: 20),
-                    Text(
-                      error.isNotEmpty ? 'Something went wrong...' : '',
-                      style: const TextStyle(color: Colors.red),
-                    ),const SizedBox(height: 20),
+                          ],
+                        )
+                      : Text(
+                          isSuccessful ? "Saved" : "Signup",
+                          style: const TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                        ),
+                ),
+                const SizedBox(height: 20),
+                Text(
+                  error.isNotEmpty ? 'Something went wrong...' : '',
+                  style: const TextStyle(color: Colors.red),
+                ),
+                const SizedBox(height: 20),
                 // Sign-in Link
                 TextButton(
                   onPressed: () {
