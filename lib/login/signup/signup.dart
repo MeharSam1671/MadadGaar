@@ -1,6 +1,6 @@
-import 'package:flutter/cupertino.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import '../../Home/Home.dart';
+import '../../Home/home.dart';
 import 'login.dart';
 
 class SignupScreen extends StatefulWidget {
@@ -20,6 +20,8 @@ class _SignupScreenState extends State<SignupScreen> {
   final TextEditingController _emailController = TextEditingController();
   bool isValidEmail = true;
   String email = "";
+  String fName = "";
+  String lName = "";
   final RegExp emailRegex = RegExp(
     r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$",
   );
@@ -36,9 +38,26 @@ class _SignupScreenState extends State<SignupScreen> {
     _startAnimation();
   }
 
+  Future<bool> signUp() async {
+    try {
+      var dbInstance = FirebaseFirestore.instance;
+      await dbInstance.collection('users').add({
+        "email": email,
+        "userID": user,
+        "fName": fName,
+        "lName": lName,
+        "password": password,
+      });
+      return true;
+    } catch (e) {
+      // Empty yet
+      return false;
+    }
+  }
+
   void _startAnimation() {
     // Toggle gradient direction every 2 seconds
-    Future.delayed(Duration(seconds: 2), () {
+    Future.delayed(const Duration(seconds: 2), () {
       if (mounted) {
         setState(() {
           // Toggle between two different gradients
@@ -61,12 +80,12 @@ class _SignupScreenState extends State<SignupScreen> {
         height: MediaQuery.of(context).size.height,
         decoration: BoxDecoration(
           gradient: LinearGradient(
-            colors: [Colors.red, Colors.blue],
+            colors: const [Colors.red, Colors.blue],
             begin: beginAlignment,
             end: endAlignment,
           ),
         ),
-        duration: Duration(seconds: 2),
+        duration: const Duration(seconds: 2),
         child: SingleChildScrollView(
           child: Center(
             child: Padding(
@@ -80,56 +99,58 @@ class _SignupScreenState extends State<SignupScreen> {
                     BoxShadow(
                       color: Colors.black.withOpacity(0.9),
                       blurRadius: 10,
-                      offset: Offset(0, 5),
+                      offset: const Offset(0, 5),
                     ),
                   ],
                 ),
-                padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 30),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 40, vertical: 30),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    Text(
+                    const Text(
                       "Signup",
                       style: TextStyle(fontSize: 24, color: Colors.black),
                     ),
-                    SizedBox(height: 20),
+                    const SizedBox(height: 20),
                     // Username Field
                     TextField(
-                      decoration: InputDecoration(
-                        hintText: "Enter firstname",
-                        hintStyle: TextStyle(color: Colors.black),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10),
-                          borderSide: BorderSide(color: Colors.black),
+                        decoration: InputDecoration(
+                          hintText: "Enter firstname",
+                          hintStyle: const TextStyle(color: Colors.black),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                            borderSide: const BorderSide(color: Colors.black),
+                          ),
+                          filled: true,
+                          fillColor: Colors.black.withOpacity(0.1),
                         ),
-                        filled: true,
-                        fillColor: Colors.black.withOpacity(0.1),
-                      ),
-                      style: TextStyle(color: Colors.black),
-                    ),
-                    SizedBox(height: 20),
+                        style: const TextStyle(color: Colors.black),
+                        onChanged: (value) => {fName = value}),
+                    const SizedBox(height: 20),
                     TextField(
                       decoration: InputDecoration(
                         hintText: "Enter lastname",
-                        hintStyle: TextStyle(color: Colors.black),
+                        hintStyle: const TextStyle(color: Colors.black),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(10),
-                          borderSide: BorderSide(color: Colors.black),
+                          borderSide: const BorderSide(color: Colors.black),
                         ),
                         filled: true,
                         fillColor: Colors.black.withOpacity(0.1),
                       ),
-                      style: TextStyle(color: Colors.black),
+                      style: const TextStyle(color: Colors.black),
+                      onChanged: (value) => {lName = value},
                     ),
-                    SizedBox(height: 20),
+                    const SizedBox(height: 20),
                     TextField(
                       decoration: InputDecoration(
                         hintText: "Enter username",
-                        hintStyle: TextStyle(color: Colors.black),
+                        hintStyle: const TextStyle(color: Colors.black),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(10),
-                          borderSide: BorderSide(color: Colors.black),
+                          borderSide: const BorderSide(color: Colors.black),
                         ),
                         filled: true,
                         fillColor: Colors.black.withOpacity(0.1),
@@ -144,29 +165,29 @@ class _SignupScreenState extends State<SignupScreen> {
                           }
                         });
                       },
-                      style: TextStyle(color: Colors.black),
+                      style: const TextStyle(color: Colors.black),
                     ),
                     if (!checkuser)
-                      Text(
+                      const Text(
                         "Username contains alphabets and numbers only",
                         style: TextStyle(color: Colors.red),
                       ),
-                    SizedBox(height: 20),
+                    const SizedBox(height: 20),
                     // Email Field
                     TextField(
                       controller: _emailController,
                       decoration: InputDecoration(
                         hintText: "Enter email",
-                        hintStyle: TextStyle(color: Colors.black),
+                        hintStyle: const TextStyle(color: Colors.black),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(10),
-                          borderSide: BorderSide(color: Colors.black),
+                          borderSide: const BorderSide(color: Colors.black),
                         ),
                         filled: true,
                         fillColor: Colors.black.withOpacity(0.1),
                         errorText: isValidEmail ? null : 'Invalid email format',
                       ),
-                      style: TextStyle(color: Colors.black),
+                      style: const TextStyle(color: Colors.black),
                       onChanged: (value) {
                         setState(() {
                           email = value;
@@ -174,16 +195,16 @@ class _SignupScreenState extends State<SignupScreen> {
                         });
                       },
                     ),
-                    SizedBox(height: 20),
+                    const SizedBox(height: 20),
                     // Password Field
                     TextField(
                       obscureText: true,
                       decoration: InputDecoration(
                         hintText: "Enter password",
-                        hintStyle: TextStyle(color: Colors.black),
+                        hintStyle: const TextStyle(color: Colors.black),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(10),
-                          borderSide: BorderSide(color: Colors.black),
+                          borderSide: const BorderSide(color: Colors.black),
                         ),
                         filled: true,
                         fillColor: Colors.black.withOpacity(0.1),
@@ -195,16 +216,16 @@ class _SignupScreenState extends State<SignupScreen> {
                         });
                       },
                     ),
-                    SizedBox(height: 20),
+                    const SizedBox(height: 20),
                     // Confirm Password Field
                     TextField(
                       obscureText: true,
                       decoration: InputDecoration(
                         hintText: "Enter password again",
-                        hintStyle: TextStyle(color: Colors.black),
+                        hintStyle: const TextStyle(color: Colors.black),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(10),
-                          borderSide: BorderSide(color: Colors.black),
+                          borderSide: const BorderSide(color: Colors.black),
                         ),
                         filled: true,
                         fillColor: Colors.black.withOpacity(0.1),
@@ -216,28 +237,31 @@ class _SignupScreenState extends State<SignupScreen> {
                         });
                       },
                     ),
-                    SizedBox(height: 20),
+                    const SizedBox(height: 20),
                     if (!passwordsMatch && confirmPassword.isNotEmpty)
-                      Text(
+                      const Text(
                         "Passwords do not match",
                         style: TextStyle(color: Colors.red, fontSize: 14),
                       ),
-                    SizedBox(height: 10),
+                    const SizedBox(height: 10),
                     // Signup Button
                     ElevatedButton(
                       onPressed: () {
                         // Check conditions before navigating
                         Navigator.pushReplacement(
-                            context, MaterialPageRoute(builder: (context) => Home()));
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => const Home()));
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.blue,
-                        padding: EdgeInsets.symmetric(vertical: 15, horizontal: 100),
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 15, horizontal: 100),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(10),
                         ),
                       ),
-                      child: Text(
+                      child: const Text(
                         "Signup",
                         style: TextStyle(
                           fontSize: 18,
@@ -246,14 +270,16 @@ class _SignupScreenState extends State<SignupScreen> {
                         ),
                       ),
                     ),
-                    SizedBox(height: 20),
+                    const SizedBox(height: 20),
                     // Sign-in Link
                     TextButton(
                       onPressed: () {
                         Navigator.pushReplacement(
-                            context, MaterialPageRoute(builder: (context) => LoginScreen()));
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => const LoginScreen()));
                       },
-                      child: Text("Already have an account? Login"),
+                      child: const Text("Already have an account? Login"),
                     ),
                   ],
                 ),

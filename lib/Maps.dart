@@ -1,32 +1,40 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Maps extends StatefulWidget {
+  const Maps({super.key});
+
   @override
-  _MapsState createState() => _MapsState();
+  State<Maps> createState() => _MapsState();
 }
 
 Future<void> _pushLocationToFirestore(Position position) async {
   try {
     // Get the Firestore instance
-    final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+    final FirebaseFirestore firestore = FirebaseFirestore.instance;
 
     // Push the user's location to Firestore
-    await _firestore.collection('users').doc('user_id') // Replace with actual user ID
+    await firestore
+        .collection('users')
+        .doc('user_id') // Replace with actual user ID
         .set({
       'latitude': position.latitude,
       'longitude': position.longitude,
       'timestamp': FieldValue.serverTimestamp(),
     });
 
-    print('Location updated successfully');
+    if (kDebugMode) {
+      print('Location updated successfully');
+    }
   } catch (e) {
-    print('Error pushing location to Firestore: $e');
+    if (kDebugMode) {
+      print('Error pushing location to Firestore: $e');
+    }
   }
 }
-
 
 class _MapsState extends State<Maps> {
   late GoogleMapController mapController;
@@ -43,7 +51,9 @@ class _MapsState extends State<Maps> {
     int value = 0;
     try {
       while (true) {
-        print("Position $value");
+        if (kDebugMode) {
+          print("Position $value");
+        }
         value++;
 
         // Attempt to get the current location
@@ -56,14 +66,15 @@ class _MapsState extends State<Maps> {
         });
 
         // Delay for 1 second before the next iteration
-        await Future.delayed(Duration(seconds: 1));
+        await Future.delayed(const Duration(seconds: 1));
       }
     } catch (e) {
       // Handle the error
-      print('Error getting location: $e');
+      if (kDebugMode) {
+        print('Error getting location: $e');
+      }
     }
   }
-
 
   void _onMapCreated(GoogleMapController controller) {
     mapController = controller;
@@ -108,17 +119,18 @@ class _MapsState extends State<Maps> {
       ),
       body: _isMapReady
           ? GoogleMap(
-        onMapCreated: _onMapCreated,
-        initialCameraPosition: CameraPosition(
-          target: _center,
-          zoom: 15.0, // Adjust zoom level as needed
-        ),
-        myLocationEnabled: true, // Enable the built-in blue dot for current location
-        myLocationButtonEnabled: true, // Show the location button
-      )
+              onMapCreated: _onMapCreated,
+              initialCameraPosition: CameraPosition(
+                target: _center,
+                zoom: 15.0, // Adjust zoom level as needed
+              ),
+              myLocationEnabled:
+                  true, // Enable the built-in blue dot for current location
+              myLocationButtonEnabled: true, // Show the location button
+            )
           : const Center(
-        child: CircularProgressIndicator(),
-      ),
+              child: CircularProgressIndicator(),
+            ),
     );
   }
 
