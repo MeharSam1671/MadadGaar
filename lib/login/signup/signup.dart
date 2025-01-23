@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import '../../Home/home.dart';
 import 'login.dart';
 
 class SignupScreen extends StatefulWidget {
@@ -11,6 +11,10 @@ class SignupScreen extends StatefulWidget {
 }
 
 class _SignupScreenState extends State<SignupScreen> {
+  bool isLoading = false;
+  bool isSuccessful = false;
+  String error = "";
+
   String password = "";
   String confirmPassword = "";
   bool passwordsMatch = true;
@@ -38,8 +42,13 @@ class _SignupScreenState extends State<SignupScreen> {
     _startAnimation();
   }
 
-  Future<bool> signUp() async {
+  Future<void> signUp(BuildContext context) async {
     try {
+      if (mounted) {
+        setState(() {
+          isLoading = true;
+        });
+      }
       var dbInstance = FirebaseFirestore.instance;
       await dbInstance.collection('users').add({
         "email": email,
@@ -48,10 +57,27 @@ class _SignupScreenState extends State<SignupScreen> {
         "lName": lName,
         "password": password,
       });
-      return true;
+      if (mounted) {
+        setState(() {
+          isLoading = false;
+          isSuccessful = true;
+        });
+        await Future.delayed(const Duration(milliseconds: 500));
+        if (context.mounted) {
+          Navigator.pushNamed(context, '/LoginProfile');
+        }
+      }
     } catch (e) {
-      // Empty yet
-      return false;
+      if (kDebugMode) {
+        print(e.toString());
+      }
+      if (mounted) {
+        setState(() {
+          isLoading = false;
+          error = e.toString();
+          isSuccessful = false;
+        });
+      }
     }
   }
 
@@ -163,13 +189,14 @@ class _SignupScreenState extends State<SignupScreen> {
                           } else {
                             checkuser = false;
                           }
+                          user = value;
                         });
                       },
                       style: const TextStyle(color: Colors.black),
                     ),
-                    if (!checkuser)
+                    if (!checkuser && user.isNotEmpty)
                       const Text(
-                        "Username contains alphabets and numbers only",
+                        "Username must be combination of alphabets and digits",
                         style: TextStyle(color: Colors.red),
                       ),
                     const SizedBox(height: 20),
@@ -246,13 +273,8 @@ class _SignupScreenState extends State<SignupScreen> {
                     const SizedBox(height: 10),
                     // Signup Button
                     ElevatedButton(
-                      onPressed: () {
-                        // Check conditions before navigating
-                        Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => const Home()));
-                      },
+                      onPressed:
+                          isLoading ? null : () async => await signUp(context),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.blue,
                         padding: const EdgeInsets.symmetric(
@@ -261,14 +283,36 @@ class _SignupScreenState extends State<SignupScreen> {
                           borderRadius: BorderRadius.circular(10),
                         ),
                       ),
-                      child: const Text(
-                        "Signup",
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                        ),
-                      ),
+                      child: isLoading
+                          ? const Row(
+                              children: [
+                                CircularProgressIndicator.adaptive(),
+                                SizedBox(
+                                  width: 10,
+                                ),
+                                Text(
+                                  "Saving details...",
+                                  style: TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              ],
+                            )
+                          : Text(
+                              isSuccessful ? "Saved" : "Signup",
+                              style: const TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                              ),
+                            ),
+                    ),
+                    const SizedBox(height: 20),
+                    Text(
+                      error.isNotEmpty ? 'Something went wrong...' : '',
+                      style: const TextStyle(color: Colors.red),
                     ),
                     const SizedBox(height: 20),
                     // Sign-in Link

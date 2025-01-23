@@ -1,3 +1,4 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:madadgaar/ChatAi/chataiscreen.dart';
 import 'package:madadgaar/login/signup/signup.dart';
@@ -5,8 +6,13 @@ import 'Home/home.dart';
 import 'maps.dart';
 import 'Profile/profile.dart';
 import 'login/signup/login.dart';
+import 'firebase_options.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
   runApp(const MyApp());
 }
 
