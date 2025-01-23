@@ -15,6 +15,11 @@ class _SignupScreenState extends State<SignupScreen> {
   bool isSuccessful = false;
   String error = "";
 
+  bool isUniqueUserID = true;
+  bool isIDCheckInProgress = false;
+  bool isUniqueEmail = true;
+  bool isEmailCheckInProgress = false;
+
   String password = "";
   String confirmPassword = "";
   bool passwordsMatch = true;
@@ -150,6 +155,17 @@ class _SignupScreenState extends State<SignupScreen> {
                 const SizedBox(height: 20),
                 TextField(
                   decoration: InputDecoration(
+                    suffixIcon: user.isNotEmpty
+                        ? isIDCheckInProgress
+                            ? const CircularProgressIndicator()
+                            : Icon(
+                                isUniqueUserID
+                                    ? Icons.check_circle
+                                    : Icons.cancel,
+                                color:
+                                    isUniqueUserID ? Colors.green : Colors.red,
+                              )
+                        : null,
                     hintText: "Enter username",
                     hintStyle: const TextStyle(color: Colors.black),
                     border: OutlineInputBorder(
@@ -166,6 +182,7 @@ class _SignupScreenState extends State<SignupScreen> {
                         checkuser = true;
                       } else {
                         checkuser = false;
+                        isUniqueUserID = false;
                       }
                       user = value;
                     });
