@@ -52,6 +52,19 @@ class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _passwordController = TextEditingController();
 
   String? userName, password;
+  bool Login=false;
+  Future<void> checkuser() async{
+    var dbInstance = FirebaseFirestore.instance;
+    var querySnapshot=await dbInstance.collection('users').where("userID",isEqualTo: userName).where("password",isEqualTo: password).get();
+    if(querySnapshot.docs.isNotEmpty)
+      {
+        Login=true;
+        userName=querySnapshot.docs.first["fName"];
+      }
+    else{
+      print("not found");
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -83,6 +96,11 @@ class _LoginScreenState extends State<LoginScreen> {
                     fillColor: Colors.black.withOpacity(0.1),
                     // Light background color for input
                   ),
+                  onChanged: (value){
+                    setState(() {
+                      userName=value;
+                    });
+                  },
                   style: const TextStyle(color: Colors.black),
                 ),
                 const SizedBox(height: 20), // Space between input fields
@@ -102,69 +120,31 @@ class _LoginScreenState extends State<LoginScreen> {
                     fillColor: Colors.black
                         .withOpacity(0.1), // Light background color for input
                   ),
+                  onChanged: (value){
+                    setState(() {
+                      password=value;
+                    });
+                  },
                   style: const TextStyle(color: Colors.black),
                 ),
                 const SizedBox(height: 30), // Space before the login button
                 // Login Button
                 ElevatedButton(
                   onPressed: () async {
-                    String email = _emailController.text.trim();
-                    String password = _passwordController.text.trim();
-
-                    if (email.isEmpty || password.isEmpty) {
+                    await checkuser(); // Call checkuser() to validate credentials
+                    if (Login) {
+                      // Navigate to Home screen if login is successful
+                      Navigator.pushNamed(context, "/Home",arguments: userName);
+                    } else {
+                      // Show an error message if login fails
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                            content:
-                                Text("Email and Password cannot be empty!")),
+                        const SnackBar(content: Text("Invalid username or password")),
                       );
-                      return;
-                    }
-
-                    try {
-                      // Sign in with Firebase Authentication
-                      UserCredential userCredential = await FirebaseAuth
-                          .instance
-                          .signInWithEmailAndPassword(
-                              email: email, password: password);
-
-                      // Fetch user details from Firestore
-                      DocumentSnapshot userDoc = await FirebaseFirestore
-                          .instance
-                          .collection('users')
-                          .doc(userCredential.user!.uid)
-                          .get();
-
-                      if (userDoc.exists) {
-                        // Navigate to the next screen (e.g., Dashboard)
-                        if (context.mounted) {
-                          Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => const Home()),
-                          );
-                        }
-                      } else {
-                        if (context.mounted) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                                content: Text(
-                                    "User does not exist in Firestore!")),
-                          );
-                        }
-                      }
-                    } catch (e) {
-                      if (context.mounted) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                              content: Text("Login failed: ${e.toString()}")),
-                        );
-                      }
                     }
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.blue, // Button color
-                    padding: const EdgeInsets.symmetric(
-                        vertical: 0, horizontal: 50),
+                    padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 50),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(50),
                     ),
@@ -172,11 +152,10 @@ class _LoginScreenState extends State<LoginScreen> {
                   child: const Text(
                     "Login",
                     style: TextStyle(
-                        fontSize: 13,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white),
+                        fontSize: 13, fontWeight: FontWeight.bold, color: Colors.white),
                   ),
                 ),
+
 
                 const SizedBox(height: 20),
                 // Login with Google Button

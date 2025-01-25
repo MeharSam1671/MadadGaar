@@ -21,6 +21,7 @@ class _HomeState extends State<Home> {
   late Alignment beginAlignment;
   late Alignment endAlignment;
   bool login = false;
+  String? userName;
   @override
   void initState() {
     super.initState();
@@ -34,6 +35,15 @@ class _HomeState extends State<Home> {
         currentTime = _getCurrentTime();
       });
     });
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final args = ModalRoute.of(context)?.settings.arguments;
+    if (args != null && args is String) {
+      userName = args; // Assign the argument to the userName variable
+    }
   }
 
   @override
@@ -129,10 +139,11 @@ class _HomeState extends State<Home> {
     );
   }
 
-  Widget _buildDialogOption(BuildContext context,
-      {required IconData icon,
-      required String text,
-      required VoidCallback onTap}) {
+  Widget _buildDialogOption(BuildContext context, {required IconData icon, required String text,required VoidCallback onTap}) {
+    final arguments = ModalRoute.of(context)?.settings.arguments as Map<String, String>?;
+
+    final userName = arguments?['userName'];
+    final password = arguments?['password'];
     return ListTile(
       leading: Icon(icon, color: Colors.blue),
       title: Text(text),
@@ -176,6 +187,9 @@ class _HomeState extends State<Home> {
 
   @override
   Widget build(BuildContext context) {
+    if (userName != null) {
+      login = true;
+    }
     return Scaffold(
         body: Stack(children: [
           Stack(
@@ -220,26 +234,9 @@ class _HomeState extends State<Home> {
                                     MediaQuery.of(context).size.height * 0.052),
                             ElevatedButton(
                               onPressed: () {
-                                if (login) {
+
                                   _showCustomDialog(context);
-                                } else {
-                                  Future.delayed(
-                                      const Duration(milliseconds: 100), () {
-                                    if (context.mounted) {
-                                      ScaffoldMessenger.of(context)
-                                          .showSnackBar(
-                                        const SnackBar(
-                                          content: Text(
-                                              'You must log in to perform this action.'),
-                                          duration: Duration(seconds: 1),
-                                          behavior: SnackBarBehavior
-                                              .floating, // Floating at the bottom
-                                          margin: EdgeInsets.all(16),
-                                        ),
-                                      );
-                                    }
-                                  });
-                                }
+
                               },
                               style: ElevatedButton.styleFrom(
                                 shape: const CircleBorder(),
@@ -437,6 +434,7 @@ class _HomeState extends State<Home> {
                   right: 16,
                   child: FloatingActionButton(
                     onPressed: () {
+
                       if (login) {
                         Navigator.pushNamed(context, "/ChatAI");
                       } else {
@@ -481,11 +479,13 @@ class _HomeState extends State<Home> {
                         ),
                         onPressed: () {
                           login
-                              ? Navigator.pushNamed(context, "/showProfile")
-                              : Navigator.pushNamed(
-                                  context, "/LoginProfile");
+                              ? Navigator.pushNamed(context,'/showProfile',arguments: "hafiz", // Pass the userName here
+                          )
+                              : Navigator.pushNamed(context, "/LoginProfile");
                         },
                       ),
+                      // Check if userName is null and display a default message if it is
+                      Text("Hi, ${userName ?? 'Guest'}",style: TextStyle(color: Colors.white,fontSize: 18,fontWeight: FontWeight.bold),), // Default to 'Guest' if userName is null
                       IconButton(
                         icon: const Icon(
                           Icons.search,
@@ -495,6 +495,7 @@ class _HomeState extends State<Home> {
                       ),
                     ],
                   ),
+
                 ]),
               )),
           )
