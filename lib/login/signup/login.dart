@@ -12,6 +12,7 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   late Alignment beginAlignment;
   late Alignment endAlignment;
+  bool _showPassword = false; // Add this state variable for password visibility
 
   @override
   void dispose() {
@@ -29,11 +30,9 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   void _startAnimation() {
-    // Toggle gradient direction every 2 seconds
     Future.delayed(const Duration(seconds: 2), () {
       if (mounted) {
         setState(() {
-          // Toggle between two different gradients
           beginAlignment = beginAlignment == Alignment.topRight
               ? Alignment.bottomLeft
               : Alignment.topRight;
@@ -41,7 +40,7 @@ class _LoginScreenState extends State<LoginScreen> {
               ? Alignment.topLeft
               : Alignment.bottomRight;
         });
-        _startAnimation(); // Repeat the animation
+        _startAnimation();
       }
     });
   }
@@ -51,7 +50,11 @@ class _LoginScreenState extends State<LoginScreen> {
 
   String? userName, password;
   bool Login = false;
+  bool isLoading = false;
   Future<void> checkuser() async {
+    setState(() {
+      isLoading = true;
+    });
     var dbInstance = FirebaseFirestore.instance;
     var querySnapshot = await dbInstance
         .collection('users')
@@ -64,6 +67,9 @@ class _LoginScreenState extends State<LoginScreen> {
     } else {
       print("not found");
     }
+    setState(() {
+      isLoading = false;
+    });
   }
 
   @override
@@ -81,20 +87,17 @@ class _LoginScreenState extends State<LoginScreen> {
                 const Text("Login",
                     style: TextStyle(fontSize: 24, color: Colors.black)),
                 const SizedBox(height: 20),
-                // Username TextField
                 TextField(
                   controller: _emailController,
                   decoration: InputDecoration(
                     hintText: "Enter username",
                     hintStyle: const TextStyle(color: Colors.black),
                     border: OutlineInputBorder(
-                      borderRadius:
-                          BorderRadius.circular(10), // Rounded borders
+                      borderRadius: BorderRadius.circular(10),
                       borderSide: const BorderSide(color: Colors.black),
                     ),
                     filled: true,
                     fillColor: Colors.black.withOpacity(0.1),
-                    // Light background color for input
                   ),
                   onChanged: (value) {
                     setState(() {
@@ -103,22 +106,37 @@ class _LoginScreenState extends State<LoginScreen> {
                   },
                   style: const TextStyle(color: Colors.black),
                 ),
-                const SizedBox(height: 20), // Space between input fields
-                // Password TextField
+                const SizedBox(height: 20),
+                // Updated Password TextField with visibility toggle
                 TextField(
                   controller: _passwordController,
-                  obscureText: true, // To hide the password input
+                  obscureText:
+                      !_showPassword, // Toggle based on _showPassword state
                   decoration: InputDecoration(
                     hintText: "Enter Password",
                     hintStyle: const TextStyle(color: Colors.black),
                     border: OutlineInputBorder(
-                      borderRadius:
-                          BorderRadius.circular(10), // Rounded borders
+                      borderRadius: BorderRadius.circular(10),
                       borderSide: const BorderSide(color: Colors.black),
                     ),
                     filled: true,
-                    fillColor: Colors.black
-                        .withOpacity(0.1), // Light background color for input
+                    fillColor: Colors.black.withOpacity(0.1),
+                    // Add suffix icon for password visibility toggle
+                    suffixIcon: password?.isNotEmpty ?? false
+                        ? IconButton(
+                            icon: Icon(
+                              _showPassword
+                                  ? Icons.visibility
+                                  : Icons.visibility_off,
+                              color: Colors.black54,
+                            ),
+                            onPressed: () {
+                              setState(() {
+                                _showPassword = !_showPassword;
+                              });
+                            },
+                          )
+                        : null,
                   ),
                   onChanged: (value) {
                     setState(() {
@@ -127,48 +145,61 @@ class _LoginScreenState extends State<LoginScreen> {
                   },
                   style: const TextStyle(color: Colors.black),
                 ),
-                const SizedBox(height: 30), // Space before the login button
-                // Login Button
+                const SizedBox(height: 30),
                 ElevatedButton(
-                  onPressed: () async {
-                    await checkuser(); // Call checkuser() to validate credentials
-                    if (Login) {
-                      // Navigate to Home screen if login is successful
-                      Navigator.pushNamed(context, "/Home",
-                          arguments: userName);
-                    } else {
-                      // Show an error message if login fails
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                            content: Text("Invalid username or password")),
-                      );
-                    }
-                  },
+                  onPressed: !isLoading &&
+                          (userName?.isNotEmpty ?? false) &&
+                          (password?.isNotEmpty ?? false)
+                      ? () async {
+                          await checkuser();
+                          if (Login) {
+                            Navigator.pushNamed(context, "/Home",
+                                arguments: userName);
+                          } else {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                  content:
+                                      Text("Invalid username or password")),
+                            );
+                          }
+                        }
+                      : null,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blue, // Button color
+                    backgroundColor: Colors.blue,
                     padding:
                         const EdgeInsets.symmetric(vertical: 0, horizontal: 50),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(50),
                     ),
                   ),
-                  child: const Text(
-                    "Login",
-                    style: TextStyle(
-                        fontSize: 13,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white),
-                  ),
+                  child: isLoading
+                      ? const Row(
+                          children: [
+                            Icon(Icons.timelapse),
+                            Text(
+                              "Logging you in...",
+                              style: TextStyle(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white),
+                            ),
+                          ],
+                        )
+                      : const Text(
+                          "Login",
+                          style: TextStyle(
+                              fontSize: 13,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white),
+                        ),
                 ),
-
                 const SizedBox(height: 20),
-                // Login with Google Button
                 ElevatedButton(
                   onPressed: () {},
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.black, // Button color
-                    padding: const EdgeInsets.symmetric(
-                        vertical: 0, horizontal: 50), // Consistent padding
+                    backgroundColor: Colors.black,
+                    padding:
+                        const EdgeInsets.symmetric(vertical: 0, horizontal: 50),
                   ),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -176,7 +207,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       Image.asset(
                         "assets/google.png",
                         height: 25,
-                        width: 25, // Ensure proper aspect ratio
+                        width: 25,
                         fit: BoxFit.contain,
                       ),
                       const SizedBox(width: 10),

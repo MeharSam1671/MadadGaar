@@ -15,6 +15,9 @@ class SignupScreen extends StatefulWidget {
 class _SignupScreenState extends State<SignupScreen> {
   Timer? idInputInactiveRecorder, emailInputInactiveRecorder;
 
+  bool _showPassword = false;
+  bool _showCnfrmPassword = false;
+
   bool isLoading = false;
   bool isSuccessful = false;
   String error = "";
@@ -328,8 +331,23 @@ class _SignupScreenState extends State<SignupScreen> {
                 const SizedBox(height: 20),
                 // Password Field
                 TextField(
-                  obscureText: true,
+                  obscureText: !_showPassword,
                   decoration: InputDecoration(
+                    suffixIcon: password.isNotEmpty
+                        ? IconButton(
+                            icon: Icon(
+                              _showPassword
+                                  ? Icons.visibility
+                                  : Icons.visibility_off,
+                              color: Colors.black54,
+                            ),
+                            onPressed: () {
+                              setState(() {
+                                _showPassword = !_showPassword;
+                              });
+                            },
+                          )
+                        : null,
                     hintText: "Enter password",
                     hintStyle: const TextStyle(color: Colors.black),
                     border: OutlineInputBorder(
@@ -349,8 +367,23 @@ class _SignupScreenState extends State<SignupScreen> {
                 const SizedBox(height: 20),
                 // Confirm Password Field
                 TextField(
-                  obscureText: true,
+                  obscureText: !_showCnfrmPassword,
                   decoration: InputDecoration(
+                    suffixIcon: confirmPassword.isNotEmpty
+                        ? IconButton(
+                            icon: Icon(
+                              _showCnfrmPassword
+                                  ? Icons.visibility
+                                  : Icons.visibility_off,
+                              color: Colors.black54,
+                            ),
+                            onPressed: () {
+                              setState(() {
+                                _showCnfrmPassword = !_showCnfrmPassword;
+                              });
+                            },
+                          )
+                        : null,
                     hintText: "Enter password again",
                     hintStyle: const TextStyle(color: Colors.black),
                     border: OutlineInputBorder(
