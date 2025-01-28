@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+
 class ProfileScreen extends StatefulWidget {
   final String? userName;
 
@@ -26,7 +26,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
     // Use the passed userName from the constructor
     var querySnapshot = await dbInstance
         .collection('users')
-        .where("fName", isEqualTo: widget.userName) // Access the userName using widget.userName
+        .where("fName",
+            isEqualTo:
+                widget.userName) // Access the userName using widget.userName
         .get();
 
     if (querySnapshot.docs.isNotEmpty) {
@@ -51,13 +53,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
         children: [
           fName != null && lName != null && email != null
               ? Column(
-            children: [
-              Text(fName!),
-              Text(lName!),
-              Text(email!),
-            ],
-          )
-              : const Center(child: CircularProgressIndicator()), // Show loading indicator until data is fetched
+                  children: [
+                    Text(fName!),
+                    Text(lName!),
+                    Text(email!),
+                  ],
+                )
+              : const Center(
+                  child:
+                      CircularProgressIndicator()), // Show loading indicator until data is fetched
         ],
       ),
     );

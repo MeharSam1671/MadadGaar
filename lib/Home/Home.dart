@@ -139,8 +139,12 @@ class _HomeState extends State<Home> {
     );
   }
 
-  Widget _buildDialogOption(BuildContext context, {required IconData icon, required String text,required VoidCallback onTap}) {
-    final arguments = ModalRoute.of(context)?.settings.arguments as Map<String, String>?;
+  Widget _buildDialogOption(BuildContext context,
+      {required IconData icon,
+      required String text,
+      required VoidCallback onTap}) {
+    final arguments =
+        ModalRoute.of(context)?.settings.arguments as Map<String, String>?;
 
     final userName = arguments?['userName'];
     final password = arguments?['password'];
@@ -207,8 +211,8 @@ class _HomeState extends State<Home> {
                       ),
                     ),
                     duration: const Duration(seconds: 2),
-                    child: SafeArea(child:
-                    Column(
+                    child: SafeArea(
+                        child: Column(
                       children: [
                         const SizedBox(
                           height: 50,
@@ -234,9 +238,7 @@ class _HomeState extends State<Home> {
                                     MediaQuery.of(context).size.height * 0.052),
                             ElevatedButton(
                               onPressed: () {
-
-                                  _showCustomDialog(context);
-
+                                _showCustomDialog(context);
                               },
                               style: ElevatedButton.styleFrom(
                                 shape: const CircleBorder(),
@@ -250,183 +252,184 @@ class _HomeState extends State<Home> {
                           ],
                         ),
                       ],
-                    )
-                    ),
+                    )),
                   ),
                   SafeArea(
-                  child:
-                  DraggableScrollableSheet(
-                    initialChildSize:
-                        0.35, // initial height (0.0 to 1.0, where 1.0 is full screen)
-                    minChildSize: 0.35, // minimum height (0.0 to 1.0)
-                    maxChildSize: 1, // maximum height (0.0 to 1.0)
-                    builder: (context, scrollController) {
-                      return Container(
-                        decoration: const BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.only(
-                            topLeft: Radius.circular(20),
-                            topRight: Radius.circular(20),
+                    child: DraggableScrollableSheet(
+                      initialChildSize:
+                          0.35, // initial height (0.0 to 1.0, where 1.0 is full screen)
+                      minChildSize: 0.35, // minimum height (0.0 to 1.0)
+                      maxChildSize: 1, // maximum height (0.0 to 1.0)
+                      builder: (context, scrollController) {
+                        return Container(
+                          decoration: const BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.only(
+                              topLeft: Radius.circular(20),
+                              topRight: Radius.circular(20),
+                            ),
                           ),
-                        ),
-                        child: Stack(
-                          children: [
-                            // Scrollable content
-                            SingleChildScrollView(
-                              controller:
-                                  scrollController, // Attach scroll controller here
-                              child: Column(
-                                children: [
-                                  const SizedBox(height: 60),
-                                  // First Card
-                                  Container(
-                                    margin: const EdgeInsets.all(10),
-                                    child: Card(
-                                      elevation: 5,
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(
-                                            15), // Rounded corners
-                                      ),
-                                      child: Padding(
-                                        padding: const EdgeInsets.all(16.0),
-                                        child: Column(
-                                          children: [
-                                            Image.asset(
-                                              "assets/amb1.jpg",
-                                              height: 130, // Set only height
-                                              width: double
-                                                  .infinity, // Set width to fill available space
-                                              fit: BoxFit
-                                                  .cover, // Ensure the aspect ratio is maintained
-                                            ),
-                                            const Text(
-                                              "New Ambulance will be Introduced in future",
-                                              style: TextStyle(
-                                                  fontSize: 20,
-                                                  fontWeight: FontWeight.bold),
-                                            ),
-                                            const SizedBox(height: 10),
-                                            const Text(
-                                              "Our goal is to revolutionize ambulance services by integrating AI-powered systems, smart vehicle tracking,...", // Truncated text
-                                              style: TextStyle(fontSize: 16),
-                                              maxLines: 2,
-                                              overflow: TextOverflow.ellipsis,
-                                            ),
-                                            GestureDetector(
-                                              onTap: () {
-                                                Navigator.push(
-                                                  context,
-                                                  MaterialPageRoute(
-                                                    builder: (context) =>
-                                                        const FullTextScreen(),
-                                                  ),
-                                                );
-                                              },
-                                              child: const Text(
-                                                "Show More",
+                          child: Stack(
+                            children: [
+                              // Scrollable content
+                              SingleChildScrollView(
+                                controller:
+                                    scrollController, // Attach scroll controller here
+                                child: Column(
+                                  children: [
+                                    const SizedBox(height: 60),
+                                    // First Card
+                                    Container(
+                                      margin: const EdgeInsets.all(10),
+                                      child: Card(
+                                        elevation: 5,
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(
+                                              15), // Rounded corners
+                                        ),
+                                        child: Padding(
+                                          padding: const EdgeInsets.all(16.0),
+                                          child: Column(
+                                            children: [
+                                              Image.asset(
+                                                "assets/amb1.jpg",
+                                                height: 130, // Set only height
+                                                width: double
+                                                    .infinity, // Set width to fill available space
+                                                fit: BoxFit
+                                                    .cover, // Ensure the aspect ratio is maintained
+                                              ),
+                                              const Text(
+                                                "New Ambulance will be Introduced in future",
                                                 style: TextStyle(
-                                                  color: Colors.blue,
-                                                  fontWeight: FontWeight.bold,
+                                                    fontSize: 20,
+                                                    fontWeight:
+                                                        FontWeight.bold),
+                                              ),
+                                              const SizedBox(height: 10),
+                                              const Text(
+                                                "Our goal is to revolutionize ambulance services by integrating AI-powered systems, smart vehicle tracking,...", // Truncated text
+                                                style: TextStyle(fontSize: 16),
+                                                maxLines: 2,
+                                                overflow: TextOverflow.ellipsis,
+                                              ),
+                                              GestureDetector(
+                                                onTap: () {
+                                                  Navigator.push(
+                                                    context,
+                                                    MaterialPageRoute(
+                                                      builder: (context) =>
+                                                          const FullTextScreen(),
+                                                    ),
+                                                  );
+                                                },
+                                                child: const Text(
+                                                  "Show More",
+                                                  style: TextStyle(
+                                                    color: Colors.blue,
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
                                                 ),
                                               ),
-                                            ),
-                                          ],
+                                            ],
+                                          ),
                                         ),
                                       ),
                                     ),
-                                  ),
-                                  const SizedBox(height: 20),
-                                  // First Card
-                                  Container(
-                                    margin: const EdgeInsets.all(10),
-                                    child: Card(
-                                      elevation: 5,
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(
-                                            15), // Rounded corners
-                                      ),
-                                      child: Padding(
-                                        padding: const EdgeInsets.all(16.0),
-                                        child: Column(
-                                          children: [
-                                            Image.asset(
-                                              "assets/amb1.jpg",
-                                              height: 130, // Set only height
-                                              width: double
-                                                  .infinity, // Set width to fill available space
-                                              fit: BoxFit
-                                                  .cover, // Ensure the aspect ratio is maintained
-                                            ),
-                                            const Text(
-                                              "New Ambulance will be Introduced in future",
-                                              style: TextStyle(
-                                                  fontSize: 20,
-                                                  fontWeight: FontWeight.bold),
-                                            ),
-                                            const SizedBox(height: 10),
-                                            const Text(
-                                              "Our goal is to revolutionize ambulance services by integrating AI-powered systems, smart vehicle tracking,...", // Truncated text
-                                              style: TextStyle(fontSize: 16),
-                                              maxLines: 2,
-                                              overflow: TextOverflow.ellipsis,
-                                            ),
-                                            GestureDetector(
-                                              onTap: () {
-                                                Navigator.push(
-                                                  context,
-                                                  MaterialPageRoute(
-                                                    builder: (context) =>
-                                                        const FullTextScreen(),
-                                                  ),
-                                                );
-                                              },
-                                              child: const Text(
-                                                "Show More",
+                                    const SizedBox(height: 20),
+                                    // First Card
+                                    Container(
+                                      margin: const EdgeInsets.all(10),
+                                      child: Card(
+                                        elevation: 5,
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(
+                                              15), // Rounded corners
+                                        ),
+                                        child: Padding(
+                                          padding: const EdgeInsets.all(16.0),
+                                          child: Column(
+                                            children: [
+                                              Image.asset(
+                                                "assets/amb1.jpg",
+                                                height: 130, // Set only height
+                                                width: double
+                                                    .infinity, // Set width to fill available space
+                                                fit: BoxFit
+                                                    .cover, // Ensure the aspect ratio is maintained
+                                              ),
+                                              const Text(
+                                                "New Ambulance will be Introduced in future",
                                                 style: TextStyle(
-                                                  color: Colors.blue,
-                                                  fontWeight: FontWeight.bold,
+                                                    fontSize: 20,
+                                                    fontWeight:
+                                                        FontWeight.bold),
+                                              ),
+                                              const SizedBox(height: 10),
+                                              const Text(
+                                                "Our goal is to revolutionize ambulance services by integrating AI-powered systems, smart vehicle tracking,...", // Truncated text
+                                                style: TextStyle(fontSize: 16),
+                                                maxLines: 2,
+                                                overflow: TextOverflow.ellipsis,
+                                              ),
+                                              GestureDetector(
+                                                onTap: () {
+                                                  Navigator.push(
+                                                    context,
+                                                    MaterialPageRoute(
+                                                      builder: (context) =>
+                                                          const FullTextScreen(),
+                                                    ),
+                                                  );
+                                                },
+                                                child: const Text(
+                                                  "Show More",
+                                                  style: TextStyle(
+                                                    color: Colors.blue,
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
                                                 ),
                                               ),
-                                            ),
-                                          ],
+                                            ],
+                                          ),
                                         ),
                                       ),
                                     ),
-                                  ),
-                                  // Repeat the cards as needed...
-                                ],
+                                    // Repeat the cards as needed...
+                                  ],
+                                ),
                               ),
-                            ),
 
-                            // Fixed "Latest News" Text at the top
-                            Positioned(
-                              top: 0,
-                              // Adjust the left position as needed
-                              child: Container(
-                                width: MediaQuery.of(context).size.width,
-                                decoration: const BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.only(
-                                    topLeft: Radius.circular(20),
-                                    topRight: Radius.circular(20),
+                              // Fixed "Latest News" Text at the top
+                              Positioned(
+                                top: 0,
+                                // Adjust the left position as needed
+                                child: Container(
+                                  width: MediaQuery.of(context).size.width,
+                                  decoration: const BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.only(
+                                      topLeft: Radius.circular(20),
+                                      topRight: Radius.circular(20),
+                                    ),
                                   ),
-                                ),
-                                padding: const EdgeInsets.all(10),
-                                child: const Center(
-                                  child: Text(
-                                    "Latest News",
-                                    style: TextStyle(
-                                        fontSize: 20,
-                                        fontWeight: FontWeight.bold),
+                                  padding: const EdgeInsets.all(10),
+                                  child: const Center(
+                                    child: Text(
+                                      "Latest News",
+                                      style: TextStyle(
+                                          fontSize: 20,
+                                          fontWeight: FontWeight.bold),
+                                    ),
                                   ),
                                 ),
                               ),
-                            ),
-                          ],
-                        ),
-                      );
-                    },
-                  ),),
+                            ],
+                          ),
+                        );
+                      },
+                    ),
+                  ),
                 ],
               ),
               Positioned(
@@ -434,7 +437,6 @@ class _HomeState extends State<Home> {
                   right: 16,
                   child: FloatingActionButton(
                     onPressed: () {
-
                       if (login) {
                         Navigator.pushNamed(context, "/ChatAI");
                       } else {
@@ -464,40 +466,49 @@ class _HomeState extends State<Home> {
           ),
           SafeArea(
             child: PreferredSize(
-              preferredSize: Size(MediaQuery.of(context).size.width, 60),
-              child: Container(
-                // Custom AppBar background color
-                padding: const EdgeInsets.symmetric(horizontal: 10),
-                child: Column(children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      IconButton(
-                        icon: const Icon(
-                          Icons.person,
-                          color: Colors.white,
+                preferredSize: Size(MediaQuery.of(context).size.width, 60),
+                child: Container(
+                  // Custom AppBar background color
+                  padding: const EdgeInsets.symmetric(horizontal: 10),
+                  child: Column(children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        IconButton(
+                          icon: const Icon(
+                            Icons.person,
+                            color: Colors.white,
+                          ),
+                          onPressed: () {
+                            login
+                                ? Navigator.pushNamed(
+                                    context,
+                                    '/showProfile',
+                                    arguments:
+                                        "hafiz", // Pass the userName here
+                                  )
+                                : Navigator.pushNamed(context, "/LoginProfile");
+                          },
                         ),
-                        onPressed: () {
-                          login
-                              ? Navigator.pushNamed(context,'/showProfile',arguments: "hafiz", // Pass the userName here
-                          )
-                              : Navigator.pushNamed(context, "/LoginProfile");
-                        },
-                      ),
-                      // Check if userName is null and display a default message if it is
-                      Text("Hi, ${userName ?? 'Guest'}",style: TextStyle(color: Colors.white,fontSize: 18,fontWeight: FontWeight.bold),), // Default to 'Guest' if userName is null
-                      IconButton(
-                        icon: const Icon(
-                          Icons.search,
-                          color: Colors.white,
+                        // Check if userName is null and display a default message if it is
+                        Text(
+                          "Hi, ${userName ?? 'Guest'}",
+                          style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold),
+                        ), // Default to 'Guest' if userName is null
+                        IconButton(
+                          icon: const Icon(
+                            Icons.search,
+                            color: Colors.white,
+                          ),
+                          onPressed: () {},
                         ),
-                        onPressed: () {},
-                      ),
-                    ],
-                  ),
-
-                ]),
-              )),
+                      ],
+                    ),
+                  ]),
+                )),
           )
         ]),
         bottomNavigationBar: BottomNavigationBar(

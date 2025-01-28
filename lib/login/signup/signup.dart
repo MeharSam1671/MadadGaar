@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -11,6 +13,8 @@ class SignupScreen extends StatefulWidget {
 }
 
 class _SignupScreenState extends State<SignupScreen> {
+  Timer? idInputInactiveRecorder, emailInputInactiveRecorder;
+
   bool isLoading = false;
   bool isSuccessful = false;
   String error = "";
@@ -45,6 +49,13 @@ class _SignupScreenState extends State<SignupScreen> {
     beginAlignment = Alignment.topRight;
     endAlignment = Alignment.bottomRight;
     _startAnimation();
+  }
+
+  @override
+  void dispose() {
+    idInputInactiveRecorder?.cancel();
+    emailInputInactiveRecorder?.cancel();
+    super.dispose();
   }
 
   Future<void> signUp(BuildContext context) async {
@@ -104,6 +115,78 @@ class _SignupScreenState extends State<SignupScreen> {
     });
   }
 
+  Future<void> isIDUnique() async {
+    try {
+      if (idInputInactiveRecorder?.isActive ?? false) {
+        idInputInactiveRecorder?.cancel();
+      }
+      idInputInactiveRecorder =
+          Timer(const Duration(milliseconds: 500), () async {
+        setState(() {
+          isIDCheckInProgress = true;
+        });
+        var dbInstance = FirebaseFirestore.instance;
+        var existingUser = await dbInstance
+            .collection('users')
+            .where('userID', isEqualTo: user)
+            .get();
+        if (existingUser.docs.isEmpty) {
+          setState(() {
+            isUniqueUserID = true;
+          });
+        } else {
+          setState(() {
+            isUniqueUserID = false;
+          });
+        }
+        setState(() {
+          isIDCheckInProgress = false;
+        });
+      });
+    } catch (e) {
+      setState(() {
+        isUniqueUserID = false;
+        isIDCheckInProgress = false;
+      });
+    }
+  }
+
+  Future<void> isEmailUnique() async {
+    try {
+      if (emailInputInactiveRecorder?.isActive ?? false) {
+        emailInputInactiveRecorder?.cancel();
+      }
+      emailInputInactiveRecorder =
+          Timer(const Duration(milliseconds: 500), () async {
+        setState(() {
+          isEmailCheckInProgress = true;
+        });
+        var dbInstance = FirebaseFirestore.instance;
+        var existingUser = await dbInstance
+            .collection('users')
+            .where('email', isEqualTo: email)
+            .get();
+        if (existingUser.docs.isEmpty) {
+          setState(() {
+            isUniqueEmail = true;
+          });
+        } else {
+          setState(() {
+            isUniqueEmail = false;
+          });
+        }
+        setState(() {
+          isEmailCheckInProgress = false;
+        });
+      });
+    } catch (e) {
+      setState(() {
+        isUniqueEmail = false;
+        isEmailCheckInProgress = false;
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -157,13 +240,14 @@ class _SignupScreenState extends State<SignupScreen> {
                   decoration: InputDecoration(
                     suffixIcon: user.isNotEmpty
                         ? isIDCheckInProgress
-                            ? const CircularProgressIndicator()
+                            ? const Icon(Icons.timelapse)
                             : Icon(
-                                isUniqueUserID
+                                isUniqueUserID && checkuser
                                     ? Icons.check_circle
                                     : Icons.cancel,
-                                color:
-                                    isUniqueUserID ? Colors.green : Colors.red,
+                                color: isUniqueUserID && checkuser
+                                    ? Colors.green
+                                    : Colors.red,
                               )
                         : null,
                     hintText: "Enter username",
@@ -176,29 +260,45 @@ class _SignupScreenState extends State<SignupScreen> {
                     fillColor: Colors.black.withOpacity(0.1),
                   ),
                   onChanged: (value) {
-                    setState(() {
-                      // Validate the username with the regex
-                      if (useregex.hasMatch(value)) {
+                    // Validate the username with the regex
+                    if (useregex.hasMatch(value)) {
+                      setState(() {
                         checkuser = true;
-                      } else {
+                      });
+                      isIDUnique();
+                    } else {
+                      setState(() {
                         checkuser = false;
-                        isUniqueUserID = false;
-                      }
-                      user = value;
-                    });
+                      });
+                    }
+                    user = value;
                   },
                   style: const TextStyle(color: Colors.black),
                 ),
-                if (!checkuser && user.isNotEmpty)
-                  const Text(
-                    "Username must be combination of alphabtes and digits",
-                    style: TextStyle(color: Colors.red),
+                if (user.isNotEmpty && !(checkuser && isUniqueUserID))
+                  Text(
+                    !checkuser
+                        ? "Username must be combination of alphabtes and digits"
+                        : "This user ID is already in use",
+                    style: const TextStyle(color: Colors.red),
                   ),
                 const SizedBox(height: 20),
                 // Email Field
                 TextField(
                   controller: _emailController,
                   decoration: InputDecoration(
+                    suffixIcon: email.isNotEmpty
+                        ? isEmailCheckInProgress
+                            ? const Icon(Icons.timelapse)
+                            : Icon(
+                                isUniqueEmail && isValidEmail
+                                    ? Icons.check_circle
+                                    : Icons.cancel,
+                                color: isUniqueEmail && isValidEmail
+                                    ? Colors.green
+                                    : Colors.red,
+                              )
+                        : null,
                     hintText: "Enter email",
                     hintStyle: const TextStyle(color: Colors.black),
                     border: OutlineInputBorder(
@@ -207,14 +307,22 @@ class _SignupScreenState extends State<SignupScreen> {
                     ),
                     filled: true,
                     fillColor: Colors.black.withOpacity(0.1),
-                    errorText: isValidEmail ? null : 'Invalid email format',
+                    errorText: !isValidEmail
+                        ? 'Invalid email format'
+                        : email.isNotEmpty && !isUniqueEmail
+                            ? 'This email is already in use'
+                            : null,
                   ),
                   style: const TextStyle(color: Colors.black),
                   onChanged: (value) {
                     setState(() {
                       email = value;
-                      isValidEmail = emailRegex.hasMatch(email);
+                      isValidEmail =
+                          emailRegex.hasMatch(email) || email.isEmpty;
                     });
+                    if (isValidEmail) {
+                      isEmailUnique();
+                    }
                   },
                 ),
                 const SizedBox(height: 20),
@@ -268,12 +376,19 @@ class _SignupScreenState extends State<SignupScreen> {
                 const SizedBox(height: 10),
                 // Signup Button
                 ElevatedButton(
-                  onPressed:
-                      isLoading ? null : () async => await signUp(context),
+                  onPressed: !(isUniqueEmail &&
+                              isUniqueUserID &&
+                              fName.isNotEmpty &&
+                              lName.isNotEmpty &&
+                              password.isNotEmpty &&
+                              passwordsMatch) ||
+                          isLoading
+                      ? null
+                      : () async => await signUp(context),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.blue,
-                    padding: const EdgeInsets.symmetric(
-                        vertical: 0, horizontal: 50),
+                    padding:
+                        const EdgeInsets.symmetric(vertical: 0, horizontal: 50),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10),
                     ),
@@ -281,7 +396,7 @@ class _SignupScreenState extends State<SignupScreen> {
                   child: isLoading
                       ? const Row(
                           children: [
-                            CircularProgressIndicator.adaptive(),
+                            Icon(Icons.timelapse),
                             SizedBox(
                               width: 10,
                             ),

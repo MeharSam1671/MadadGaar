@@ -1,7 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:madadgaar/Home/home.dart';
 import 'package:madadgaar/login/signup/signup.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -52,16 +50,18 @@ class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _passwordController = TextEditingController();
 
   String? userName, password;
-  bool Login=false;
-  Future<void> checkuser() async{
+  bool Login = false;
+  Future<void> checkuser() async {
     var dbInstance = FirebaseFirestore.instance;
-    var querySnapshot=await dbInstance.collection('users').where("userID",isEqualTo: userName).where("password",isEqualTo: password).get();
-    if(querySnapshot.docs.isNotEmpty)
-      {
-        Login=true;
-        userName=querySnapshot.docs.first["fName"];
-      }
-    else{
+    var querySnapshot = await dbInstance
+        .collection('users')
+        .where("userID", isEqualTo: userName)
+        .where("password", isEqualTo: password)
+        .get();
+    if (querySnapshot.docs.isNotEmpty) {
+      Login = true;
+      userName = querySnapshot.docs.first["fName"];
+    } else {
       print("not found");
     }
   }
@@ -96,9 +96,9 @@ class _LoginScreenState extends State<LoginScreen> {
                     fillColor: Colors.black.withOpacity(0.1),
                     // Light background color for input
                   ),
-                  onChanged: (value){
+                  onChanged: (value) {
                     setState(() {
-                      userName=value;
+                      userName = value;
                     });
                   },
                   style: const TextStyle(color: Colors.black),
@@ -120,9 +120,9 @@ class _LoginScreenState extends State<LoginScreen> {
                     fillColor: Colors.black
                         .withOpacity(0.1), // Light background color for input
                   ),
-                  onChanged: (value){
+                  onChanged: (value) {
                     setState(() {
-                      password=value;
+                      password = value;
                     });
                   },
                   style: const TextStyle(color: Colors.black),
@@ -134,17 +134,20 @@ class _LoginScreenState extends State<LoginScreen> {
                     await checkuser(); // Call checkuser() to validate credentials
                     if (Login) {
                       // Navigate to Home screen if login is successful
-                      Navigator.pushNamed(context, "/Home",arguments: userName);
+                      Navigator.pushNamed(context, "/Home",
+                          arguments: userName);
                     } else {
                       // Show an error message if login fails
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text("Invalid username or password")),
+                        const SnackBar(
+                            content: Text("Invalid username or password")),
                       );
                     }
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.blue, // Button color
-                    padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 50),
+                    padding:
+                        const EdgeInsets.symmetric(vertical: 0, horizontal: 50),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(50),
                     ),
@@ -152,10 +155,11 @@ class _LoginScreenState extends State<LoginScreen> {
                   child: const Text(
                     "Login",
                     style: TextStyle(
-                        fontSize: 13, fontWeight: FontWeight.bold, color: Colors.white),
+                        fontSize: 13,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white),
                   ),
                 ),
-
 
                 const SizedBox(height: 20),
                 // Login with Google Button
@@ -177,8 +181,10 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                       const SizedBox(width: 10),
                       const Text("Login with Google",
-                          style:
-                          TextStyle(fontSize: 10, color: Colors.white,)),
+                          style: TextStyle(
+                            fontSize: 10,
+                            color: Colors.white,
+                          )),
                     ],
                   ),
                 ),
