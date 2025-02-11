@@ -4,20 +4,17 @@ import 'package:flutter/services.dart';
 import 'package:madadgaar/ChatAi/chataiscreen.dart';
 import 'package:madadgaar/firebase_options.dart';
 import 'package:madadgaar/login/signup/signup.dart';
-import 'Home/home.dart'; // Ensure this file exists
+import 'Home/home.dart';
 import 'Maps.dart';
 import 'Profile/profile.dart';
-import 'login/signup/login.dart'; // Ensure this file exists
+import 'login/signup/login.dart';
 
 void main() async {
-  // Ensure bindings are initialized before interacting with them
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-  // Set preferred orientations
   SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
-    DeviceOrientation
-        .portraitDown, // Optional, if you want to allow upside-down portrait
+    DeviceOrientation.portraitDown,
   ]).then((_) {
     runApp(const MyApp());
   });
@@ -38,18 +35,14 @@ class _MyAppState extends State<MyApp> {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       routes: {
-        "/maps": (context) =>
-            const Maps(), // Corrected the syntax for route definition
-        "/Home": (context) =>
-            const Home(), // Corrected the syntax for route definition
-        "/ChatAI": (context) =>
-            const ChatAIScreen(), // Corrected the syntax for route definition
+        "/maps": (context) => const Maps(),
+        "/Home": (context) => const Home(),
+        "/ChatAI": (context) => const ChatAIScreen(),
         "/Signup": (context) => const SignupScreen(),
         '/showProfile': (context) => const ProfileScreen(),
-        '/LoginProfile': (context) =>
-            const LoginScreen(), // Corrected the syntax for route definition
+        '/LoginProfile': (context) => const LoginScreen(),
       },
-      home: const Home(), // Render Home or Profile
+      home: const Home(),
     );
   }
 }

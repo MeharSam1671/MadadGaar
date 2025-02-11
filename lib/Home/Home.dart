@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:intl/intl.dart';
+import 'package:madadgaar/Profile/profile.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../Blogs/blogs.dart';
@@ -481,11 +482,13 @@ class _HomeState extends State<Home> {
                           ),
                           onPressed: () {
                             login
-                                ? Navigator.pushNamed(
+                                ? Navigator.push(
                                     context,
-                                    '/showProfile',
-                                    arguments:
-                                        "hafiz", // Pass the userName here
+                                    MaterialPageRoute(
+                                      builder: (context) => ProfileScreen(
+                                        userName: userName,
+                                      ),
+                                    ),
                                   )
                                 : Navigator.pushNamed(context, "/LoginProfile");
                           },

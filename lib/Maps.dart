@@ -124,6 +124,13 @@ class _MapsState extends State<Maps> {
                 target: _center,
                 zoom: 15.0, // Adjust zoom level as needed
               ),
+
+              markers: {
+                const Marker(
+                  markerId: MarkerId('ambulance'),
+                  position: LatLng(32.201217, 74.206839),
+                ),
+              },
               myLocationEnabled:
                   true, // Enable the built-in blue dot for current location
               myLocationButtonEnabled: true, // Show the location button
