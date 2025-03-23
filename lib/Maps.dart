@@ -1,8 +1,17 @@
-import 'package:flutter/foundation.dart';
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter_polyline_points/flutter_polyline_points.dart';
+
+Stream<Position> getLocationStream() {
+  return Geolocator.getPositionStream(
+    locationSettings: LocationSettings(
+      accuracy: LocationAccuracy.high,
+      distanceFilter: 10, // Update when the user moves 10 meters
+    ),
+  );
+}
 
 class Maps extends StatefulWidget {
   const Maps({super.key});
@@ -11,104 +20,80 @@ class Maps extends StatefulWidget {
   State<Maps> createState() => _MapsState();
 }
 
-Future<void> _pushLocationToFirestore(Position position) async {
-  try {
-    // Get the Firestore instance
-    final FirebaseFirestore firestore = FirebaseFirestore.instance;
-
-    // Push the user's location to Firestore
-    await firestore
-        .collection('users')
-        .doc('user_id') // Replace with actual user ID
-        .set({
-      'latitude': position.latitude,
-      'longitude': position.longitude,
-      'timestamp': FieldValue.serverTimestamp(),
-    });
-
-    if (kDebugMode) {
-      print('Location updated successfully');
-    }
-  } catch (e) {
-    if (kDebugMode) {
-      print('Error pushing location to Firestore: $e');
-    }
-  }
-}
-
 class _MapsState extends State<Maps> {
   late GoogleMapController mapController;
-  LatLng _center = const LatLng(0.0, 0.0); // Default location
-  bool _isMapReady = false;
+  LatLng initialmaps = LatLng(0, 0);
+  LatLng initialmaps2 = LatLng(31.622729, 74.286317);
+  bool isLoading = true;
+  late StreamSubscription<Position> locationSubscription;
+  Set<Polyline> polylines = {}; // Store polyline data
+
+  Future<void> setlocation() async {
+    Position position = await Geolocator.getCurrentPosition(
+      desiredAccuracy: LocationAccuracy.high,
+    );
+    setState(() {
+      initialmaps = LatLng(position.latitude, position.longitude);
+      isLoading = false;
+    });
+
+    _createRoute(); // Call to draw the polyline
+  }
 
   @override
   void initState() {
     super.initState();
-    _initializeLocation();
+    setlocation();
+    locationSubscription = getLocationStream().listen((Position position) {
+      setState(() {
+        initialmaps = LatLng(position.latitude, position.longitude);
+        isLoading = false;
+      });
+
+      _createRoute(); // Update route when location changes
+    });
   }
 
-  void _initializeLocation() async {
-    int value = 0;
-    try {
-      while (true) {
-        if (kDebugMode) {
-          print("Position $value");
-        }
-        value++;
-
-        // Attempt to get the current location
-        Position position = await getCurrentLocation();
-
-        // Update the state with the new location
-        setState(() {
-          _center = LatLng(position.latitude, position.longitude);
-          _isMapReady = true;
-        });
-
-        // Delay for 1 second before the next iteration
-        await Future.delayed(const Duration(seconds: 1));
-      }
-    } catch (e) {
-      // Handle the error
-      if (kDebugMode) {
-        print('Error getting location: $e');
-      }
-    }
+  @override
+  void dispose() {
+    locationSubscription.cancel(); // Cancel stream to avoid memory leaks
+    super.dispose();
   }
 
-  void _onMapCreated(GoogleMapController controller) {
-    mapController = controller;
+  Future<void> _createRoute() async {
+    List<LatLng> polylineCoordinates = await getPolylinePoints();
+    setState(() {
+      polylines.add(
+        Polyline(
+          polylineId: PolylineId("route"),
+          points: polylineCoordinates,
+          color: Colors.blue,
+          width: 5,
+        ),
+      );
+    });
   }
 
-  Future<Position> getCurrentLocation() async {
-    bool serviceEnabled;
-    LocationPermission permission;
+  Future<List<LatLng>> getPolylinePoints() async {
+    List<LatLng> polylineCoordinates = [];
+    PolylinePoints polylinePoints = PolylinePoints();
 
-    // Check if location services are enabled
-    serviceEnabled = await Geolocator.isLocationServiceEnabled();
-    if (!serviceEnabled) {
-      // If location services are not enabled, you can prompt the user to enable them
-      return Future.error('Location services are disabled.');
-    }
+    PolylineResult result = await polylinePoints.getRouteBetweenCoordinates(
+      "AIzaSyCBQv1_43-rVkUZFCftBVHFeGW8XkmR9Is",
+      PointLatLng(initialmaps.latitude, initialmaps.longitude),
+      PointLatLng(initialmaps2.latitude, initialmaps2.longitude),
+      travelMode: TravelMode.driving,
+    );
 
-    // Check for location permissions
-    permission = await Geolocator.checkPermission();
-    if (permission == LocationPermission.denied) {
-      permission = await Geolocator.requestPermission();
-      if (permission == LocationPermission.denied) {
-        // Permissions are denied, so you cannot access location
-        return Future.error('Location permissions are denied');
+    if (result.points.isNotEmpty) {
+      for (PointLatLng point in result.points) {
+        polylineCoordinates.add(LatLng(point.latitude, point.longitude));
       }
+    } else {
+      print(result.errorMessage);
     }
 
-    if (permission == LocationPermission.deniedForever) {
-      // Permissions are denied forever, handle appropriately
-      return Future.error(
-          'Location permissions are permanently denied, we cannot request permissions.');
-    }
-
-    // Get the current location
-    return await Geolocator.getCurrentPosition();
+    return polylineCoordinates;
   }
 
   @override
@@ -117,33 +102,27 @@ class _MapsState extends State<Maps> {
       appBar: AppBar(
         title: const Text('Google Maps'),
       ),
-      body: _isMapReady
-          ? GoogleMap(
-              onMapCreated: _onMapCreated,
-              initialCameraPosition: CameraPosition(
-                target: _center,
-                zoom: 15.0, // Adjust zoom level as needed
-              ),
+      body: isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : GoogleMap(
+        initialCameraPosition:
+        CameraPosition(target: initialmaps, zoom: 12),
+        onMapCreated: (GoogleMapController controller) {
+          mapController = controller;
+          mapController.animateCamera(
+            CameraUpdate.newLatLng(initialmaps),
+          );
+        },
+        markers: {
+          Marker(
+              markerId: MarkerId("destination"),
+              position: initialmaps2),
 
-              markers: {
-                const Marker(
-                  markerId: MarkerId('ambulance'),
-                  position: LatLng(32.201217, 74.206839),
-                ),
-              },
-              myLocationEnabled:
-                  true, // Enable the built-in blue dot for current location
-              myLocationButtonEnabled: true, // Show the location button
-            )
-          : const Center(
-              child: CircularProgressIndicator(),
-            ),
+        },
+        myLocationEnabled: true,
+        myLocationButtonEnabled: true,
+        polylines: polylines, // Add the polyline to the map
+      ),
     );
-  }
-
-  @override
-  void dispose() {
-    mapController.dispose();
-    super.dispose();
   }
 }
