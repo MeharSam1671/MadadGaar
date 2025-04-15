@@ -50,8 +50,10 @@ class _MapsState extends State<Maps> {
         isLoading = false;
       });
 
-      _createRoute(); // Update route when location changes
+      mapController.animateCamera(CameraUpdate.newLatLng(initialmaps)); // Smooth follow
+      _createRoute(); // Recalculate route
     });
+
   }
 
   @override
@@ -63,15 +65,17 @@ class _MapsState extends State<Maps> {
   Future<void> _createRoute() async {
     List<LatLng> polylineCoordinates = await getPolylinePoints();
     setState(() {
+      polylines.clear(); // Clear previous polyline
       polylines.add(
         Polyline(
           polylineId: PolylineId("route"),
           points: polylineCoordinates,
           color: Colors.blue,
-          width: 5,
+          width: 4,
         ),
       );
     });
+
   }
 
   Future<List<LatLng>> getPolylinePoints() async {
