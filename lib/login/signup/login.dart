@@ -156,8 +156,9 @@ class _LoginScreenState extends State<LoginScreen> {
                           (password?.isNotEmpty ?? false)
                       ? () async {
                           await checkuser();
-                          if (Login) {
-                            Navigator.pushNamed(context, "/Home",
+                          if (Login && context.mounted) {
+                            Navigator.pushNamedAndRemoveUntil(context, "/Home",
+                                (Route<dynamic> route) => false,
                                 arguments: userName);
                           } else {
                             ScaffoldMessenger.of(context).showSnackBar(

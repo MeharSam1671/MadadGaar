@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:madadgaar/auth/utils.dart';
 
 class ProfileScreen extends StatefulWidget {
   final String? userName;
@@ -12,8 +13,7 @@ class ProfileScreen extends StatefulWidget {
 
 class _ProfileScreenState extends State<ProfileScreen> {
   String? fName, lName, email, userID;
-
-  @override
+  final AuthUtils authUtils = AuthUtils();
   @override
   void initState() {
     super.initState();
@@ -26,9 +26,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     // Use the passed userName from the constructor
     var querySnapshot = await dbInstance
         .collection('users')
-        .where("fName",
-            isEqualTo:
-                widget.userName) // Access the userName using widget.userName
+        .where("fName", isEqualTo: widget.userName)
         .get();
 
     if (querySnapshot.docs.isNotEmpty) {
@@ -46,23 +44,73 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Profile")),
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          fName != null && lName != null && email != null
-              ? Column(
-                  children: [
-                    Text(fName!),
-                    Text(lName!),
-                    Text(email!),
-                  ],
-                )
-              : const Center(
-                  child:
-                      CircularProgressIndicator()), // Show loading indicator until data is fetched
+      appBar: AppBar(
+        title: const Text("Profile"),
+        actions: [
+          Padding(
+            padding: const EdgeInsets.only(right: 16.0),
+            child: IconButton(
+              onPressed: () async {
+                print("Logout button pressed");
+                final success = await authUtils.logOut();
+                if (success && context.mounted) {
+                  Navigator.pushNamedAndRemoveUntil(
+                    context,
+                    '/Home',
+                    (Route<dynamic> route) => false,
+                    arguments: null,
+                  );
+                }
+              },
+              style: TextButton.styleFrom(
+                foregroundColor: Colors.black,
+              ),
+              icon: const Icon(Icons.logout),
+            ),
+          ),
         ],
+      ),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            if (fName != null && lName != null && email != null)
+              Column(
+                children: [
+                  CircleAvatar(
+                    radius: 50,
+                    backgroundColor: Colors.blue.shade100,
+                    child: Text(
+                      '${fName![0]}${lName![0]}',
+                      style: const TextStyle(
+                        fontSize: 30,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.blue,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  Text(
+                    '$fName $lName',
+                    style: const TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    email!,
+                    style: TextStyle(color: Colors.grey[600]),
+                  ),
+                  const SizedBox(height: 20),
+                  // You can add more profile information here if needed
+                ],
+              )
+            else
+              const CircularProgressIndicator(), // Show loading indicator until data is fetched
+          ],
+        ),
       ),
     );
   }
