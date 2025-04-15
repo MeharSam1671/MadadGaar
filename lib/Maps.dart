@@ -30,7 +30,9 @@ class _MapsState extends State<Maps> {
 
   Future<void> setlocation() async {
     Position position = await Geolocator.getCurrentPosition(
-      desiredAccuracy: LocationAccuracy.high,
+      locationSettings: const LocationSettings(
+        accuracy: LocationAccuracy.high,
+      ),
     );
     setState(() {
       initialmaps = LatLng(position.latitude, position.longitude);

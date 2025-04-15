@@ -108,7 +108,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ],
               )
             else
-              const CircularProgressIndicator(), // Show loading indicator until data is fetched
+              const Column(
+                children: [
+                  CircularProgressIndicator(), // Show loading indicator until data is fetched
+                  Text("Fetching your data..."),
+                ],
+              ),
           ],
         ),
       ),
