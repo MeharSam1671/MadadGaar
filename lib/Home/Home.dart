@@ -172,6 +172,10 @@ class _HomeState extends State<Home> {
               onPressed: () => Navigator.pop(context),
               child: const Text("Cancel"),
             ),
+            TextButton(
+              onPressed: () => Navigator.pushNamed(context, "/maps"),
+              child: const Text("Skip"),
+            ),
           ],
         );
       },
