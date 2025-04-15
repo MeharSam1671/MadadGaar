@@ -4,8 +4,8 @@ import 'package:flutter/services.dart';
 import 'package:madadgaar/ChatAi/chataiscreen.dart';
 import 'package:madadgaar/firebase_options.dart';
 import 'package:madadgaar/login/signup/signup.dart';
-import 'Home/Home.dart';
-import 'Maps.dart';
+import 'Home/home.dart';
+import 'maps.dart';
 import 'Profile/profile.dart';
 import 'login/signup/login.dart';
 

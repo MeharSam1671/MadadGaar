@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
@@ -22,7 +23,7 @@ class Maps extends StatefulWidget {
 
 class _MapsState extends State<Maps> {
   late GoogleMapController mapController;
-  LatLng initialmaps = const LatLng(32.2002501, 74.2061927);
+  LatLng initialmaps = const LatLng(0, 0);
   LatLng initialmaps2 = const LatLng(31.622729, 74.286317);
   bool isLoading = true;
   late StreamSubscription<Position> locationSubscription;
@@ -30,10 +31,9 @@ class _MapsState extends State<Maps> {
 
   Future<void> setlocation() async {
     Position position = await Geolocator.getCurrentPosition(
-      locationSettings: const LocationSettings(
-        accuracy: LocationAccuracy.high,
-      ),
-    );
+
+        ///desiredAccuracy: LocationAccuracy.high,
+        );
     setState(() {
       initialmaps = LatLng(position.latitude, position.longitude);
       isLoading = false;
@@ -45,11 +45,6 @@ class _MapsState extends State<Maps> {
   @override
   void initState() {
     super.initState();
-
-    setState(() {
-      initialmaps = const LatLng(32.2002501, 74.2061927);
-      isLoading = false;
-    });
     setlocation();
     locationSubscription = getLocationStream().listen((Position position) {
       setState(() {
@@ -57,7 +52,9 @@ class _MapsState extends State<Maps> {
         isLoading = false;
       });
 
-      _createRoute(); // Update route when location changes
+      mapController
+          .animateCamera(CameraUpdate.newLatLng(initialmaps)); // Smooth follow
+      _createRoute(); // Recalculate route
     });
   }
 
@@ -70,35 +67,53 @@ class _MapsState extends State<Maps> {
   Future<void> _createRoute() async {
     List<LatLng> polylineCoordinates = await getPolylinePoints();
     setState(() {
+      polylines.clear(); // Clear previous polyline
       polylines.add(
         Polyline(
           polylineId: const PolylineId("route"),
           points: polylineCoordinates,
           color: Colors.blue,
-          width: 5,
+          width: 4,
         ),
       );
     });
   }
 
   Future<List<LatLng>> getPolylinePoints() async {
-    List<LatLng> polylineCoordinates = [];
-    PolylinePoints polylinePoints = PolylinePoints();
-    PolylineResult result = await polylinePoints.getRouteBetweenCoordinates(
-      "AIzaSyCBQv1_43-rVkUZFCftBVHFeGW8XkmR9Is",
-      PointLatLng(initialmaps.latitude, initialmaps.longitude),
-      PointLatLng(initialmaps2.latitude, initialmaps2.longitude),
-      travelMode: TravelMode.driving,
-    );
-    if (result.points.isNotEmpty) {
-      for (PointLatLng point in result.points) {
-        polylineCoordinates.add(LatLng(point.latitude, point.longitude));
-      }
-    } else {
-      print(result.errorMessage);
-    }
+    try {
+      List<LatLng> polylineCoordinates = [];
+      PolylinePoints polylinePoints = PolylinePoints();
 
-    return polylineCoordinates;
+      PolylineResult result = await polylinePoints.getRouteBetweenCoordinates(
+        "AIzaSyCBQv1_43-rVkUZFCftBVHFeGW8XkmR9Is",
+        PointLatLng(initialmaps.latitude, initialmaps.longitude),
+        PointLatLng(initialmaps2.latitude, initialmaps2.longitude),
+        travelMode: TravelMode.driving,
+      );
+
+      if (result.points.isNotEmpty) {
+        for (PointLatLng point in result.points) {
+          polylineCoordinates.add(LatLng(point.latitude, point.longitude));
+        }
+      } else {
+        if (kDebugMode) {
+          print(result.errorMessage);
+        }
+        if (mounted) {
+          ScaffoldMessenger.of(context)
+              .showSnackBar(const SnackBar(content: Text("No route found")));
+        }
+        return [];
+      }
+
+      return polylineCoordinates;
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text("Unable to fetch the routes")));
+      }
+      return [];
+    }
   }
 
   @override

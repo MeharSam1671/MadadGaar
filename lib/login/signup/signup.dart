@@ -223,7 +223,7 @@ class _SignupScreenState extends State<SignupScreen> {
                         borderSide: const BorderSide(color: Colors.black),
                       ),
                       filled: true,
-                      fillColor: Colors.black.withOpacity(0.1),
+                      fillColor: Colors.black.withAlpha(26),
                     ),
                     style: const TextStyle(color: Colors.black),
                     onChanged: (value) => {fName = value}),
@@ -237,7 +237,7 @@ class _SignupScreenState extends State<SignupScreen> {
                       borderSide: const BorderSide(color: Colors.black),
                     ),
                     filled: true,
-                    fillColor: Colors.black.withOpacity(0.1),
+                    fillColor: Colors.black.withAlpha(26),
                   ),
                   style: const TextStyle(color: Colors.black),
                   onChanged: (value) => {lName = value},
@@ -264,7 +264,7 @@ class _SignupScreenState extends State<SignupScreen> {
                       borderSide: const BorderSide(color: Colors.black),
                     ),
                     filled: true,
-                    fillColor: Colors.black.withOpacity(0.1),
+                    fillColor: Colors.black.withAlpha(26),
                   ),
                   onChanged: (value) {
                     // Validate the username with the regex
@@ -313,7 +313,7 @@ class _SignupScreenState extends State<SignupScreen> {
                       borderSide: const BorderSide(color: Colors.black),
                     ),
                     filled: true,
-                    fillColor: Colors.black.withOpacity(0.1),
+                    fillColor: Colors.black.withAlpha(26),
                     errorText: !isValidEmail
                         ? 'Invalid email format'
                         : email.isNotEmpty && !isUniqueEmail
@@ -359,7 +359,7 @@ class _SignupScreenState extends State<SignupScreen> {
                       borderSide: const BorderSide(color: Colors.black),
                     ),
                     filled: true,
-                    fillColor: Colors.black.withOpacity(0.1),
+                    fillColor: Colors.black.withAlpha(26),
                   ),
                   onChanged: (value) {
                     setState(() {
@@ -395,7 +395,7 @@ class _SignupScreenState extends State<SignupScreen> {
                       borderSide: const BorderSide(color: Colors.black),
                     ),
                     filled: true,
-                    fillColor: Colors.black.withOpacity(0.1),
+                    fillColor: Colors.black.withAlpha(26),
                   ),
                   onChanged: (value) {
                     setState(() {

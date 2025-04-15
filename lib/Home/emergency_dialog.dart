@@ -18,20 +18,11 @@ class EmergencyDialogContent extends StatefulWidget {
 class _EmergencyDialogContentState extends State<EmergencyDialogContent> {
   File? _imageFile;
   bool _isLoading = false;
-  final _textController = TextEditingController();
-
-  // For recording
-  final _audioRecorder = AudioRecorder();
-  String? _recordingPath;
-  bool _isRecording = false;
-  final _audioPlayer = AudioPlayer();
-  bool _isPlaying = false;
+  // Remove the text controller here because it was only used for the dialog
 
   @override
   void dispose() {
-    _textController.dispose();
-    _audioRecorder.dispose();
-    _audioPlayer.dispose();
+    // Nothing extra to dispose now.
     super.dispose();
   }
 
@@ -72,8 +63,7 @@ class _EmergencyDialogContentState extends State<EmergencyDialogContent> {
     try {
       var request = http.MultipartRequest(
         'POST',
-        Uri.parse(
-            'YOUR_API_ENDPOINT_HERE/upload'), // Replace with your actual API endpoint
+        Uri.parse('YOUR_API_ENDPOINT_HERE/upload'),
       );
 
       request.files.add(
@@ -91,12 +81,13 @@ class _EmergencyDialogContentState extends State<EmergencyDialogContent> {
         bool detected = jsonResponse['detected'] ?? false;
 
         if (!detected) {
+          // Close current dialog and open alternative input dialog
           if (mounted) {
-            Navigator.pop(context); // Close current dialog
+            Navigator.pop(context);
             _showAlternativeInputDialog(context);
           }
         } else {
-          // Handle successful detection - perhaps navigate to maps
+          // Handle successful detection (e.g. navigate to maps)
           if (mounted) {
             Navigator.pop(context);
             _checkAndNavigateToMap(context);
@@ -119,7 +110,7 @@ class _EmergencyDialogContentState extends State<EmergencyDialogContent> {
         );
       }
     } finally {
-      if (context.mounted) {
+      if (mounted) {
         setState(() {
           _isLoading = false;
         });
@@ -127,247 +118,17 @@ class _EmergencyDialogContentState extends State<EmergencyDialogContent> {
     }
   }
 
-  // Show dialog for alternative input methods
+  // This version now shows the alternative input dialog by pushing a new widget
   void _showAlternativeInputDialog(BuildContext context) {
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (BuildContext context) {
-        return StatefulBuilder(
-          builder: (context, setState) {
-            return AlertDialog(
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(15),
-              ),
-              title: const Text(
-                "Describe Emergency",
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-              content: SingleChildScrollView(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Text(
-                      "Our system was unable to detect any medical emergency in the image. We're very sorry if this is due to system limitations. To continue, please describe the issue via voice or text.",
-                      style: TextStyle(fontSize: 16),
-                    ),
-                    const SizedBox(height: 20),
-                    // Voice recording controls
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        IconButton(
-                          icon: Icon(
-                            _isRecording ? Icons.stop : Icons.mic,
-                            color: _isRecording ? Colors.red : Colors.blue,
-                            size: 36,
-                          ),
-                          onPressed: () {
-                            _isRecording
-                                ? _stopRecording(setState)
-                                : _startRecording(setState);
-                          },
-                        ),
-                        if (_recordingPath != null) ...[
-                          const SizedBox(width: 16),
-                          IconButton(
-                            icon: Icon(
-                              _isPlaying ? Icons.pause : Icons.play_arrow,
-                              color: Colors.blue,
-                              size: 36,
-                            ),
-                            onPressed: () {
-                              _isPlaying
-                                  ? _pausePlayback(setState)
-                                  : _playRecording(setState);
-                            },
-                          ),
-                        ],
-                      ],
-                    ),
-                    const SizedBox(height: 20),
-                    const Text("OR",
-                        style: TextStyle(fontWeight: FontWeight.bold)),
-                    const SizedBox(height: 20),
-                    // Text input
-                    TextField(
-                      controller: _textController,
-                      maxLines: 3,
-                      decoration: const InputDecoration(
-                        hintText: "Describe the emergency here...",
-                        border: OutlineInputBorder(),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.pop(context),
-                  child: const Text("Cancel"),
-                ),
-                ElevatedButton(
-                  onPressed: () {
-                    _submitAlternativeInput(context);
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blue,
-                    foregroundColor: Colors.white,
-                  ),
-                  child: const Text("Submit"),
-                ),
-              ],
-            );
-          },
-        );
-      },
+      builder: (_) => const AlternativeInputDialog(),
     );
   }
 
-  // Start voice recording
-  Future<void> _startRecording(StateSetter setState) async {
-    try {
-      if (await _audioRecorder.hasPermission()) {
-        final directory = await getTemporaryDirectory();
-        final path =
-            '${directory.path}/recording_${DateTime.now().millisecondsSinceEpoch}.m4a';
-
-        await _audioRecorder
-            .start(const RecordConfig(encoder: AudioEncoder.aacLc), path: path);
-
-        setState(() {
-          _isRecording = true;
-          _recordingPath = path;
-        });
-      } else {
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Microphone permission denied')),
-          );
-        }
-      }
-    } catch (e) {
-      debugPrint('Error starting recording: $e');
-    }
-  }
-
-  // Stop voice recording
-  Future<void> _stopRecording(StateSetter setState) async {
-    try {
-      await _audioRecorder.stop();
-      setState(() {
-        _isRecording = false;
-      });
-    } catch (e) {
-      debugPrint('Error stopping recording: $e');
-    }
-  }
-
-  // Play recorded audio
-  Future<void> _playRecording(StateSetter setState) async {
-    if (_recordingPath == null) return;
-
-    try {
-      await _audioPlayer.play(DeviceFileSource(_recordingPath!));
-      setState(() {
-        _isPlaying = true;
-      });
-
-      _audioPlayer.onPlayerComplete.listen((event) {
-        setState(() {
-          _isPlaying = false;
-        });
-      });
-    } catch (e) {
-      debugPrint('Error playing recording: $e');
-    }
-  }
-
-  // Pause audio playback
-  Future<void> _pausePlayback(StateSetter setState) async {
-    try {
-      await _audioPlayer.pause();
-      setState(() {
-        _isPlaying = false;
-      });
-    } catch (e) {
-      debugPrint('Error pausing playback: $e');
-    }
-  }
-
-  // Submit either voice or text input
-  Future<void> _submitAlternativeInput(BuildContext context) async {
-    bool hasInput = _textController.text.isNotEmpty || _recordingPath != null;
-
-    if (!hasInput) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-            content: Text('Please provide either voice or text input')),
-      );
-      return;
-    }
-
-    setState(() {
-      _isLoading = true;
-    });
-
-    try {
-      var request = http.MultipartRequest(
-        'POST',
-        Uri.parse(
-            'YOUR_API_ENDPOINT_HERE/submit-emergency'), // Replace with your actual API endpoint
-      );
-
-      // Add text if available
-      if (_textController.text.isNotEmpty) {
-        request.fields['description'] = _textController.text;
-      }
-
-      // Add audio file if available
-      if (_recordingPath != null) {
-        request.files.add(
-          await http.MultipartFile.fromPath(
-            'audio',
-            _recordingPath!,
-          ),
-        );
-      }
-
-      var streamedResponse = await request.send();
-      var response = await http.Response.fromStream(streamedResponse);
-
-      if (response.statusCode == 200) {
-        // Handle successful submission
-        if (context.mounted) {
-          Navigator.pop(context);
-          _checkAndNavigateToMap(context);
-        }
-      } else {
-        if (context.mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Failed to submit. Please try again')),
-          );
-        }
-      }
-    } catch (e) {
-      debugPrint('Error submitting: $e');
-      if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Network error. Please try again')),
-        );
-      }
-    } finally {
-      if (context.mounted) {
-        setState(() {
-          _isLoading = false;
-        });
-      }
-    }
-  }
-
-  // Check and navigate to map function - use your existing implementation
+  // Check and navigate to map function – unchanged
   Future<void> _checkAndNavigateToMap(BuildContext context) async {
-    // Check if location services are enabled
     bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
     if (!serviceEnabled) {
       await Geolocator.openLocationSettings();
@@ -397,13 +158,53 @@ class _EmergencyDialogContentState extends State<EmergencyDialogContent> {
           // Show image preview if available
           if (_imageFile != null) ...[
             const SizedBox(height: 16),
-            ClipRRect(
-              borderRadius: BorderRadius.circular(8),
-              child: Image.file(
-                _imageFile!,
-                height: 150,
-                width: double.infinity,
-                fit: BoxFit.cover,
+            GestureDetector(
+              onTap: () {
+                // Show zoomed image in dialog
+                showDialog(
+                  context: context,
+                  builder: (context) => Dialog(
+                    insetPadding: const EdgeInsets.all(16),
+                    child: Stack(
+                      fit: StackFit.passthrough,
+                      children: [
+                        InteractiveViewer(
+                          panEnabled: true,
+                          minScale: 0.5,
+                          maxScale: 4,
+                          child: Image.file(
+                            _imageFile!,
+                            fit: BoxFit.contain,
+                          ),
+                        ),
+                        Positioned(
+                          top: 8,
+                          right: 8,
+                          child: IconButton(
+                            icon: const Icon(Icons.close, color: Colors.white),
+                            onPressed: () => Navigator.of(context).pop(),
+                            style: IconButton.styleFrom(
+                              backgroundColor: Colors.black54,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              },
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(8),
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(
+                    maxWidth: MediaQuery.of(context).size.width * 0.8,
+                    maxHeight: 150,
+                  ),
+                  child: Image.file(
+                    _imageFile!,
+                    fit: BoxFit.contain,
+                  ),
+                ),
               ),
             ),
             const SizedBox(height: 8),
@@ -432,7 +233,7 @@ class _EmergencyDialogContentState extends State<EmergencyDialogContent> {
           const Text("OR", style: TextStyle(fontWeight: FontWeight.bold)),
           const SizedBox(height: 16),
 
-          // Second option: Skip to alternative inputs
+          // Second option: Alternative input
           _buildOptionCard(
             context,
             title: "Describe Emergency",
@@ -499,6 +300,243 @@ class _EmergencyDialogContentState extends State<EmergencyDialogContent> {
           ),
         ),
       ),
+    );
+  }
+}
+
+// -------------------------------------------------------------
+// Alternative Input Dialog Widget
+// This dialog now manages its own text controller (and audio state)
+// so its lifecycle is independent and you avoid accessing a controller after disposal.
+// -------------------------------------------------------------
+class AlternativeInputDialog extends StatefulWidget {
+  const AlternativeInputDialog({super.key});
+
+  @override
+  State<AlternativeInputDialog> createState() => _AlternativeInputDialogState();
+}
+
+class _AlternativeInputDialogState extends State<AlternativeInputDialog> {
+  final TextEditingController _textController = TextEditingController();
+
+  // Audio recording state for the dialog
+  final _audioRecorder = AudioRecorder();
+  String? _recordingPath;
+  bool _isRecording = false;
+  final _audioPlayer = AudioPlayer();
+  bool _isPlaying = false;
+  bool _isLoading = false;
+
+  @override
+  void dispose() {
+    _textController.dispose();
+    _audioRecorder.dispose();
+    _audioPlayer.dispose();
+    super.dispose();
+  }
+
+  // Start voice recording
+  Future<void> _startRecording() async {
+    try {
+      if (await _audioRecorder.hasPermission()) {
+        final directory = await getTemporaryDirectory();
+        final path =
+            '${directory.path}/recording_${DateTime.now().millisecondsSinceEpoch}.m4a';
+        await _audioRecorder.start(
+          const RecordConfig(encoder: AudioEncoder.aacLc),
+          path: path,
+        );
+        setState(() {
+          _isRecording = true;
+          _recordingPath = path;
+        });
+      } else {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Microphone permission denied')),
+          );
+        }
+      }
+    } catch (e) {
+      debugPrint('Error starting recording: $e');
+    }
+  }
+
+  // Stop voice recording
+  Future<void> _stopRecording() async {
+    try {
+      await _audioRecorder.stop();
+      setState(() {
+        _isRecording = false;
+      });
+    } catch (e) {
+      debugPrint('Error stopping recording: $e');
+    }
+  }
+
+  // Play recorded audio
+  Future<void> _playRecording() async {
+    if (_recordingPath == null) return;
+    try {
+      await _audioPlayer.play(DeviceFileSource(_recordingPath!));
+      setState(() {
+        _isPlaying = true;
+      });
+      _audioPlayer.onPlayerComplete.listen((event) {
+        setState(() {
+          _isPlaying = false;
+        });
+      });
+    } catch (e) {
+      debugPrint('Error playing recording: $e');
+    }
+  }
+
+  // Pause audio playback
+  Future<void> _pausePlayback() async {
+    try {
+      await _audioPlayer.pause();
+      setState(() {
+        _isPlaying = false;
+      });
+    } catch (e) {
+      debugPrint('Error pausing playback: $e');
+    }
+  }
+
+  // Submit the alternative input (voice or text)
+  Future<void> _submitAlternativeInput() async {
+    bool hasInput = _textController.text.isNotEmpty || _recordingPath != null;
+    if (!hasInput) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+            content: Text('Please provide either voice or text input')),
+      );
+      return;
+    }
+    setState(() {
+      _isLoading = true;
+    });
+    try {
+      var request = http.MultipartRequest(
+        'POST',
+        Uri.parse('YOUR_API_ENDPOINT_HERE/submit-emergency'),
+      );
+      // Use the text from the dialog's controller
+      if (_textController.text.isNotEmpty) {
+        request.fields['description'] = _textController.text;
+      }
+      // Add audio file if available
+      if (_recordingPath != null) {
+        request.files.add(
+          await http.MultipartFile.fromPath('audio', _recordingPath!),
+        );
+      }
+      var streamedResponse = await request.send();
+      var response = await http.Response.fromStream(streamedResponse);
+      if (response.statusCode == 200 && mounted) {
+        Navigator.pop(context);
+        // Optionally, trigger navigation (e.g. maps) here.
+      } else {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Failed to submit. Please try again')),
+          );
+        }
+      }
+    } catch (e) {
+      debugPrint('Error submitting: $e');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Network error. Please try again')),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(15),
+      ),
+      title: const Text(
+        "Describe Emergency",
+        style: TextStyle(fontWeight: FontWeight.bold),
+      ),
+      content: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text(
+              "Our system was unable to detect any medical emergency in the image. We're very sorry if this is due to system limitations. To continue, please describe the issue via voice or text.",
+              style: TextStyle(fontSize: 16),
+            ),
+            const SizedBox(height: 20),
+            // Voice recording controls
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                IconButton(
+                  icon: Icon(
+                    _isRecording ? Icons.stop : Icons.mic,
+                    color: _isRecording ? Colors.red : Colors.blue,
+                    size: 36,
+                  ),
+                  onPressed: () {
+                    _isRecording ? _stopRecording() : _startRecording();
+                  },
+                ),
+                if (_recordingPath != null) ...[
+                  const SizedBox(width: 16),
+                  IconButton(
+                    icon: Icon(
+                      _isPlaying ? Icons.pause : Icons.play_arrow,
+                      color: Colors.blue,
+                      size: 36,
+                    ),
+                    onPressed: () {
+                      _isPlaying ? _pausePlayback() : _playRecording();
+                    },
+                  ),
+                ],
+              ],
+            ),
+            const SizedBox(height: 20),
+            const Text("OR", style: TextStyle(fontWeight: FontWeight.bold)),
+            const SizedBox(height: 20),
+            // Text input using the dialog's own TextEditingController
+            TextField(
+              controller: _textController,
+              maxLines: 3,
+              decoration: const InputDecoration(
+                hintText: "Describe the emergency here...",
+                border: OutlineInputBorder(),
+              ),
+            ),
+          ],
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: const Text("Cancel"),
+        ),
+        ElevatedButton(
+          onPressed: _isLoading ? null : _submitAlternativeInput,
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.blue,
+            foregroundColor: Colors.white,
+          ),
+          child: const Text("Submit"),
+        ),
+      ],
     );
   }
 }

@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:madadgaar/auth/utils.dart';
 
@@ -37,7 +38,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
         email = querySnapshot.docs.first["email"];
       });
     } else {
-      print("User not found");
+      if (kDebugMode) {
+        print("User not found");
+      }
+      if (mounted) {
+        await authUtils.logOut(context);
+      }
     }
   }
 
@@ -51,16 +57,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
             padding: const EdgeInsets.only(right: 16.0),
             child: IconButton(
               onPressed: () async {
-                print("Logout button pressed");
-                final success = await authUtils.logOut();
-                if (success && context.mounted) {
-                  Navigator.pushNamedAndRemoveUntil(
-                    context,
-                    '/Home',
-                    (Route<dynamic> route) => false,
-                    arguments: null,
-                  );
+                if (kDebugMode) {
+                  print("Logout button pressed");
                 }
+                await authUtils.logOut(context, silent: false);
               },
               style: TextButton.styleFrom(
                 foregroundColor: Colors.black,

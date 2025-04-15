@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:dialog_flowtter/dialog_flowtter.dart';
 
@@ -44,7 +45,9 @@ class _ChatAIScreenState extends State<ChatAIScreen> {
       });
       setState(() => _isInitialized = true);
     } catch (e) {
-      print('Error initializing Dialogflow: $e');
+      if (kDebugMode) {
+        print('Error initializing Dialogflow: $e');
+      }
       // Handle initialization error
     }
   }
@@ -76,7 +79,9 @@ class _ChatAIScreenState extends State<ChatAIScreen> {
           });
         }
       } catch (e) {
-        print('Error getting Dialogflow response: $e');
+        if (kDebugMode) {
+          print('Error getting Dialogflow response: $e');
+        }
         setState(() {
           _messages.add({
             'message': 'Sorry, there was an error processing your request.',

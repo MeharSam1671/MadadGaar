@@ -1,11 +1,9 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:geolocator/geolocator.dart';
 import 'package:intl/intl.dart';
 import 'package:madadgaar/Home/emergency_dialog.dart';
 import 'package:madadgaar/Profile/profile.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 import '../Blogs/blogs.dart';
 import 'fulltext.dart';
@@ -79,81 +77,6 @@ class _HomeState extends State<Home> {
     return DateFormat('hh:mm:ss a').format(DateTime.now());
   }
 
-  Future<void> _checkAndNavigateToMap(BuildContext context) async {
-    // Check if location services are enabled
-    bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
-    if (!serviceEnabled) {
-      await Geolocator.openLocationSettings();
-    } else {
-      if (context.mounted) {
-        Navigator.pushNamed(context, "/maps");
-      }
-    }
-  }
-
-  // void _showCustomDialog(BuildContext context) {
-  //   showDialog(
-  //     context: context,
-  //     builder: (BuildContext context) {
-  //       return AlertDialog(
-  //         shape: RoundedRectangleBorder(
-  //           borderRadius: BorderRadius.circular(15),
-  //         ),
-  //         title: const Text(
-  //           "Select an Option",
-  //           style: TextStyle(fontWeight: FontWeight.bold),
-  //         ),
-  //         content: Column(
-  //           mainAxisSize: MainAxisSize.min,
-  //           children: [
-  //             _buildDialogOption(
-  //               context,
-  //               icon: Icons.local_shipping,
-  //               text: "Ambulance Van",
-  //               onTap: () {
-  //                 _performAction("Ambulance Van selected");
-  //               },
-  //             ),
-  //             _buildDialogOption(
-  //               context,
-  //               icon: Icons.two_wheeler,
-  //               text: "Ambulance Bike",
-  //               onTap: () {
-  //                 _performAction("Ambulance Bike selected");
-  //                 _checkAndNavigateToMap(context);
-  //               },
-  //             ),
-  //             _buildDialogOption(
-  //               context,
-  //               icon: Icons.phone,
-  //               text: "Call Helpline",
-  //               onTap: () {
-  //                 _performAction("Call Helpline");
-  //                 // Replace with the helpline number
-  //               },
-  //             ),
-  //             _buildDialogOption(
-  //               context,
-  //               icon: Icons.help_outline,
-  //               text: "Help & Queries",
-  //               onTap: () {
-  //                 Navigator.pop(context);
-  //                 _performAction("Help & Queries selected");
-  //               },
-  //             ),
-  //           ],
-  //         ),
-  //         actions: [
-  //           TextButton(
-  //             onPressed: () => Navigator.pop(context),
-  //             child: const Text("Cancel"),
-  //           ),
-  //         ],
-  //       );
-  //     },
-  //   );
-  // }
-
   void _showCustomDialog(BuildContext context) {
     showDialog(
       context: context,
@@ -180,38 +103,6 @@ class _HomeState extends State<Home> {
         );
       },
     );
-  }
-
-  Widget _buildDialogOption(BuildContext context,
-      {required IconData icon,
-      required String text,
-      required VoidCallback onTap}) {
-    final arguments =
-        ModalRoute.of(context)?.settings.arguments as Map<String, String>?;
-
-    final userName = arguments?['userName'];
-    final password = arguments?['password'];
-    return ListTile(
-      leading: Icon(icon, color: Colors.blue),
-      title: Text(text),
-      onTap: onTap,
-    );
-  }
-
-  void _performAction(String message) {
-    if (message == "Ambulance Van selected") {
-      _checkAndNavigateToMap(context);
-      Navigator.pushNamed(context, "/maps");
-    }
-    if (message == "Ambulance Bike selected") {
-      _checkAndNavigateToMap(context);
-      Navigator.pushNamed(context, "/maps");
-    }
-    if (message == "Call Helpline") {
-      _callHelpline(context, "1122");
-    }
-    // Placeholder for performing specific actions
-    debugPrint(message);
   }
 
   void _startAnimation() {
@@ -578,72 +469,5 @@ class _HomeState extends State<Home> {
             });
           },
         ));
-  }
-
-  Widget _buildListItem(String title, String subtitle, String assetPath) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
-      child: Row(
-        children: [
-          Container(
-            width: MediaQuery.of(context).size.width *
-                0.5, // Provide a width constraint
-            color: Colors.blue,
-            alignment: Alignment.centerLeft,
-            padding: const EdgeInsets.symmetric(horizontal: 10),
-            child: Text(
-              title,
-              style: const TextStyle(color: Colors.white, fontSize: 16),
-            ),
-          ),
-          Container(
-            width: MediaQuery.of(context).size.width *
-                0.5, // Provide a width constraint
-            decoration: const BoxDecoration(
-              borderRadius: BorderRadius.only(
-                topRight: Radius.circular(20),
-                bottomLeft: Radius.circular(20),
-              ),
-              color: Colors.red,
-            ),
-            child: ListTile(
-              subtitle: Text(
-                subtitle,
-                style: const TextStyle(color: Colors.white),
-              ),
-              trailing: Image.asset(
-                assetPath,
-                height: 30,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-Future<void> _callHelpline(BuildContext context, String phoneNumber) async {
-  try {
-    final Uri url = Uri(scheme: 'tel', path: phoneNumber);
-    debugPrint("Attempting to launch URL: $url");
-
-    if (await canLaunchUrl(url)) {
-      debugPrint("Launching URL: $url");
-      await launchUrl(url, mode: LaunchMode.externalApplication);
-    } else {
-      debugPrint("Cannot launch URL: $url");
-      if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-            content: Text("Phone dialer could not be launched.")));
-      }
-    }
-  } catch (e, stackTrace) {
-    debugPrint("Error launching URL: $e");
-    debugPrint("Stack Trace: $stackTrace");
-    if (context.mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("An unexpected error occurred.")));
-    }
   }
 }

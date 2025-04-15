@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:madadgaar/login/signup/signup.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -50,7 +51,7 @@ class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _passwordController = TextEditingController();
 
   String? userName, password;
-  bool Login = false;
+  bool login = false;
   bool isLoading = false;
   Future<void> checkuser() async {
     setState(() {
@@ -64,12 +65,14 @@ class _LoginScreenState extends State<LoginScreen> {
         .get();
     if (querySnapshot.docs.isNotEmpty) {
       final SharedPreferences prefs = await SharedPreferences.getInstance();
-      Login = true;
+      login = true;
       await prefs.setString("userName", querySnapshot.docs.first["fName"]);
 
       userName = querySnapshot.docs.first["fName"];
     } else {
-      print("not found");
+      if (kDebugMode) {
+        print("not found");
+      }
     }
     setState(() {
       isLoading = false;
@@ -101,7 +104,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       borderSide: const BorderSide(color: Colors.black),
                     ),
                     filled: true,
-                    fillColor: Colors.black.withOpacity(0.1),
+                    fillColor: Colors.black.withAlpha(26),
                   ),
                   onChanged: (value) {
                     setState(() {
@@ -124,7 +127,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       borderSide: const BorderSide(color: Colors.black),
                     ),
                     filled: true,
-                    fillColor: Colors.black.withOpacity(0.1),
+                    fillColor: Colors.black.withAlpha(26),
                     // Add suffix icon for password visibility toggle
                     suffixIcon: password?.isNotEmpty ?? false
                         ? IconButton(
@@ -156,16 +159,18 @@ class _LoginScreenState extends State<LoginScreen> {
                           (password?.isNotEmpty ?? false)
                       ? () async {
                           await checkuser();
-                          if (Login && context.mounted) {
+                          if (login && context.mounted) {
                             Navigator.pushNamedAndRemoveUntil(context, "/Home",
                                 (Route<dynamic> route) => false,
                                 arguments: userName);
                           } else {
-                            ScaffoldMessenger.of(context).showSnackBar(
+                            if (context.mounted) {
+                              ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(
                                   content:
                                       Text("Invalid username or password")),
                             );
+                            }
                           }
                         }
                       : null,
