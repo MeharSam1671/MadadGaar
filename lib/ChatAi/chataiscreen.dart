@@ -108,7 +108,7 @@ class _ChatAIScreenState extends State<ChatAIScreen> {
               reverse: true,
               itemCount: _messages.length,
               itemBuilder: (context, index) {
-                final messageData = _messages[index];
+                final messageData = _messages[_messages.length - 1 - index];
                 return Align(
                   alignment: messageData['isUserMessage']
                       ? Alignment.centerRight
