@@ -6,7 +6,7 @@ import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 
 Stream<Position> getLocationStream() {
   return Geolocator.getPositionStream(
-    locationSettings: LocationSettings(
+    locationSettings: const LocationSettings(
       accuracy: LocationAccuracy.high,
       distanceFilter: 10, // Update when the user moves 10 meters
     ),
@@ -22,8 +22,8 @@ class Maps extends StatefulWidget {
 
 class _MapsState extends State<Maps> {
   late GoogleMapController mapController;
-  LatLng initialmaps = LatLng(0, 0);
-  LatLng initialmaps2 = LatLng(31.622729, 74.286317);
+  LatLng initialmaps = const LatLng(32.2002501, 74.2061927);
+  LatLng initialmaps2 = const LatLng(31.622729, 74.286317);
   bool isLoading = true;
   late StreamSubscription<Position> locationSubscription;
   Set<Polyline> polylines = {}; // Store polyline data
@@ -43,6 +43,11 @@ class _MapsState extends State<Maps> {
   @override
   void initState() {
     super.initState();
+
+    setState(() {
+      initialmaps = const LatLng(32.2002501, 74.2061927);
+      isLoading = false;
+    });
     setlocation();
     locationSubscription = getLocationStream().listen((Position position) {
       setState(() {
@@ -65,7 +70,7 @@ class _MapsState extends State<Maps> {
     setState(() {
       polylines.add(
         Polyline(
-          polylineId: PolylineId("route"),
+          polylineId: const PolylineId("route"),
           points: polylineCoordinates,
           color: Colors.blue,
           width: 5,
@@ -77,14 +82,12 @@ class _MapsState extends State<Maps> {
   Future<List<LatLng>> getPolylinePoints() async {
     List<LatLng> polylineCoordinates = [];
     PolylinePoints polylinePoints = PolylinePoints();
-
     PolylineResult result = await polylinePoints.getRouteBetweenCoordinates(
       "AIzaSyCBQv1_43-rVkUZFCftBVHFeGW8XkmR9Is",
       PointLatLng(initialmaps.latitude, initialmaps.longitude),
       PointLatLng(initialmaps2.latitude, initialmaps2.longitude),
       travelMode: TravelMode.driving,
     );
-
     if (result.points.isNotEmpty) {
       for (PointLatLng point in result.points) {
         polylineCoordinates.add(LatLng(point.latitude, point.longitude));
@@ -105,24 +108,23 @@ class _MapsState extends State<Maps> {
       body: isLoading
           ? const Center(child: CircularProgressIndicator())
           : GoogleMap(
-        initialCameraPosition:
-        CameraPosition(target: initialmaps, zoom: 12),
-        onMapCreated: (GoogleMapController controller) {
-          mapController = controller;
-          mapController.animateCamera(
-            CameraUpdate.newLatLng(initialmaps),
-          );
-        },
-        markers: {
-          Marker(
-              markerId: MarkerId("destination"),
-              position: initialmaps2),
-
-        },
-        myLocationEnabled: true,
-        myLocationButtonEnabled: true,
-        polylines: polylines, // Add the polyline to the map
-      ),
+              initialCameraPosition:
+                  CameraPosition(target: initialmaps, zoom: 12),
+              onMapCreated: (GoogleMapController controller) {
+                mapController = controller;
+                mapController.animateCamera(
+                  CameraUpdate.newLatLng(initialmaps),
+                );
+              },
+              markers: {
+                Marker(
+                    markerId: const MarkerId("destination"),
+                    position: initialmaps2),
+              },
+              myLocationEnabled: true,
+              myLocationButtonEnabled: true,
+              polylines: polylines, // Add the polyline to the map
+            ),
     );
   }
 }

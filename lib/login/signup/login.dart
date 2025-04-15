@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:madadgaar/login/signup/signup.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -62,7 +63,10 @@ class _LoginScreenState extends State<LoginScreen> {
         .where("password", isEqualTo: password)
         .get();
     if (querySnapshot.docs.isNotEmpty) {
+      final SharedPreferences prefs = await SharedPreferences.getInstance();
       Login = true;
+      await prefs.setString("userName", querySnapshot.docs.first["fName"]);
+
       userName = querySnapshot.docs.first["fName"];
     } else {
       print("not found");

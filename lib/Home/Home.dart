@@ -2,7 +2,9 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:intl/intl.dart';
+import 'package:madadgaar/Home/emergency_dialog.dart';
 import 'package:madadgaar/Profile/profile.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../Blogs/blogs.dart';
@@ -22,10 +24,12 @@ class _HomeState extends State<Home> {
   late Alignment beginAlignment;
   late Alignment endAlignment;
   bool login = false;
+  bool isUserLoading = true;
   String? userName;
   @override
   void initState() {
     super.initState();
+    getUserState();
     beginAlignment = Alignment.topRight;
     endAlignment = Alignment.bottomLeft;
     _startAnimation();
@@ -36,6 +40,16 @@ class _HomeState extends State<Home> {
         currentTime = _getCurrentTime();
       });
     });
+  }
+
+  Future<void> getUserState() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? user = prefs.getString('userName');
+    if (user != null) {
+      setState(() {
+        userName = user;
+      });
+    }
   }
 
   @override
@@ -77,6 +91,69 @@ class _HomeState extends State<Home> {
     }
   }
 
+  // void _showCustomDialog(BuildContext context) {
+  //   showDialog(
+  //     context: context,
+  //     builder: (BuildContext context) {
+  //       return AlertDialog(
+  //         shape: RoundedRectangleBorder(
+  //           borderRadius: BorderRadius.circular(15),
+  //         ),
+  //         title: const Text(
+  //           "Select an Option",
+  //           style: TextStyle(fontWeight: FontWeight.bold),
+  //         ),
+  //         content: Column(
+  //           mainAxisSize: MainAxisSize.min,
+  //           children: [
+  //             _buildDialogOption(
+  //               context,
+  //               icon: Icons.local_shipping,
+  //               text: "Ambulance Van",
+  //               onTap: () {
+  //                 _performAction("Ambulance Van selected");
+  //               },
+  //             ),
+  //             _buildDialogOption(
+  //               context,
+  //               icon: Icons.two_wheeler,
+  //               text: "Ambulance Bike",
+  //               onTap: () {
+  //                 _performAction("Ambulance Bike selected");
+  //                 _checkAndNavigateToMap(context);
+  //               },
+  //             ),
+  //             _buildDialogOption(
+  //               context,
+  //               icon: Icons.phone,
+  //               text: "Call Helpline",
+  //               onTap: () {
+  //                 _performAction("Call Helpline");
+  //                 // Replace with the helpline number
+  //               },
+  //             ),
+  //             _buildDialogOption(
+  //               context,
+  //               icon: Icons.help_outline,
+  //               text: "Help & Queries",
+  //               onTap: () {
+  //                 Navigator.pop(context);
+  //                 _performAction("Help & Queries selected");
+  //               },
+  //             ),
+  //           ],
+  //         ),
+  //         actions: [
+  //           TextButton(
+  //             onPressed: () => Navigator.pop(context),
+  //             child: const Text("Cancel"),
+  //           ),
+  //         ],
+  //       );
+  //     },
+  //   );
+  // }
+
   void _showCustomDialog(BuildContext context) {
     showDialog(
       context: context,
@@ -86,49 +163,10 @@ class _HomeState extends State<Home> {
             borderRadius: BorderRadius.circular(15),
           ),
           title: const Text(
-            "Select an Option",
+            "Emergency Assistance",
             style: TextStyle(fontWeight: FontWeight.bold),
           ),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              _buildDialogOption(
-                context,
-                icon: Icons.local_shipping,
-                text: "Ambulance Van",
-                onTap: () {
-                  _performAction("Ambulance Van selected");
-                },
-              ),
-              _buildDialogOption(
-                context,
-                icon: Icons.two_wheeler,
-                text: "Ambulance Bike",
-                onTap: () {
-                  _performAction("Ambulance Bike selected");
-                  _checkAndNavigateToMap(context);
-                },
-              ),
-              _buildDialogOption(
-                context,
-                icon: Icons.phone,
-                text: "Call Helpline",
-                onTap: () {
-                  _performAction("Call Helpline");
-                  // Replace with the helpline number
-                },
-              ),
-              _buildDialogOption(
-                context,
-                icon: Icons.help_outline,
-                text: "Help & Queries",
-                onTap: () {
-                  Navigator.pop(context);
-                  _performAction("Help & Queries selected");
-                },
-              ),
-            ],
-          ),
+          content: const EmergencyDialogContent(),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),

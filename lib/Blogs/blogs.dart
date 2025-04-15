@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../Home/home.dart';
+import '../Home/Home.dart';
 import '../Home/fulltext.dart';
 
 class BlogsScreen extends StatefulWidget {

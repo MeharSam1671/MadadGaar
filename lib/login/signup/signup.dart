@@ -69,13 +69,17 @@ class _SignupScreenState extends State<SignupScreen> {
         });
       }
       var dbInstance = FirebaseFirestore.instance;
+
+      // Add the createdAt field with the current timestamp
       await dbInstance.collection('users').add({
         "email": email,
         "userID": user,
         "fName": fName,
         "lName": lName,
         "password": password,
+        "createdAt": FieldValue.serverTimestamp(), // Adding createdAt field
       });
+
       if (mounted) {
         setState(() {
           isLoading = false;
