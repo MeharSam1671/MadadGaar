@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:madadgaar/ChatAi/chataiscreen.dart';
 import 'package:madadgaar/firebase_options.dart';
 import 'package:madadgaar/login/signup/signup.dart';
+import 'package:madadgaar/settings/settings.dart';
 import 'Home/home.dart';
 import 'maps.dart';
 import 'Profile/profile.dart';
@@ -41,6 +42,7 @@ class _MyAppState extends State<MyApp> {
         "/Signup": (context) => const SignupScreen(),
         '/showProfile': (context) => const ProfileScreen(),
         '/LoginProfile': (context) => const LoginScreen(),
+        '/Settings': (context) => const SettingsPage(),
       },
       home: const Home(),
     );

@@ -436,11 +436,20 @@ class _HomeState extends State<Home> {
                         ), // Default to 'Guest' if userName is null
                         IconButton(
                           icon: const Icon(
-                            Icons.search,
+                            Icons.settings,
                             color: Colors.white,
                           ),
-                          onPressed: () {},
+                          onPressed: () {
+                            Navigator.of(context).pushNamed('/Settings');
+                          },
                         ),
+                        // IconButton(
+                        //   icon: const Icon(
+                        //     Icons.search,
+                        //     color: Colors.white,
+                        //   ),
+                        //   onPressed: () {},
+                        // ),
                       ],
                     ),
                   ]),

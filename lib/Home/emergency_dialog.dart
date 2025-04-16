@@ -3,6 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:http/http.dart' as http;
+import 'package:http_parser/http_parser.dart';
+import 'package:mime/mime.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 import 'package:record/record.dart';
 import 'package:path_provider/path_provider.dart';
@@ -18,7 +21,22 @@ class EmergencyDialogContent extends StatefulWidget {
 class _EmergencyDialogContentState extends State<EmergencyDialogContent> {
   File? _imageFile;
   bool _isLoading = false;
+  String _backendAddress = '192.168.100.51:4000';
   // Remove the text controller here because it was only used for the dialog
+
+  Future<void> _loadBackendAddress() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _backendAddress =
+          prefs.getString('backend_addr') ?? '192.168.100.51:4000';
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _loadBackendAddress();
+  }
 
   @override
   void dispose() {
@@ -63,22 +81,26 @@ class _EmergencyDialogContentState extends State<EmergencyDialogContent> {
     try {
       var request = http.MultipartRequest(
         'POST',
-        Uri.parse('YOUR_API_ENDPOINT_HERE/upload'),
+        Uri.parse('$_backendAddress/image-analysis/analyze'),
       );
+
+      String? mimeType = lookupMimeType(_imageFile!.path);
 
       request.files.add(
         await http.MultipartFile.fromPath(
           'image',
           _imageFile!.path,
+          contentType: mimeType != null
+              ? MediaType.parse(mimeType)
+              : null, // Set the content type here
         ),
       );
 
       var streamedResponse = await request.send();
       var response = await http.Response.fromStream(streamedResponse);
-
-      if (response.statusCode == 200) {
+      if (response.statusCode == 201) {
         var jsonResponse = jsonDecode(response.body);
-        bool detected = jsonResponse['detected'] ?? false;
+        bool detected = jsonResponse['detected_medical_emergency'] ?? false;
 
         if (!detected) {
           // Close current dialog and open alternative input dialog
@@ -123,7 +145,9 @@ class _EmergencyDialogContentState extends State<EmergencyDialogContent> {
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (_) => const AlternativeInputDialog(),
+        builder: (_) => AlternativeInputDialog(
+              backendAddress: _backendAddress,
+            )
     );
   }
 
@@ -310,7 +334,8 @@ class _EmergencyDialogContentState extends State<EmergencyDialogContent> {
 // so its lifecycle is independent and you avoid accessing a controller after disposal.
 // -------------------------------------------------------------
 class AlternativeInputDialog extends StatefulWidget {
-  const AlternativeInputDialog({super.key});
+  const AlternativeInputDialog({super.key, required this.backendAddress});
+  final String backendAddress;
 
   @override
   State<AlternativeInputDialog> createState() => _AlternativeInputDialogState();
@@ -420,7 +445,7 @@ class _AlternativeInputDialogState extends State<AlternativeInputDialog> {
     try {
       var request = http.MultipartRequest(
         'POST',
-        Uri.parse('YOUR_API_ENDPOINT_HERE/submit-emergency'),
+        Uri.parse('${widget.backendAddress}/submit-emergency'),
       );
       // Use the text from the dialog's controller
       if (_textController.text.isNotEmpty) {

@@ -85,10 +85,12 @@ class _MapsState extends State<Maps> {
       PolylinePoints polylinePoints = PolylinePoints();
 
       PolylineResult result = await polylinePoints.getRouteBetweenCoordinates(
-        "AIzaSyCBQv1_43-rVkUZFCftBVHFeGW8XkmR9Is",
-        PointLatLng(initialmaps.latitude, initialmaps.longitude),
-        PointLatLng(initialmaps2.latitude, initialmaps2.longitude),
-        travelMode: TravelMode.driving,
+        googleApiKey: "AIzaSyCBQv1_43-rVkUZFCftBVHFeGW8XkmR9Is",
+        request: PolylineRequest(
+            origin: PointLatLng(initialmaps.latitude, initialmaps.longitude),
+            destination:
+                PointLatLng(initialmaps2.latitude, initialmaps2.longitude),
+            mode: TravelMode.driving),
       );
 
       if (result.points.isNotEmpty) {
