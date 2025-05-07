@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:madadgaar/Home/emergency_dialog.dart';
@@ -15,15 +16,41 @@ class Home extends StatefulWidget {
   State<Home> createState() => _HomeState();
 }
 
-class _HomeState extends State<Home> {
-  String currentTime = ''; // For displaying the current time
-  int _currentIndex = 0; // For bottom navigation bar index
-  Timer? _timer; // Timer to update the current time periodically
+class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
+  String currentTime = '';
+  final List<String> _cardImages = [
+    "https://picsum.photos/id/237/400/200",
+    "https://picsum.photos/id/1003/400/200",
+    "https://picsum.photos/id/1025/400/200",
+  ];
+  final List<String> _cardTitles = [
+    "Breaking News",
+    "Tech Update",
+    "Health Tips",
+  ];
+  final List<String> _cardSubtitles = [
+    "Flutter 3.22 launched with major improvements.",
+    "AI continues to transform software development.",
+    "10 simple steps to boost your immune system.",
+  ];
+
+  final List<String> _cardDates = [
+    "Posted: May 7, 2025",
+    "Posted: May 6, 2025",
+    "Posted: May 5, 2025",
+  ];
+  int _currentIndex = 0;
+  Timer? _timer;
   late Alignment beginAlignment;
   late Alignment endAlignment;
   bool login = false;
   bool isUserLoading = true;
   String? userName;
+
+  int _currentCardIndex = 0;
+  final PageController _cardController = PageController();
+  final List<String> _cardTexts = ['Emergency Tip 1', 'Emergency Tip 2', 'Emergency Tip 3'];
+
   @override
   void initState() {
     super.initState();
@@ -32,11 +59,21 @@ class _HomeState extends State<Home> {
     endAlignment = Alignment.bottomLeft;
     _startAnimation();
     currentTime = _getCurrentTime();
-    // Timer to update the current time every second
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
       setState(() {
         currentTime = _getCurrentTime();
       });
+    });
+    // Auto scroll cards every 3 seconds
+    Timer.periodic(const Duration(seconds: 3), (timer) {
+      if (_cardController.hasClients) {
+        _currentCardIndex = (_currentCardIndex + 1) % _cardTexts.length;
+        _cardController.animateToPage(
+          _currentCardIndex,
+          duration: const Duration(milliseconds: 500),
+          curve: Curves.easeInOut,
+        );
+      }
     });
   }
 
@@ -55,26 +92,15 @@ class _HomeState extends State<Home> {
     super.didChangeDependencies();
     final args = ModalRoute.of(context)?.settings.arguments;
     if (args != null && args is String) {
-      userName = args; // Assign the argument to the userName variable
+      userName = args;
     }
   }
 
   @override
   void dispose() {
-    _timer?.cancel(); // Cancel timer to avoid memory leaks
+    _timer?.cancel();
+    _cardController.dispose();
     super.dispose();
-  }
-
-  void checkBottomNavigationBar() {
-    if (_currentIndex == 1) {
-      Navigator.pushReplacement(context,
-          MaterialPageRoute(builder: (context) => const BlogsScreen()));
-    }
-  }
-
-  String _getCurrentTime() {
-    // Format the current time
-    return DateFormat('hh:mm:ss a').format(DateTime.now());
   }
 
   void _showCustomDialog(BuildContext context) {
@@ -106,11 +132,9 @@ class _HomeState extends State<Home> {
   }
 
   void _startAnimation() {
-    // Toggle gradient direction every 2 seconds
     Future.delayed(const Duration(seconds: 3), () {
       if (mounted) {
         setState(() {
-          // Toggle between two different gradients
           beginAlignment = beginAlignment == Alignment.topRight
               ? Alignment.topLeft
               : Alignment.topRight;
@@ -118,365 +142,229 @@ class _HomeState extends State<Home> {
               ? Alignment.bottomRight
               : Alignment.bottomLeft;
         });
-        _startAnimation(); // Repeat the animation
+        _startAnimation();
       }
     });
   }
 
+  String _getCurrentTime() {
+    return DateFormat('hh:mm:ss a').format(DateTime.now());
+  }
+
   @override
   Widget build(BuildContext context) {
-    if (userName != null) {
-      login = true;
-    }
+    if (userName != null) login = true;
+
     return Scaffold(
-        body: Stack(children: [
-          Stack(
-            children: [
-              Stack(
+      body: Stack(
+        children: [
+          // Gradient Background
+          AnimatedContainer(
+            height: MediaQuery.of(context).size.height,
+            width: MediaQuery.of(context).size.width,
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [Colors.blue.shade500, Colors.purple.shade300], // Gradient colors
+                begin: beginAlignment,
+                end: endAlignment,
+              ),
+            ),
+            duration: const Duration(seconds: 2),
+            child: SafeArea(
+              child: Column(
                 children: [
-                  AnimatedContainer(
-                    height: MediaQuery.of(context).size.height,
-                    width: MediaQuery.of(context).size.width,
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: const [Colors.red, Colors.blue],
-                        begin: beginAlignment,
-                        end: endAlignment,
+                  const SizedBox(height: 40),
+                  SizedBox(height: MediaQuery.of(context).size.height * 0.052),
+                  const Center(
+                    child: Text(
+                      "Call Now for Help",
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
                       ),
                     ),
-                    duration: const Duration(seconds: 2),
-                    child: SafeArea(
-                        child: Column(
-                      children: [
-                        const SizedBox(
-                          height: 50,
-                        ),
-                        Column(
-                          children: [
-                            SizedBox(
-                                height:
-                                    MediaQuery.of(context).size.height * 0.052),
-                            const Center(
-                              child: Text(
-                                "Call Now",
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white,
-                                ),
-                              ),
-                            ),
-                            SizedBox(
-                                height:
-                                    MediaQuery.of(context).size.height * 0.052),
-                            ElevatedButton(
-                              onPressed: () {
-                                _showCustomDialog(context);
-                              },
-                              style: ElevatedButton.styleFrom(
-                                shape: const CircleBorder(),
-                                backgroundColor: Colors.red,
-                                padding: const EdgeInsets.all(60),
-                                elevation: 15,
-                              ),
-                              child: Image.asset("assets/call.gif",
-                                  height: 40, color: Colors.white),
-                            ),
-                          ],
-                        ),
-                      ],
-                    )),
                   ),
-                  SafeArea(
-                    child: DraggableScrollableSheet(
-                      initialChildSize:
-                          0.35, // initial height (0.0 to 1.0, where 1.0 is full screen)
-                      minChildSize: 0.35, // minimum height (0.0 to 1.0)
-                      maxChildSize: 1, // maximum height (0.0 to 1.0)
-                      builder: (context, scrollController) {
-                        return Container(
-                          decoration: const BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.only(
-                              topLeft: Radius.circular(20),
-                              topRight: Radius.circular(20),
-                            ),
-                          ),
-                          child: Stack(
-                            children: [
-                              // Scrollable content
-                              SingleChildScrollView(
-                                controller:
-                                    scrollController, // Attach scroll controller here
-                                child: Column(
-                                  children: [
-                                    const SizedBox(height: 60),
-                                    // First Card
-                                    Container(
-                                      margin: const EdgeInsets.all(10),
-                                      child: Card(
-                                        elevation: 5,
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(
-                                              15), // Rounded corners
-                                        ),
-                                        child: Padding(
-                                          padding: const EdgeInsets.all(16.0),
-                                          child: Column(
-                                            children: [
-                                              Image.asset(
-                                                "assets/amb1.jpg",
-                                                height: 130, // Set only height
-                                                width: double
-                                                    .infinity, // Set width to fill available space
-                                                fit: BoxFit
-                                                    .cover, // Ensure the aspect ratio is maintained
-                                              ),
-                                              const Text(
-                                                "New Ambulance will be Introduced in future",
-                                                style: TextStyle(
-                                                    fontSize: 20,
-                                                    fontWeight:
-                                                        FontWeight.bold),
-                                              ),
-                                              const SizedBox(height: 10),
-                                              const Text(
-                                                "Our goal is to revolutionize ambulance services by integrating AI-powered systems, smart vehicle tracking,...", // Truncated text
-                                                style: TextStyle(fontSize: 16),
-                                                maxLines: 2,
-                                                overflow: TextOverflow.ellipsis,
-                                              ),
-                                              GestureDetector(
-                                                onTap: () {
-                                                  Navigator.push(
-                                                    context,
-                                                    MaterialPageRoute(
-                                                      builder: (context) =>
-                                                          const FullTextScreen(),
-                                                    ),
-                                                  );
-                                                },
-                                                child: const Text(
-                                                  "Show More",
-                                                  style: TextStyle(
-                                                    color: Colors.blue,
-                                                    fontWeight: FontWeight.bold,
-                                                  ),
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                    const SizedBox(height: 20),
-                                    // First Card
-                                    Container(
-                                      margin: const EdgeInsets.all(10),
-                                      child: Card(
-                                        elevation: 5,
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(
-                                              15), // Rounded corners
-                                        ),
-                                        child: Padding(
-                                          padding: const EdgeInsets.all(16.0),
-                                          child: Column(
-                                            children: [
-                                              Image.asset(
-                                                "assets/amb1.jpg",
-                                                height: 130, // Set only height
-                                                width: double
-                                                    .infinity, // Set width to fill available space
-                                                fit: BoxFit
-                                                    .cover, // Ensure the aspect ratio is maintained
-                                              ),
-                                              const Text(
-                                                "New Ambulance will be Introduced in future",
-                                                style: TextStyle(
-                                                    fontSize: 20,
-                                                    fontWeight:
-                                                        FontWeight.bold),
-                                              ),
-                                              const SizedBox(height: 10),
-                                              const Text(
-                                                "Our goal is to revolutionize ambulance services by integrating AI-powered systems, smart vehicle tracking,...", // Truncated text
-                                                style: TextStyle(fontSize: 16),
-                                                maxLines: 2,
-                                                overflow: TextOverflow.ellipsis,
-                                              ),
-                                              GestureDetector(
-                                                onTap: () {
-                                                  Navigator.push(
-                                                    context,
-                                                    MaterialPageRoute(
-                                                      builder: (context) =>
-                                                          const FullTextScreen(),
-                                                    ),
-                                                  );
-                                                },
-                                                child: const Text(
-                                                  "Show More",
-                                                  style: TextStyle(
-                                                    color: Colors.blue,
-                                                    fontWeight: FontWeight.bold,
-                                                  ),
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                    // Repeat the cards as needed...
-                                  ],
-                                ),
-                              ),
-
-                              // Fixed "Latest News" Text at the top
-                              Positioned(
-                                top: 0,
-                                // Adjust the left position as needed
-                                child: Container(
-                                  width: MediaQuery.of(context).size.width,
-                                  decoration: const BoxDecoration(
-                                    color: Colors.white,
-                                    borderRadius: BorderRadius.only(
-                                      topLeft: Radius.circular(20),
-                                      topRight: Radius.circular(20),
-                                    ),
-                                  ),
-                                  padding: const EdgeInsets.all(10),
-                                  child: const Center(
-                                    child: Text(
-                                      "Latest News",
-                                      style: TextStyle(
-                                          fontSize: 20,
-                                          fontWeight: FontWeight.bold),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        );
+                  SizedBox(height: MediaQuery.of(context).size.height * 0.052),
+                  Center(
+                    child: ElevatedButton(
+                      onPressed: () {
+                        _showCustomDialog(context);
                       },
+                      style: ElevatedButton.styleFrom(
+                        shape: const CircleBorder(),
+                        backgroundColor: Colors.redAccent,
+                        padding: const EdgeInsets.all(70),
+                        elevation: 20,
+                      ),
+                      child: Image.asset("assets/call.gif", height: 50, color: Colors.white),
                     ),
                   ),
                 ],
               ),
-              Positioned(
-                  bottom: 20,
-                  right: 16,
-                  child: FloatingActionButton(
-                    onPressed: () {
-                      if (login) {
-                        Navigator.pushNamed(context, "/ChatAI");
-                      } else {
-                        Future.delayed(const Duration(milliseconds: 100), () {
-                          if (context.mounted) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text(
-                                    'You must log in to perform this action.'),
-                                duration: Duration(seconds: 1),
-                                behavior: SnackBarBehavior
-                                    .floating, // Floating at the bottom
-                                margin: EdgeInsets.all(16),
-                              ),
-                            );
-                          }
-                        });
-                      }
-                    },
-                    backgroundColor: Colors.blueAccent,
-                    child: const Icon(
-                      Icons.chat_bubble,
-                      color: Colors.white,
-                    ),
-                  )),
-            ],
+            ),
           ),
+
+          // Header Section (Welcome, Profile, Settings)
           SafeArea(
             child: PreferredSize(
-                preferredSize: Size(MediaQuery.of(context).size.width, 60),
-                child: Container(
-                  // Custom AppBar background color
-                  padding: const EdgeInsets.symmetric(horizontal: 10),
-                  child: Column(children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              preferredSize: Size(MediaQuery.of(context).size.width, 60),
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 15),
+                child: Column(children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      IconButton(
+                        icon: const Icon(Icons.person, color: Colors.white),
+                        onPressed: () {
+                          login
+                              ? Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) =>
+                                  ProfileScreen(userName: userName),
+                            ),
+                          )
+                              : Navigator.pushNamed(context, "/LoginProfile");
+                        },
+                      ),
+                      Text(
+                        "Welcome, ${userName ?? 'Guest'}",
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.settings, color: Colors.white),
+                        onPressed: () {
+                          Navigator.of(context).pushNamed('/Settings');
+                        },
+                      ),
+                    ],
+                  ),
+                ]),
+              ),
+            ),
+          ),
+
+          // Latest News Text Above Cards (Adjusted Position)
+          Positioned(
+            bottom: 230,  // Adjusted to make sure it doesn't overlap with other elements
+            left: 110,
+            child: Text(
+              'Latest News: ',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 22,
+                fontWeight: FontWeight.bold,
+                letterSpacing: 1.2,
+              ),
+            ),
+          ),
+
+          // News/Tip Cards Section (Scroll through Cards)
+          Positioned(
+            bottom: 10,
+            left: 0,
+            right: 0,
+            child: SizedBox(
+              height: 250,
+              child: PageView.builder(
+                controller: _cardController,
+                scrollDirection: Axis.horizontal,
+                itemCount: _cardTexts.length,
+                itemBuilder: (context, index) {
+                  return Card(
+                    elevation: 8,
+                    margin: const EdgeInsets.symmetric(horizontal: 25, vertical: 40),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    clipBehavior: Clip.antiAlias,
+                    child: Stack(
                       children: [
-                        IconButton(
-                          icon: const Icon(
-                            Icons.person,
-                            color: Colors.white,
+                        // Background Image
+                        SizedBox(
+                          height: double.infinity,
+                          width: double.infinity,
+                          child: Image.network(
+                            _cardImages[index],
+                            fit: BoxFit.cover,
                           ),
-                          onPressed: () {
-                            login
-                                ? Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => ProfileScreen(
-                                        userName: userName,
+                        ),
+
+                        // Gradient Overlay
+                        Container(
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              colors: [Colors.black.withOpacity(0.6), Colors.transparent],
+                              begin: Alignment.bottomCenter,
+                              end: Alignment.topCenter,
+                            ),
+                          ),
+                        ),
+
+                        // Content Box
+                        Positioned(
+                          bottom: 20,
+                          left: 20,
+                          right: 20,
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(15),
+                            child: BackdropFilter(
+                              filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
+                              child: Container(
+                                padding: const EdgeInsets.all(16),
+                                decoration: BoxDecoration(
+                                  color: Colors.white.withOpacity(0.2),
+                                  borderRadius: BorderRadius.circular(15),
+                                ),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      _cardTitles[index],
+                                      style: const TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 22,
+                                        fontWeight: FontWeight.bold,
                                       ),
                                     ),
-                                  )
-                                : Navigator.pushNamed(context, "/LoginProfile");
-                          },
-                        ),
-                        // Check if userName is null and display a default message if it is
-                        Text(
-                          "Hi, ${userName ?? 'Guest'}",
-                          style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold),
-                        ), // Default to 'Guest' if userName is null
-                        IconButton(
-                          icon: const Icon(
-                            Icons.settings,
-                            color: Colors.white,
+                                    const SizedBox(height: 6),
+                                    Text(
+                                      _cardSubtitles[index],
+                                      style: const TextStyle(
+                                        color: Colors.white70,
+                                        fontSize: 16,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 4),
+                                    Text(
+                                      _cardDates[index],
+                                      style: const TextStyle(
+                                        color: Colors.white54,
+                                        fontSize: 12,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
                           ),
-                          onPressed: () {
-                            Navigator.of(context).pushNamed('/Settings');
-                          },
                         ),
-                        // IconButton(
-                        //   icon: const Icon(
-                        //     Icons.search,
-                        //     color: Colors.white,
-                        //   ),
-                        //   onPressed: () {},
-                        // ),
                       ],
                     ),
-                  ]),
-                )),
-          )
-        ]),
-        bottomNavigationBar: BottomNavigationBar(
-          selectedItemColor: Colors.black,
-          unselectedItemColor:
-              Colors.grey, // Optional, to make unselected items gray
-          items: const [
-            BottomNavigationBarItem(
-              icon: Icon(Icons.home),
-              label: "Home",
+                  );
+                },
+              ),
             ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.article),
-              label: "Blogs",
-            ),
-          ],
-          currentIndex: _currentIndex, // Bind currentIndex to _currentIndex
-          onTap: (int index) {
-            setState(() {
-              _currentIndex = index; // Update _currentIndex on tap
-              checkBottomNavigationBar(); // Your additional logic if needed
-            });
-          },
-        ));
+          ),
+        ],
+      ),
+    );
   }
 }
