@@ -6,9 +6,7 @@ import 'package:madadgaar/Home/emergency_dialog.dart';
 import 'package:madadgaar/Profile/profile.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../Blogs/blogs.dart';
 import '../Reporting/report_screen.dart';
-import 'fulltext.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -191,7 +189,11 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                   Center(
                     child: ElevatedButton(
                       onPressed: () {
-                        Navigator.push(context, MaterialPageRoute(builder:(context) => EmergencyReportScreen()));
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) =>
+                                    const EmergencyReportScreen()));
                       },
                       style: ElevatedButton.styleFrom(
                         shape: const CircleBorder(),
@@ -253,7 +255,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
           ),
 
           // Latest News Text Above Cards (Adjusted Position)
-          Positioned(
+          const Positioned(
             bottom: 230,  // Adjusted to make sure it doesn't overlap with other elements
             left: 110,
             child: Text(
