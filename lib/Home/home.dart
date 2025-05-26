@@ -7,6 +7,7 @@ import 'package:madadgaar/Profile/profile.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../Blogs/blogs.dart';
+import '../Reporting/report_screen.dart';
 import 'fulltext.dart';
 
 class Home extends StatefulWidget {
@@ -190,7 +191,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                   Center(
                     child: ElevatedButton(
                       onPressed: () {
-                        _showCustomDialog(context);
+                        Navigator.push(context, MaterialPageRoute(builder:(context) => EmergencyReportScreen()));
                       },
                       style: ElevatedButton.styleFrom(
                         shape: const CircleBorder(),
