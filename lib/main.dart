@@ -43,7 +43,7 @@ class _MyAppState extends State<MyApp> {
         "/ChatAI": (context) => const ChatAIScreen(),
         "/Signup": (context) => const SignupScreen(),
         '/showProfile': (context) => const ProfileScreen(),
-        '/LoginProfile': (context) => const LoginScreen(),
+        '/LoginProfile': (context) => LoginScreen(),
         '/Settings': (context) => const SettingsPage(),
       },
       home: const Home(),

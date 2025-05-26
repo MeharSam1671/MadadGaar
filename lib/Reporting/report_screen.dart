@@ -1,4 +1,10 @@
 import 'package:flutter/material.dart';
+Map<String,dynamic> selection={
+  'ReportEmergency':'set1',
+  'Catogery':'set2',
+  'Subcatogery':'set3',
+
+};
 
 class EmergencyReportScreen extends StatefulWidget {
   const EmergencyReportScreen({super.key});
@@ -59,10 +65,9 @@ class _EmergencyReportScreenState extends State<EmergencyReportScreen> {
     final scaleSelected = _selectedScale != null;
     return Scaffold(
       appBar: AppBar(
-        leading: Icon(Icons.emergency),
-        title: const Text('Madadgaar'),
-        backgroundColor: const Color(0xFFB71C1C),
-        foregroundColor: Colors.white,
+        title: Center(child: const Text('Please Select Option:')),
+        backgroundColor: Colors.transparent,
+        foregroundColor: Colors.black,
         // centerTitle: true,
       ),
       body: Padding(
@@ -89,7 +94,12 @@ class _EmergencyReportScreenState extends State<EmergencyReportScreen> {
                 final opt = _scaleOptions[idx];
                 final selected = _selectedScale == idx;
                 return GestureDetector(
-                  onTap: () => setState(() => _selectedScale = idx),
+                  onTap: (){
+                    setState(() {
+                      _selectedScale = idx;
+                      selection['ReportEmergency']=idx;
+                    });
+                  },
                   child: Container(
                     decoration: BoxDecoration(
                       color:
@@ -131,7 +141,12 @@ class _EmergencyReportScreenState extends State<EmergencyReportScreen> {
                       title: Text(cat.title),
                       subtitle: Text(cat.subtitle),
                       trailing: const Icon(Icons.arrow_forward_ios),
-                      onTap: () => _onCategoryTap(cat),
+                      onTap: () {
+                        setState(() {
+                          _onCategoryTap(cat);
+                          selection["Catogery"]=cat.title;
+                        });
+                      },
                     );
                   },
                 ),
@@ -144,12 +159,17 @@ class _EmergencyReportScreenState extends State<EmergencyReportScreen> {
   }
 }
 
-class SubcategoryScreen extends StatelessWidget {
+class SubcategoryScreen extends StatefulWidget {
   final Option category;
   final String scaleTitle;
   const SubcategoryScreen(
       {required this.category, required this.scaleTitle, super.key});
 
+  @override
+  State<SubcategoryScreen> createState() => _SubcategoryScreenState();
+}
+
+class _SubcategoryScreenState extends State<SubcategoryScreen> {
   @override
   Widget build(BuildContext context) {
     final Map<String, List<Option>> subcategoryData = {
@@ -206,13 +226,13 @@ class SubcategoryScreen extends StatelessWidget {
       ],
     };
 
-    final subcats = subcategoryData[category.title] ?? [];
+    final subcats = subcategoryData[widget.category.title] ?? [];
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Individual ${category.title} Cases'),
-        backgroundColor: const Color(0xFFB71C1C),
-        foregroundColor: Colors.white,
+        title: Text('Individual ${widget.category.title} Cases'),
+        backgroundColor: Colors.white,
+        foregroundColor: Colors.black,
       ),
       body: ListView.builder(
         itemCount: subcats.length,
@@ -223,7 +243,17 @@ class SubcategoryScreen extends StatelessWidget {
             title: Text(sub.title),
             subtitle: Text(sub.subtitle),
             trailing: const Icon(Icons.arrow_forward_ios),
-            onTap: () {},
+            onTap: () {
+              setState(() {
+                selection["Subcatogery"]=sub.title;
+                  print(selection["ReportEmergency"]);
+                  print(selection["Catogery"]);
+                  print(selection["Subcatogery"]);
+
+
+              });
+
+            },
           );
         },
       ),
@@ -237,3 +267,6 @@ class Option {
   final IconData icon;
   Option(this.title, this.subtitle, this.icon);
 }
+
+
+
