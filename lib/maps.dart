@@ -24,10 +24,12 @@ class Maps extends StatefulWidget {
 class _MapsState extends State<Maps> {
   late GoogleMapController mapController;
   LatLng initialmaps = const LatLng(0, 0);
-  LatLng initialmaps2 = const LatLng(31.622729, 74.286317);
+  LatLng initialmaps2 = const LatLng(32.1945477, 74.1994981);
   bool isLoading = true;
   late StreamSubscription<Position> locationSubscription;
   Set<Polyline> polylines = {}; // Store polyline data
+  String? routeDistance;
+  String? routeDuration;
 
   Future<void> setlocation() async {
     Position position = await Geolocator.getCurrentPosition(
@@ -85,18 +87,24 @@ class _MapsState extends State<Maps> {
       PolylinePoints polylinePoints = PolylinePoints();
 
       PolylineResult result = await polylinePoints.getRouteBetweenCoordinates(
-        googleApiKey: "AIzaSyCBQv1_43-rVkUZFCftBVHFeGW8XkmR9Is",
+        googleApiKey: "AIzaSyCQd0aTxNVJZ9C6Oq9aGUUG3AAN2Yncve0",
         request: PolylineRequest(
-            origin: PointLatLng(initialmaps.latitude, initialmaps.longitude),
-            destination:
-                PointLatLng(initialmaps2.latitude, initialmaps2.longitude),
-            mode: TravelMode.driving),
+          origin: PointLatLng(initialmaps.latitude, initialmaps.longitude),
+          destination:
+              PointLatLng(initialmaps2.latitude, initialmaps2.longitude),
+          mode: TravelMode.driving,
+        ),
       );
 
       if (result.points.isNotEmpty) {
         for (PointLatLng point in result.points) {
           polylineCoordinates.add(LatLng(point.latitude, point.longitude));
         }
+        // Set distance and duration from result
+        setState(() {
+          routeDistance = result.distanceTexts?[0];
+          routeDuration = result.durationTexts?[0];
+        });
       } else {
         if (kDebugMode) {
           print(result.errorMessage);
@@ -105,6 +113,10 @@ class _MapsState extends State<Maps> {
           ScaffoldMessenger.of(context)
               .showSnackBar(const SnackBar(content: Text("No route found")));
         }
+        setState(() {
+          routeDistance = null;
+          routeDuration = null;
+        });
         return [];
       }
 
@@ -114,6 +126,10 @@ class _MapsState extends State<Maps> {
         ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text("Unable to fetch the routes")));
       }
+      setState(() {
+        routeDistance = null;
+        routeDuration = null;
+      });
       return [];
     }
   }
@@ -122,27 +138,88 @@ class _MapsState extends State<Maps> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Google Maps'),
+        title: const Text('Madadgaar'),
+        backgroundColor: const Color(0xFFB71C1C),
+        foregroundColor: Colors.white,
       ),
       body: isLoading
           ? const Center(child: CircularProgressIndicator())
-          : GoogleMap(
-              initialCameraPosition:
-                  CameraPosition(target: initialmaps, zoom: 12),
-              onMapCreated: (GoogleMapController controller) {
-                mapController = controller;
-                mapController.animateCamera(
-                  CameraUpdate.newLatLng(initialmaps),
-                );
-              },
-              markers: {
-                Marker(
-                    markerId: const MarkerId("destination"),
-                    position: initialmaps2),
-              },
-              myLocationEnabled: true,
-              myLocationButtonEnabled: true,
-              polylines: polylines, // Add the polyline to the map
+          : Stack(
+              children: [
+                GoogleMap(
+                  initialCameraPosition:
+                      CameraPosition(target: initialmaps, zoom: 12),
+                  onMapCreated: (GoogleMapController controller) {
+                    mapController = controller;
+                    mapController.animateCamera(
+                      CameraUpdate.newLatLng(initialmaps),
+                    );
+                  },
+                  markers: {
+                    Marker(
+                      markerId: const MarkerId("destination"),
+                      position: initialmaps2,
+                      infoWindow: const InfoWindow(
+                        title: "Ambulance approaching",
+                        snippet: "Your ambulance is on the way!",
+                      ),
+                      icon: BitmapDescriptor.defaultMarkerWithHue(
+                        BitmapDescriptor.hueRed,
+                      ),
+                    ),
+                  },
+                  myLocationEnabled: true,
+                  myLocationButtonEnabled: true,
+                  polylines: polylines, // Add the polyline to the map
+                ),
+                if (routeDistance != null && routeDuration != null)
+                  Positioned(
+                    left: 0,
+                    right: 0,
+                    bottom: 20,
+                    child: Center(
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 24, vertical: 14),
+                        margin: const EdgeInsets.symmetric(horizontal: 24),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.95),
+                          borderRadius: BorderRadius.circular(16),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black26,
+                              blurRadius: 8,
+                              offset: Offset(0, 2),
+                            ),
+                          ],
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Icon(Icons.directions_car,
+                                color: Colors.blue),
+                            const SizedBox(width: 12),
+                            Text(
+                              'ETA: $routeDuration',
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 16,
+                              ),
+                            ),
+                            const SizedBox(width: 24),
+                            Text(
+                              'Distance: $routeDistance',
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 16,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+              ],
             ),
     );
   }

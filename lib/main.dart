@@ -2,6 +2,8 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:madadgaar/ChatAi/chataiscreen.dart';
+import 'package:madadgaar/Reporting/loader_screen.dart';
+import 'package:madadgaar/Reporting/report_screen.dart';
 import 'package:madadgaar/firebase_options.dart';
 import 'package:madadgaar/login/signup/signup.dart';
 import 'package:madadgaar/settings/settings.dart';
