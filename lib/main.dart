@@ -7,7 +7,7 @@ import 'package:madadgaar/login/signup/signup.dart';
 import 'package:madadgaar/settings/settings.dart';
 import 'package:madadgaar/splashscreen.dart';
 import 'Home/home.dart';
-import 'maps.dart';
+import 'Maps/maps.dart';
 import 'Profile/profile.dart';
 import 'login/signup/login.dart';
 import 'package:madadgaar/Home/newhome.dart';
@@ -45,6 +45,7 @@ class _MyAppState extends State<MyApp> {
         '/showProfile': (context) => const ProfileScreen(),
         '/LoginProfile': (context) => LoginScreen(),
         '/Settings': (context) => const SettingsPage(),
+        '/Newhome': (context) =>  Newhome(),
       },
 
       //home:  SplashScreen(home: home),

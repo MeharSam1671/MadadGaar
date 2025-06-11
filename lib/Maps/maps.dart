@@ -148,7 +148,7 @@ class _MapsState extends State<Maps> {
         request: PolylineRequest(
           origin: PointLatLng(initialmaps2.latitude, initialmaps2.longitude),
           destination:
-              PointLatLng(initialmaps.latitude, initialmaps.longitude),
+          PointLatLng(initialmaps.latitude, initialmaps.longitude),
           mode: TravelMode.driving,
         ),
       );
@@ -196,86 +196,114 @@ class _MapsState extends State<Maps> {
     return
       WillPopScope(
           child:
-      Scaffold(
-        body: isLoading
-            ? SplashScreen(home: "maps",)
-            : Stack(
-          children: [
-            GoogleMap(
-              initialCameraPosition:
-              CameraPosition(target: initialmaps, zoom: 15.5),
-              onMapCreated: (GoogleMapController controller) {
-                mapController = controller;
-                mapController.animateCamera(
-                  CameraUpdate.newLatLng(initialmaps),
-                );
-              },
-              markers: {
-                Marker(
-                  markerId: const MarkerId("destination"),
-                  position: initialmaps2,
-                  infoWindow: const InfoWindow(
-                    title: "Ambulance approaching",
-                    snippet: "Your ambulance is on the way!",
-                  ),
-                  icon: ambulanceIcon,
-                ),
+          Scaffold(
+            body: isLoading
+                ? SplashScreen(home: "maps",)
+                : Stack(
+              children: [
+                GoogleMap(
+                  initialCameraPosition:
+                  CameraPosition(target: initialmaps, zoom: 15.5),
+                  onMapCreated: (GoogleMapController controller) {
+                    mapController = controller;
+                    mapController.animateCamera(
+                      CameraUpdate.newLatLng(initialmaps),
+                    );
+                  },
+                  markers: {
+                    Marker(
+                      markerId: const MarkerId("destination"),
+                      position: initialmaps2,
+                      infoWindow: const InfoWindow(
+                        title: "Ambulance approaching",
+                        snippet: "Your ambulance is on the way!",
+                      ),
+                      icon: ambulanceIcon,
+                    ),
 
-              },
-              myLocationEnabled: true,
-              myLocationButtonEnabled: true,
-              polylines: polylines, // Add the polyline to the map
-            ),
-            if (routeDistance != null && routeDuration != null)
-              Positioned(
-                left: 0,
-                right: 0,
-                bottom: 20,
-                child: Center(
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 24, vertical: 14),
-                    margin: const EdgeInsets.symmetric(horizontal: 24),
-                    decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.95),
-                      borderRadius: BorderRadius.circular(16),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black26,
-                          blurRadius: 8,
-                          offset: Offset(0, 2),
+                  },
+                  myLocationEnabled: true,
+                  myLocationButtonEnabled: true,
+                  polylines: polylines, // Add the polyline to the map
+                ),
+                if (routeDistance != null && routeDuration != null)
+                  Positioned(
+                    left: 0,
+                    right: 0,
+                    top: 20,
+                    child: Center(
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 14, vertical: 34),
+                        margin: const EdgeInsets.symmetric(horizontal: 14),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.95),
+                          borderRadius: BorderRadius.circular(16),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black26,
+                              blurRadius: 8,
+                              offset: Offset(0, 2),
+                            ),
+                          ],
                         ),
-                      ],
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Icon(Icons.directions_car,
+                                color: Colors.blue),
+                            const SizedBox(width: 12),
+                            Text(
+                              'ETA: $routeDuration',
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 16,
+                              ),
+                            ),
+                            const SizedBox(width: 24),
+                            Text(
+                              'Distance: $routeDistance',
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 16,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
                     ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        const Icon(Icons.directions_car,
-                            color: Colors.blue),
-                        const SizedBox(width: 12),
-                        Text(
-                          'ETA: $routeDuration',
-                          style: const TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 16,
-                          ),
+                  ),
+                Positioned(
+                  left: 0,
+                  right: 0,
+                  bottom: 20,
+                  child: Center(
+                    child: Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 14, vertical: 14),
+                        margin: const EdgeInsets.symmetric(horizontal: 14),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.95),
+                          borderRadius: BorderRadius.circular(16),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black26,
+                              blurRadius: 8,
+                              offset: Offset(0, 2),
+                            ),
+                          ],
                         ),
-                        const SizedBox(width: 24),
-                        Text(
-                          'Distance: $routeDistance',
-                          style: const TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 16,
-                          ),
-                        ),
-                      ],
+                        child: Column(
+                          children: [
+                            ListTile(leading: Text("Driver Name: ",style: TextStyle(fontWeight: FontWeight.bold,fontSize: 14),),trailing: Text("Muhammad Saadullah Zafar"),)
+                          ],
+                        )
                     ),
                   ),
                 ),
-              ),
-          ],
-        ),
-      ),
+              ],
+            ),
+          ),
           onWillPop: () async {
             bool? exit = await showDialog<bool>(
               context: context,

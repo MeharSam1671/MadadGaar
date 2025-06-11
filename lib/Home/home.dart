@@ -163,9 +163,11 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
             width: MediaQuery.of(context).size.width,
             decoration: BoxDecoration(
               gradient: LinearGradient(
-                colors: [Colors.blue.shade200,
-                  Colors.purple.shade100,
-                  Colors.white,], // Gradient colors
+                colors: [
+                  Color(0xFF2E57A5), // Blue
+                  Color(0xFF7D3988), // Purple
+                  Color(0xFFF45F88), // Pink
+                ],
                 begin: beginAlignment,
                 end: endAlignment,
               ),
@@ -178,7 +180,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                   SizedBox(height: MediaQuery.of(context).size.height * 0.052),
                   const Center(
                     child: Text(
-                      "Call Now for Help",
+                      "Need Help",
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         fontSize: 24,
@@ -187,7 +189,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                       ),
                     ),
                   ),
-                  SizedBox(height: MediaQuery.of(context).size.height * 0.052),
+                  SizedBox(height: MediaQuery.of(context).size.height * 0.02),
                   Center(
                     child: ElevatedButton(
                       onPressed: () {
@@ -199,11 +201,11 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                       },
                       style: ElevatedButton.styleFrom(
                         shape: const CircleBorder(),
-                        backgroundColor: Colors.redAccent,
+                        backgroundColor: Colors.white,
                         padding: const EdgeInsets.all(70),
                         elevation: 20,
                       ),
-                      child: Image.asset("assets/call.gif", height: 50, color: Colors.white),
+                      child: Image.asset("assets/pharmacy.png", height: 50,),
                     ),
                   ),
                 ],
