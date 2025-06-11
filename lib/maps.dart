@@ -1,9 +1,13 @@
 import 'dart:async';
+import 'dart:ui' as ui;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
+import 'package:madadgaar/Home/Home.dart';
+import 'package:madadgaar/splashscreen.dart';
 
 Stream<Position> getLocationStream() {
   return Geolocator.getPositionStream(
@@ -23,6 +27,7 @@ class Maps extends StatefulWidget {
 
 class _MapsState extends State<Maps> {
   late GoogleMapController mapController;
+  late BitmapDescriptor ambulanceIcon = BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueBlue);
   LatLng initialmaps = const LatLng(0, 0);
   LatLng initialmaps2 = const LatLng(32.1945477, 74.1994981);
   bool isLoading = true;
@@ -32,21 +37,57 @@ class _MapsState extends State<Maps> {
   String? routeDuration;
 
   Future<void> setlocation() async {
-    Position position = await Geolocator.getCurrentPosition(
+    LocationPermission permission;
 
-        ///desiredAccuracy: LocationAccuracy.high,
+    permission = await Geolocator.checkPermission();
+
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
+        // Permissions are denied, show a message and return
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text("Location permission denied")),
+          );
+        }
+        return;
+      }
+    }
+
+    if (permission == LocationPermission.deniedForever) {
+      // Permissions are permanently denied
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+              content: Text("Location permission permanently denied")),
         );
-    setState(() {
-      initialmaps = LatLng(position.latitude, position.longitude);
-      isLoading = false;
-    });
+      }
+      return;
+    }
 
-    _createRoute(); // Call to draw the polyline
+    // If we reach here, permission is granted
+    try {
+      Position position = await Geolocator.getCurrentPosition();
+      setState(() {
+        initialmaps = LatLng(position.latitude, position.longitude);
+        isLoading = false;
+      });
+
+      _createRoute();
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Failed to get location: $e")),
+        );
+      }
+    }
   }
+
 
   @override
   void initState() {
     super.initState();
+    _loadAmbulanceIcon();
     setlocation();
     locationSubscription = getLocationStream().listen((Position position) {
       setState(() {
@@ -59,8 +100,24 @@ class _MapsState extends State<Maps> {
       _createRoute(); // Recalculate route
     });
   }
+  Future<void> _loadAmbulanceIcon() async {
+    final ByteData byteData = await rootBundle.load('assets/ambulance.png');
 
-  @override
+    final codec = await ui.instantiateImageCodec(
+      byteData.buffer.asUint8List(),
+      targetWidth: 100, // Change width here
+      targetHeight: 100, // And height here
+    );
+    final frame = await codec.getNextFrame();
+    final ui.Image image = frame.image;
+
+    final byteDataResized = await image.toByteData(format: ui.ImageByteFormat.png);
+    final resizedBytes = byteDataResized!.buffer.asUint8List();
+
+    setState(() {
+      ambulanceIcon = BitmapDescriptor.fromBytes(resizedBytes);
+    });
+  }  @override
   void dispose() {
     locationSubscription.cancel(); // Cancel stream to avoid memory leaks
     super.dispose();
@@ -89,9 +146,9 @@ class _MapsState extends State<Maps> {
       PolylineResult result = await polylinePoints.getRouteBetweenCoordinates(
         googleApiKey: "AIzaSyCQd0aTxNVJZ9C6Oq9aGUUG3AAN2Yncve0",
         request: PolylineRequest(
-          origin: PointLatLng(initialmaps.latitude, initialmaps.longitude),
+          origin: PointLatLng(initialmaps2.latitude, initialmaps2.longitude),
           destination:
-              PointLatLng(initialmaps2.latitude, initialmaps2.longitude),
+              PointLatLng(initialmaps.latitude, initialmaps.longitude),
           mode: TravelMode.driving,
         ),
       );
@@ -136,91 +193,124 @@ class _MapsState extends State<Maps> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Madadgaar'),
-        backgroundColor: const Color(0xFFB71C1C),
-        foregroundColor: Colors.white,
-      ),
-      body: isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : Stack(
-              children: [
-                GoogleMap(
-                  initialCameraPosition:
-                      CameraPosition(target: initialmaps, zoom: 12),
-                  onMapCreated: (GoogleMapController controller) {
-                    mapController = controller;
-                    mapController.animateCamera(
-                      CameraUpdate.newLatLng(initialmaps),
-                    );
-                  },
-                  markers: {
-                    Marker(
-                      markerId: const MarkerId("destination"),
-                      position: initialmaps2,
-                      infoWindow: const InfoWindow(
-                        title: "Ambulance approaching",
-                        snippet: "Your ambulance is on the way!",
-                      ),
-                      icon: BitmapDescriptor.defaultMarkerWithHue(
-                        BitmapDescriptor.hueRed,
-                      ),
-                    ),
-                  },
-                  myLocationEnabled: true,
-                  myLocationButtonEnabled: true,
-                  polylines: polylines, // Add the polyline to the map
+    return
+      WillPopScope(
+          child:
+      Scaffold(
+        body: isLoading
+            ? SplashScreen(home: "maps",)
+            : Stack(
+          children: [
+            GoogleMap(
+              initialCameraPosition:
+              CameraPosition(target: initialmaps, zoom: 15.5),
+              onMapCreated: (GoogleMapController controller) {
+                mapController = controller;
+                mapController.animateCamera(
+                  CameraUpdate.newLatLng(initialmaps),
+                );
+              },
+              markers: {
+                Marker(
+                  markerId: const MarkerId("destination"),
+                  position: initialmaps2,
+                  infoWindow: const InfoWindow(
+                    title: "Ambulance approaching",
+                    snippet: "Your ambulance is on the way!",
+                  ),
+                  icon: ambulanceIcon,
                 ),
-                if (routeDistance != null && routeDuration != null)
-                  Positioned(
-                    left: 0,
-                    right: 0,
-                    bottom: 20,
-                    child: Center(
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 24, vertical: 14),
-                        margin: const EdgeInsets.symmetric(horizontal: 24),
-                        decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.95),
-                          borderRadius: BorderRadius.circular(16),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black26,
-                              blurRadius: 8,
-                              offset: Offset(0, 2),
-                            ),
-                          ],
+
+              },
+              myLocationEnabled: true,
+              myLocationButtonEnabled: true,
+              polylines: polylines, // Add the polyline to the map
+            ),
+            if (routeDistance != null && routeDuration != null)
+              Positioned(
+                left: 0,
+                right: 0,
+                bottom: 20,
+                child: Center(
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 24, vertical: 14),
+                    margin: const EdgeInsets.symmetric(horizontal: 24),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.95),
+                      borderRadius: BorderRadius.circular(16),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black26,
+                          blurRadius: 8,
+                          offset: Offset(0, 2),
                         ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            const Icon(Icons.directions_car,
-                                color: Colors.blue),
-                            const SizedBox(width: 12),
-                            Text(
-                              'ETA: $routeDuration',
-                              style: const TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 16,
-                              ),
-                            ),
-                            const SizedBox(width: 24),
-                            Text(
-                              'Distance: $routeDistance',
-                              style: const TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 16,
-                              ),
-                            ),
-                          ],
+                      ],
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(Icons.directions_car,
+                            color: Colors.blue),
+                        const SizedBox(width: 12),
+                        Text(
+                          'ETA: $routeDuration',
+                          style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                          ),
                         ),
-                      ),
+                        const SizedBox(width: 24),
+                        Text(
+                          'Distance: $routeDistance',
+                          style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
-              ],
-            ),
-    );
+                ),
+              ),
+          ],
+        ),
+      ),
+          onWillPop: () async {
+            bool? exit = await showDialog<bool>(
+              context: context,
+              barrierDismissible: false, // Prevent dismissing by tapping outside
+              builder: (context) => AlertDialog(
+                backgroundColor: Colors.white,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                title: Row(
+                  children: const [
+                    Icon(Icons.warning_amber_rounded, color: Colors.red),
+                    SizedBox(width: 8),
+                    Text("Warning: ", style: TextStyle(fontWeight: FontWeight.bold,color: Colors.red)),
+                  ],
+                ),
+                content: const Text(
+                  "Cancelling an ambulance request wastes valuable emergency resources. "
+                      "Are you sure you want to cancel?\n\nRepeated cancellations may lead to service restrictions.",
+                  style: TextStyle(fontSize: 16),
+                ),
+                actions: [
+                  TextButton(
+                    onPressed: () => Navigator.of(context).pop(false),
+                    child: const Text("No", style: TextStyle(color: Colors.green)),
+                  ),
+                  TextButton(
+                    onPressed: () => Navigator.of(context).popUntil((route) => route.isFirst),
+                    child: const Text("Yes, Cancel", style: TextStyle(color: Colors.red)),
+                  ),
+                ],
+              ),
+            );
+            return exit ?? false;
+          }
+
+      );
+
   }
 }

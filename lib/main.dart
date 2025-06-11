@@ -5,10 +5,12 @@ import 'package:madadgaar/ChatAi/chataiscreen.dart';
 import 'package:madadgaar/firebase_options.dart';
 import 'package:madadgaar/login/signup/signup.dart';
 import 'package:madadgaar/settings/settings.dart';
+import 'package:madadgaar/splashscreen.dart';
 import 'Home/home.dart';
 import 'maps.dart';
 import 'Profile/profile.dart';
 import 'login/signup/login.dart';
+import 'package:madadgaar/Home/newhome.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -30,7 +32,7 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   Color primaryColor = const Color(0xFFE0F7FA);
-
+  static const String home = "home";
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -44,7 +46,9 @@ class _MyAppState extends State<MyApp> {
         '/LoginProfile': (context) => LoginScreen(),
         '/Settings': (context) => const SettingsPage(),
       },
-      home: const Home(),
+
+      //home:  SplashScreen(home: home),
+      home: SplashScreen(home: home),
     );
   }
 }

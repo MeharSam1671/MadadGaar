@@ -163,7 +163,9 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
             width: MediaQuery.of(context).size.width,
             decoration: BoxDecoration(
               gradient: LinearGradient(
-                colors: [Colors.blue.shade500, Colors.purple.shade300], // Gradient colors
+                colors: [Colors.blue.shade200,
+                  Colors.purple.shade100,
+                  Colors.white,], // Gradient colors
                 begin: beginAlignment,
                 end: endAlignment,
               ),
@@ -242,7 +244,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                         ),
                       ),
                       IconButton(
-                        icon: const Icon(Icons.settings, color: Colors.white),
+                        icon: const Icon(Icons.notifications, color: Colors.white),
                         onPressed: () {
                           Navigator.of(context).pushNamed('/Settings');
                         },
@@ -256,10 +258,10 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
 
           // Latest News Text Above Cards (Adjusted Position)
           const Positioned(
-            bottom: 230,  // Adjusted to make sure it doesn't overlap with other elements
-            left: 110,
+            bottom: 250,  // Adjusted to make sure it doesn't overlap with other elements
+            left: 125,
             child: Text(
-              'Latest News: ',
+              'Latest News ',
               style: TextStyle(
                 color: Colors.white,
                 fontSize: 22,

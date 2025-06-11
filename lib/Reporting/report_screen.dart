@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:madadgaar/maps.dart';
+import 'package:madadgaar/splashscreen.dart';
 Map<String,dynamic> selection={
   'ReportEmergency':'set1',
   'Catogery':'set2',
@@ -249,6 +251,10 @@ class _SubcategoryScreenState extends State<SubcategoryScreen> {
                   print(selection["ReportEmergency"]);
                   print(selection["Catogery"]);
                   print(selection["Subcatogery"]);
+                  {/*
+                  API Called to send actions
+                  */}
+                  Navigator.push(context, MaterialPageRoute(builder: (context) => Maps(),));
 
 
               });
