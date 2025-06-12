@@ -146,7 +146,7 @@ class _SplashScreenState extends State<SplashScreen>
     return WillPopScope(
       onWillPop: () async => false, // 🔒 Disable back button on splash screen
       child: Scaffold(
-        backgroundColor: Colors.white,
+        backgroundColor: Color(0xFFEFF3F9),
         body: SafeArea(
           child: Center(
             child: Column(

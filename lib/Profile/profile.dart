@@ -35,20 +35,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.transparent, // Transparent to show gradient
+      backgroundColor: Color(0xFFEFF3F9), // Transparent to show gradient
 
       body: Container(
         height: MediaQuery.of(context).size.height,
         decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topRight,
-            end: Alignment.bottomLeft,
-            colors: [
-              Colors.blue.shade200,
-              Colors.purple.shade100,
-              Colors.white,
-            ],
-          ),
+
+
         ),
         child: SafeArea(
           child: SingleChildScrollView(

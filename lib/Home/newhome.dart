@@ -3,9 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:madadgaar/Home/showdialog.dart';
 import 'package:madadgaar/Maps/maps.dart';
 import 'package:madadgaar/Maps/simplemaps.dart';
+import 'package:madadgaar/Profile.dart';
+import 'package:madadgaar/Profile/profile.dart';
 
 class Newhome extends StatefulWidget {
-
   const Newhome({super.key});
 
   @override
@@ -15,14 +16,15 @@ class Newhome extends StatefulWidget {
 class _NewhomeState extends State<Newhome> {
   @override
   Widget build(BuildContext context) {
-    final args = ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
+    bool Login = true;
+    final args =
+        ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
     final city = args['City'];
     final country = args['Country'];
     final List<String> queries = [
       "I had an \naccident",
       "I need \nmedical help",
       "I feel \nunsafe",
-
     ];
 
     return Scaffold(
@@ -48,7 +50,31 @@ class _NewhomeState extends State<Newhome> {
                         ],
                       ),
                     ),
-                    SafeArea(child: Icon(Icons.person)),
+                    GestureDetector(
+                      child: SafeArea(
+                        child: Login
+                            ? Container(
+                          width: 40,
+                          height: 40,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(50),
+                            image: DecorationImage(
+                              image: AssetImage("assets/my_image.jpg"),
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                        )
+                            : Icon(Icons.person),
+                      ),
+
+                      onTap: () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => ProfileScreen(),
+                            ));
+                      },
+                    ),
                   ]),
             ),
             Positioned(
@@ -98,8 +124,13 @@ class _NewhomeState extends State<Newhome> {
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
                           gradient: const LinearGradient(
-                            colors: [Colors.red, Color(0xFFD32F2F)],
-                            begin: Alignment.topCenter,
+                            colors: [
+                              Colors.white,
+                              Color(0xFFD32F2F),
+                              Color(0xFFD32F2F),
+                              Color(0xFFD32F2F),
+                            ],
+                            begin: Alignment.topLeft,
                             end: Alignment.bottomCenter,
                           ),
                           boxShadow: [
@@ -115,8 +146,7 @@ class _NewhomeState extends State<Newhome> {
                           icon: const Icon(Icons.sos,
                               size: 50, color: Colors.white),
                           onPressed: () {
-                              showScaleDialog(context);
-
+                            showScaleDialog(context);
                           },
                         ),
                       ),
@@ -128,7 +158,7 @@ class _NewhomeState extends State<Newhome> {
             ),
             Positioned(
                 top: 460,
-                left: MediaQuery.of(context).size.width/5,
+                left: MediaQuery.of(context).size.width / 5,
                 child: Text(
                   "Not Sure What to do?",
                   style: TextStyle(
@@ -141,12 +171,10 @@ class _NewhomeState extends State<Newhome> {
                 )),
             Positioned(
                 top: 490,
-                left: MediaQuery.of(context).size.width/3,
+                left: MediaQuery.of(context).size.width / 3,
                 child: Text(
                   "Pick a Subject to call",
-
                 )),
-
             Positioned(
               bottom: 60,
               left: -70,
@@ -158,7 +186,6 @@ class _NewhomeState extends State<Newhome> {
                   itemCount: queries.length,
                   itemBuilder: (context, index) {
                     // Sample emergency queries
-
 
                     return Container(
                       margin: EdgeInsets.symmetric(horizontal: 10),
@@ -173,20 +200,17 @@ class _NewhomeState extends State<Newhome> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-
                               Text(
                                 queries[index],
                                 style: TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold),
+                                    fontSize: 18, fontWeight: FontWeight.bold),
                               ),
                               SizedBox(height: 10),
                               Row(
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
                                 children: [
-                                  Icon(Icons.arrow_forward,
-                                      color: Colors.red),
+                                  Icon(Icons.arrow_forward, color: Colors.red),
                                   SizedBox(width: 8),
                                   Icon(
                                     Icons.text_fields,
@@ -211,18 +235,20 @@ class _NewhomeState extends State<Newhome> {
       ),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: 0,
-        selectedItemColor: Colors.redAccent,// Optional, but recommended
+        selectedItemColor: Colors.redAccent, // Optional, but recommended
         onTap: (index) {
-          if(index==1){
-            Navigator.push(context, MaterialPageRoute(builder: (context) => Simplemaps(),));
+          if (index == 1) {
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => Simplemaps(),
+                ));
           }
           /*if(index==2){
             Navigator.push(context, History());
 
           }*/
-          if(index==0){
-
-          }
+          if (index == 0) {}
         },
         items: const [
           BottomNavigationBarItem(
@@ -239,7 +265,6 @@ class _NewhomeState extends State<Newhome> {
           ),
         ],
       ),
-
     );
   }
 }
