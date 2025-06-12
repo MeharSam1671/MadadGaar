@@ -152,11 +152,11 @@ class _SplashScreenState extends State<SplashScreen>
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Image.asset(
-                  'assets/ambulance.gif',
-                  width: 130,
-                  height: 130,
-                ),
+                // Image.asset(
+                //   'assets/ambulance.gif',
+                //   width: 130,
+                //   height: 130,
+                // ),
                 const SizedBox(height: 20),
                 buildColorfulText(),
                 const SizedBox(height: 30),

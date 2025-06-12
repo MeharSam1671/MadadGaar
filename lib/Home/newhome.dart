@@ -18,6 +18,12 @@ class _NewhomeState extends State<Newhome> {
     final args = ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
     final city = args['City'];
     final country = args['Country'];
+    final List<String> queries = [
+      "I had an \naccident",
+      "I need \nmedical help",
+      "I feel \nunsafe",
+
+    ];
 
     return Scaffold(
       backgroundColor: Color(0xFFEFF3F9),
@@ -46,7 +52,7 @@ class _NewhomeState extends State<Newhome> {
                   ]),
             ),
             Positioned(
-                top: MediaQuery.of(context).size.height * 0.17,
+                top: MediaQuery.of(context).size.height * 0.12,
                 left: MediaQuery.of(context).size.width / 5,
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -140,6 +146,7 @@ class _NewhomeState extends State<Newhome> {
                   "Pick a Subject to call",
 
                 )),
+
             Positioned(
               bottom: 60,
               left: -70,
@@ -148,14 +155,10 @@ class _NewhomeState extends State<Newhome> {
                 height: 150,
                 child: PageView.builder(
                   controller: PageController(viewportFraction: 0.55),
-                  itemCount: 3,
+                  itemCount: queries.length,
                   itemBuilder: (context, index) {
                     // Sample emergency queries
-                    final List<String> queries = [
-                      "I had an \naccident",
-                      "I need \nmedical help",
-                      "I feel \nunsafe"
-                    ];
+
 
                     return Container(
                       margin: EdgeInsets.symmetric(horizontal: 10),
@@ -170,6 +173,7 @@ class _NewhomeState extends State<Newhome> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
+
                               Text(
                                 queries[index],
                                 style: TextStyle(
