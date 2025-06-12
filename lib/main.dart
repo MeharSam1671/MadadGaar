@@ -1,8 +1,10 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:madadgaar/ChatAi/chataiscreen.dart';
+import 'package:provider/provider.dart';
+
 import 'package:madadgaar/firebase_options.dart';
+import 'package:madadgaar/ChatAi/chataiscreen.dart';
 import 'package:madadgaar/login/signup/signup.dart';
 import 'package:madadgaar/settings/settings.dart';
 import 'package:madadgaar/splashscreen.dart';
@@ -19,24 +21,60 @@ void main() async {
     DeviceOrientation.portraitUp,
     DeviceOrientation.portraitDown,
   ]).then((_) {
-    runApp(const MyApp());
+    runApp(
+      ChangeNotifierProvider(
+        create: (_) => ThemeProvider(),
+        child: const MyApp(),
+      ),
+    );
   });
 }
 
-class MyApp extends StatefulWidget {
-  const MyApp({super.key});
+// ThemeProvider class for managing theme state
+class ThemeProvider with ChangeNotifier {
+  ThemeMode _themeMode = ThemeMode.light;
 
-  @override
-  State<MyApp> createState() => _MyAppState();
+  ThemeMode get themeMode => _themeMode;
+
+  bool get isDarkMode => _themeMode == ThemeMode.dark;
+
+  void toggleTheme(bool isDark) {
+    _themeMode = isDark ? ThemeMode.dark : ThemeMode.light;
+    notifyListeners();
+  }
 }
 
-class _MyAppState extends State<MyApp> {
-  Color primaryColor = const Color(0xFFE0F7FA);
+// Dark Theme
+final darkTheme = ThemeData(
+  brightness: Brightness.dark,
+  scaffoldBackgroundColor: Colors.black,
+  primaryColor: Colors.blueGrey,
+  appBarTheme: AppBarTheme(backgroundColor: Colors.grey[900]),
+  colorScheme: ColorScheme.dark(),
+);
+
+// Light Theme
+final lightTheme = ThemeData(
+  brightness: Brightness.light,
+  scaffoldBackgroundColor: Colors.white,
+  primaryColor: Colors.blue,
+  appBarTheme: const AppBarTheme(backgroundColor: Colors.white),
+  colorScheme: ColorScheme.light(),
+);
+
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
   static const String home = "home";
+
   @override
   Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+
     return MaterialApp(
       debugShowCheckedModeBanner: false,
+      theme: lightTheme,
+      darkTheme: darkTheme,
+      themeMode: themeProvider.themeMode,
       routes: {
         "/maps": (context) => const Maps(),
         "/Home": (context) => const Home(),
@@ -45,11 +83,9 @@ class _MyAppState extends State<MyApp> {
         '/showProfile': (context) => const ProfileScreen(),
         '/LoginProfile': (context) => LoginScreen(),
         '/Settings': (context) => const SettingsPage(),
-        '/Newhome': (context) =>  Newhome(),
+        '/Newhome': (context) => Newhome(),
       },
-
-      //home:  SplashScreen(home: home),
-      home: SplashScreen(home: home),
+      home:  SplashScreen(home: home),
     );
   }
 }

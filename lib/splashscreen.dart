@@ -1,9 +1,12 @@
 import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'dart:async';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:provider/provider.dart';
+
+import 'main.dart';
+
 Future<Map<String, String>> _getUserLocation() async {
   bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
   if (!serviceEnabled) {
@@ -43,8 +46,8 @@ Future<Map<String, String>> _getUserLocation() async {
 }
 
 class SplashScreen extends StatefulWidget {
-  SplashScreen({Key? key,required this.home}) : super(key: key);
   final String? home;
+  SplashScreen({Key? key, required this.home}) : super(key: key);
 
   @override
   State<SplashScreen> createState() => _SplashScreenState();
@@ -53,10 +56,7 @@ class SplashScreen extends StatefulWidget {
 class _SplashScreenState extends State<SplashScreen>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
-  late final beginAlignment = Alignment.bottomCenter;
-  late final endAlignment = Alignment.topCenter;
 
-  @override
   @override
   void initState() {
     super.initState();
@@ -68,7 +68,6 @@ class _SplashScreenState extends State<SplashScreen>
 
     if (widget.home == "home") {
       _getUserLocation().then((location) {
-
         // After fetching location, wait then navigate
         Timer(const Duration(seconds: 2), () {
           Navigator.of(context).pushReplacementNamed(
@@ -86,27 +85,24 @@ class _SplashScreenState extends State<SplashScreen>
     }
   }
 
-
-
   @override
   void dispose() {
     _controller.dispose();
     super.dispose();
   }
 
-
-  Widget buildColorfulText() {
+  Widget buildColorfulText(bool isDark) {
     final letters = "MadadGaar".split("");
     final colors = [
-      Colors.red,
-      Colors.black,
-      Colors.black,
-      Colors.black,
-      Colors.black,
-      Colors.red,
-      Colors.black,
-      Colors.black,
-      Colors.black,
+      isDark ? Colors.red[300]! : Colors.red,
+      isDark ? Colors.white : Colors.black,
+      isDark ? Colors.white : Colors.black,
+      isDark ? Colors.white : Colors.black,
+      isDark ? Colors.white : Colors.black,
+      isDark ? Colors.red[300]! : Colors.red,
+      isDark ? Colors.white : Colors.black,
+      isDark ? Colors.white : Colors.black,
+      isDark ? Colors.white : Colors.black,
     ];
 
     return Row(
@@ -143,33 +139,37 @@ class _SplashScreenState extends State<SplashScreen>
 
   @override
   Widget build(BuildContext context) {
+    // Obtain theme info inside build
+    final themeProvider = Provider.of<ThemeProvider>(context);
+    final isDark = themeProvider.isDarkMode;
+
     return WillPopScope(
-      onWillPop: () async => false, // 🔒 Disable back button on splash screen
+      onWillPop: () async => false, // Disable back button on splash screen
       child: Scaffold(
-        backgroundColor: Color(0xFFEFF3F9),
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         body: SafeArea(
           child: Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
+                // Uncomment this if you want the gif
                 // Image.asset(
                 //   'assets/ambulance.gif',
                 //   width: 130,
                 //   height: 130,
                 // ),
                 const SizedBox(height: 20),
-                buildColorfulText(),
+                buildColorfulText(isDark),
                 const SizedBox(height: 30),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 90),
-                  child: LinearProgressIndicator(color: Colors.pink,),
-                )
-                                ],
+                  child: LinearProgressIndicator(color: Colors.pink),
+                ),
+              ],
             ),
           ),
         ),
       ),
     );
   }
-
 }

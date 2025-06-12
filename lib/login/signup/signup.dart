@@ -82,11 +82,9 @@ class _SignupScreenState extends State<SignupScreen> {
     return Scaffold(
       body: Container(
         decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [Colors.blue.shade500, Colors.purple.shade300],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
+
+          color: Theme.of(context).scaffoldBackgroundColor,
+
         ),
         child: Center(
           child: SingleChildScrollView(
@@ -99,54 +97,54 @@ class _SignupScreenState extends State<SignupScreen> {
                   style: TextStyle(
                     fontSize: 32,
                     fontWeight: FontWeight.bold,
-                    color: Colors.white,
+                    color: Colors.black,
                   ),
                 ),
                 const SizedBox(height: 40),
                 ClipRRect(
                   borderRadius: BorderRadius.circular(16),
                   child: Container(
-                    color: Colors.white.withOpacity(0.1),
+                    color: Colors.black.withOpacity(0.1),
                     padding:
                     const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                     child: Column(
                       children: [
                         TextField(
-                          style: const TextStyle(color: Colors.white),
+                          style: const TextStyle(color: Colors.black),
                           controller: _FirstName,
                           onChanged: (_) => _checkFormValid(),
                           decoration: InputDecoration(
                             hintText: 'First Name',
-                            hintStyle: TextStyle(color: Colors.white70),
+                            hintStyle: TextStyle(color: Colors.black),
                             border: InputBorder.none,
-                            icon: Icon(Icons.person, color: Colors.white),
+                            icon: Icon(Icons.person, color: Colors.black),
                           ),
                         ),
-                        const Divider(color: Colors.white38),
+                        const Divider(color: Colors.black),
                         TextField(
-                          style: const TextStyle(color: Colors.white),
+                          style: const TextStyle(color: Colors.black),
                           controller: _LastName,
                           onChanged: (_) => _checkFormValid(),
                           decoration: InputDecoration(
                             hintText: 'Last Name',
-                            hintStyle: TextStyle(color: Colors.white70),
+                            hintStyle: TextStyle(color: Colors.black),
                             border: InputBorder.none,
-                            icon: Icon(Icons.person, color: Colors.white),
+                            icon: Icon(Icons.person, color: Colors.black),
                           ),
                         ),
-                        const Divider(color: Colors.white38),
+                        const Divider(color: Colors.black),
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             TextField(
-                              style: const TextStyle(color: Colors.white),
+                              style: const TextStyle(color: Colors.black),
                               controller: _Email,
                               onChanged: (_) => _checkFormValid(),
                               decoration: InputDecoration(
                                 hintText: 'Email',
-                                hintStyle: TextStyle(color: Colors.white70),
+                                hintStyle: TextStyle(color: Colors.black),
                                 border: InputBorder.none,
-                                icon: Icon(Icons.email, color: Colors.white),
+                                icon: Icon(Icons.email, color: Colors.black),
                               ),
                             ),
                             if (_Email.text.isNotEmpty &&
@@ -159,37 +157,37 @@ class _SignupScreenState extends State<SignupScreen> {
                                     Text(
                                       'Invalid email format',
                                       style: TextStyle(
-                                          color: Colors.white, fontSize: 12),
+                                          color: Colors.black, fontSize: 12),
                                     ),
                                   ],
                                 ),
                               ),
                           ],
                         ),
-                        const Divider(color: Colors.white38),
+                        const Divider(color: Colors.black),
                         TextField(
                           obscureText: true,
                           controller: _Password,
-                          style: const TextStyle(color: Colors.white),
+                          style: const TextStyle(color: Colors.black),
                           onChanged: (_) => _checkFormValid(),
                           decoration: InputDecoration(
                             hintText: 'Password',
-                            hintStyle: TextStyle(color: Colors.white70),
+                            hintStyle: TextStyle(color: Colors.black),
                             border: InputBorder.none,
-                            icon: Icon(Icons.lock, color: Colors.white),
+                            icon: Icon(Icons.lock, color: Colors.black),
                           ),
                         ),
-                        const Divider(color: Colors.white38),
+                        const Divider(color: Colors.black),
                         TextField(
                           obscureText: true,
                           controller: _CheckPassword,
-                          style: const TextStyle(color: Colors.white),
+                          style: const TextStyle(color: Colors.black),
                           onChanged: (_) => _checkFormValid(),
                           decoration: InputDecoration(
                             hintText: 'Enter Password again',
-                            hintStyle: TextStyle(color: Colors.white70),
+                            hintStyle: TextStyle(color: Colors.black),
                             border: InputBorder.none,
-                            icon: Icon(Icons.lock, color: Colors.white),
+                            icon: Icon(Icons.lock, color: Colors.black),
                           ),
                         ),
                         if (_Password.text != _CheckPassword.text &&
@@ -202,7 +200,7 @@ class _SignupScreenState extends State<SignupScreen> {
                                 Text(
                                   'Passwords do not match',
                                   style: TextStyle(
-                                      color: Colors.white, fontSize: 12),
+                                      color: Colors.black, fontSize: 12),
                                 ),
                               ],
                             ),
@@ -220,7 +218,7 @@ class _SignupScreenState extends State<SignupScreen> {
                   }
                       : null,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.white,
+                    backgroundColor: Colors.black,
                     foregroundColor: const Color(0xFF8E2DE2),
                     padding: const EdgeInsets.symmetric(
                         horizontal: 80, vertical: 15),
@@ -230,24 +228,21 @@ class _SignupScreenState extends State<SignupScreen> {
                   ),
                   child: const Text(
                     'Sign Up',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold,color: Colors.white),
                   ),
                 ),
                 const SizedBox(height: 10),
                 TextButton(
                   onPressed: () {
-                    Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(builder: (context) => LoginScreen()),
-                    );
+                    Navigator.pop(context);
                   },
                   child: const Text(
                     "Already have an account?",
-                    style: TextStyle(color: Colors.white70),
+                    style: TextStyle(color: Colors.black),
                   ),
                 ),
                 const SizedBox(height: 20),
-                const Text(
+                /*const Text(
                   "or",
                   style: TextStyle(color: Colors.white70, fontSize: 16),
                 ),
@@ -275,7 +270,7 @@ class _SignupScreenState extends State<SignupScreen> {
                     ),
                     elevation: 3,
                   ),
-                ),
+                ),*/
               ],
             ),
           ),

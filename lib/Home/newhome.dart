@@ -1,10 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:madadgaar/Home/showdialog.dart';
-import 'package:madadgaar/Maps/maps.dart';
-import 'package:madadgaar/Maps/simplemaps.dart';
-import 'package:madadgaar/Profile.dart';
-import 'package:madadgaar/Profile/profile.dart';
+import 'package:madadgaar/Profile/newprofile.dart';
 
 class Newhome extends StatefulWidget {
   const Newhome({super.key});
@@ -16,9 +13,9 @@ class Newhome extends StatefulWidget {
 class _NewhomeState extends State<Newhome> {
   @override
   Widget build(BuildContext context) {
-    bool Login = true;
+    final bool login = true; // Prefer lowercase for variable names
     final args =
-        ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
+    ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
     final city = args['City'];
     final country = args['Country'];
     final List<String> queries = [
@@ -27,9 +24,12 @@ class _NewhomeState extends State<Newhome> {
       "I feel \nunsafe",
     ];
 
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return Scaffold(
-      backgroundColor: Color(0xFFEFF3F9),
-      body: Container(
+      backgroundColor: theme.scaffoldBackgroundColor,
+      body: SizedBox(
         height: MediaQuery.of(context).size.height,
         width: MediaQuery.of(context).size.width,
         child: Stack(
@@ -37,144 +37,173 @@ class _NewhomeState extends State<Newhome> {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 10),
               child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    SafeArea(
-                      child: Row(
-                        children: [
-                          Icon(Icons.location_on_sharp),
-                          SizedBox(
-                            width: 6,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  SafeArea(
+                    child: Row(
+                      children: [
+                        Icon(
+                          Icons.location_on_sharp,
+                          color: theme.iconTheme.color,
+                        ),
+                        const SizedBox(width: 6),
+                        Text(
+                          "$city, $country",
+                          style: TextStyle(
+                            color: theme.textTheme.bodyLarge!.color,
+                            fontWeight: FontWeight.w600,
                           ),
-                          Text("$city, $country")
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
-                    GestureDetector(
-                      child: SafeArea(
-                        child: Login
-                            ? Container(
-                          width: 40,
-                          height: 40,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(50),
-                            image: DecorationImage(
-                              image: AssetImage("assets/my_image.jpg"),
-                              fit: BoxFit.cover,
-                            ),
+                  ),
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const NewProfile(),
+                        ),
+                      );
+                    },
+                    child: SafeArea(
+                      child:Container(
+                        width: 40,
+                        height: 40,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(50),
+                          image: const DecorationImage(
+                            image: AssetImage("assets/my_image.jpg"),
+                            fit: BoxFit.cover,
                           ),
-                        )
-                            : Icon(Icons.person),
-                      ),
+                        ),
+                      )
 
-                      onTap: () {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => ProfileScreen(),
-                            ));
-                      },
                     ),
-                  ]),
+                  ),
+                ],
+              ),
             ),
-            Positioned(
-                top: MediaQuery.of(context).size.height * 0.12,
-                left: MediaQuery.of(context).size.width / 5,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Text(
-                      "Need\nEmergency Help",
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontSize: 28,
-                        fontWeight: FontWeight.w900,
-                        color: Colors.black87,
-                        letterSpacing: 1.2,
-                        height: 1.3,
-                      ),
-                    ),
-                    const SizedBox(height: 10),
-                    const Text("Click the button for ambulance"),
-                    const SizedBox(height: 10),
 
-                    // Outer silver ring
-                    Container(
-                      padding: const EdgeInsets.all(6), // Ring thickness
+            // Emergency Help Text + Button
+            Positioned(
+              top: MediaQuery.of(context).size.height * 0.12,
+              left: MediaQuery.of(context).size.width / 5,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    "Need\nEmergency Help",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 28,
+                      fontWeight: FontWeight.w900,
+                      color: theme.textTheme.headlineMedium!.color,
+                      letterSpacing: 1.2,
+                      height: 1.3,
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  Text(
+                    "Click the button for ambulance",
+                    style: TextStyle(
+                      color: theme.textTheme.bodyMedium!.color,
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+
+                  // Outer silver ring
+                  Container(
+                    padding: const EdgeInsets.all(6), // Ring thickness
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      gradient: LinearGradient(
+                        colors: isDark
+                            ? [Colors.grey[900]!, Colors.grey[800]!]
+                            : const [Color(0xFFF4F6F8), Color(0xFFB1BAC8)],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: isDark
+                              ? Colors.black54
+                              : Colors.grey.withOpacity(0.6),
+                          blurRadius: 10,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
+                    ),
+
+                    // Inner red button
+                    child: Container(
+                      height: MediaQuery.of(context).size.width * 0.5,
+                      width: MediaQuery.of(context).size.width * 0.5,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
                         gradient: const LinearGradient(
-                          colors: [Color(0xFFF4F6F8), Color(0xFFB1BAC8)],
+                          colors: [
+                            Colors.white,
+                            Color(0xFFD32F2F),
+                            Color(0xFFD32F2F),
+                            Color(0xFFD32F2F),
+                          ],
                           begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
+                          end: Alignment.bottomCenter,
                         ),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.grey.withOpacity(0.6),
-                            blurRadius: 10,
-                            offset: const Offset(0, 4),
+                            color: isDark
+                                ? Colors.redAccent.withOpacity(0.3)
+                                : Colors.redAccent.withOpacity(0.5),
+                            blurRadius: 30,
+                            spreadRadius: 6,
+                            offset: const Offset(0, 12),
                           ),
                         ],
                       ),
-
-                      // Inner red button
-                      child: Container(
-                        height: MediaQuery.of(context).size.width * 0.5,
-                        width: MediaQuery.of(context).size.width * 0.5,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          gradient: const LinearGradient(
-                            colors: [
-                              Colors.white,
-                              Color(0xFFD32F2F),
-                              Color(0xFFD32F2F),
-                              Color(0xFFD32F2F),
-                            ],
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomCenter,
-                          ),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.redAccent.withOpacity(0.5),
-                              blurRadius: 30,
-                              spreadRadius: 6,
-                              offset: const Offset(0, 12),
-                            ),
-                          ],
-                        ),
-                        child: IconButton(
-                          icon: const Icon(Icons.sos,
-                              size: 50, color: Colors.white),
-                          onPressed: () {
-                            showScaleDialog(context);
-                          },
-                        ),
+                      child: IconButton(
+                        icon:
+                        const Icon(Icons.sos, size: 50, color: Colors.white),
+                        onPressed: () {
+                          showScaleDialog(context);
+                        },
                       ),
                     ),
-                  ],
-                )),
-            SizedBox(
-              height: 40,
-            ),
-            Positioned(
-                top: 460,
-                left: MediaQuery.of(context).size.width / 5,
-                child: Text(
-                  "Not Sure What to do?",
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.w900,
-                    color: Colors.black87,
-                    letterSpacing: 1.2,
-                    height: 1.3,
                   ),
-                )),
+                ],
+              ),
+            ),
+
+            // "Not Sure What to do?" Text
             Positioned(
-                top: 490,
-                left: MediaQuery.of(context).size.width / 3,
-                child: Text(
-                  "Pick a Subject to call",
-                )),
+              top: 460,
+              left: MediaQuery.of(context).size.width / 5,
+              child: Text(
+                "Not Sure What to do?",
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w900,
+                  color: theme.textTheme.headlineMedium!.color,
+                  letterSpacing: 1.2,
+                  height: 1.3,
+                ),
+              ),
+            ),
+
+            // "Pick a Subject to call" Text
+            Positioned(
+              top: 490,
+              left: MediaQuery.of(context).size.width / 3,
+              child: Text(
+                "Pick a Subject to call",
+                style: TextStyle(
+                  color: theme.textTheme.bodyMedium!.color,
+                ),
+              ),
+            ),
+
+            // Emergency Query Cards
             Positioned(
               bottom: 60,
               left: -70,
@@ -185,15 +214,14 @@ class _NewhomeState extends State<Newhome> {
                   controller: PageController(viewportFraction: 0.55),
                   itemCount: queries.length,
                   itemBuilder: (context, index) {
-                    // Sample emergency queries
-
                     return Container(
-                      margin: EdgeInsets.symmetric(horizontal: 10),
+                      margin: const EdgeInsets.symmetric(horizontal: 10),
                       child: Card(
                         shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(16)),
+                          borderRadius: BorderRadius.circular(16),
+                        ),
                         elevation: 4,
-                        color: Color(0xFFF4F6F8), // Light silver background
+                        color: theme.cardColor,
                         child: Padding(
                           padding: const EdgeInsets.only(left: 20),
                           child: Column(
@@ -203,22 +231,24 @@ class _NewhomeState extends State<Newhome> {
                               Text(
                                 queries[index],
                                 style: TextStyle(
-                                    fontSize: 18, fontWeight: FontWeight.bold),
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                  color: theme.textTheme.bodyLarge!.color,
+                                ),
                               ),
-                              SizedBox(height: 10),
+                              const SizedBox(height: 10),
                               Row(
                                 mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
+                                MainAxisAlignment.spaceBetween,
                                 children: [
-                                  Icon(Icons.arrow_forward, color: Colors.red),
-                                  SizedBox(width: 8),
+                                  Icon(Icons.arrow_forward,
+                                      color: theme.colorScheme.error),
+                                  const SizedBox(width: 8),
                                   Icon(
                                     Icons.text_fields,
-                                    color: Colors.grey[500],
+                                    color: theme.iconTheme.color!.withOpacity(0.5),
                                   ),
-                                  SizedBox(
-                                    width: 2,
-                                  )
+                                  const SizedBox(width: 2),
                                 ],
                               ),
                             ],
@@ -229,35 +259,24 @@ class _NewhomeState extends State<Newhome> {
                   },
                 ),
               ),
-            )
+            ),
           ],
         ),
       ),
+
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: 0,
-        selectedItemColor: Colors.redAccent, // Optional, but recommended
+        selectedItemColor: theme.colorScheme.error,
         onTap: (index) {
-          if (index == 1) {
-            Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => Simplemaps(),
-                ));
+          if (index == 0) {
+            Navigator.popUntil(context, (route) => route.isFirst);
           }
-          /*if(index==2){
-            Navigator.push(context, History());
-
-          }*/
-          if (index == 0) {}
+          // You can add more navigation logic here
         },
         items: const [
           BottomNavigationBarItem(
             icon: Icon(Icons.home),
             label: 'Home',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.location_on),
-            label: 'Map',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.history),

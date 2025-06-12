@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:madadgaar/login/signup/signup.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -83,14 +84,8 @@ class _LoginScreenState extends State<LoginScreen> {
     return Scaffold(
       body: Container(
         decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [
-              Colors.blue.shade500,
-              Colors.purple.shade300
-            ], // Gradient colors
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
+          color: Theme.of(context).scaffoldBackgroundColor,
+
         ),
         child: Center(
           child: SingleChildScrollView(
@@ -103,37 +98,37 @@ class _LoginScreenState extends State<LoginScreen> {
                   style: TextStyle(
                     fontSize: 32,
                     fontWeight: FontWeight.bold,
-                    color: Colors.white,
+                    color: Colors.black,
                   ),
                 ),
                 SizedBox(height: 40),
                 ClipRRect(
                   borderRadius: BorderRadius.circular(16),
                   child: Container(
-                    color: Colors.white.withOpacity(0.1),
+                    color: Colors.black.withOpacity(0.1),
                     padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                     child: Column(
                       children: [
                         TextField(
                           controller: _Email,
-                          style: TextStyle(color: Colors.white),
+                          style: TextStyle(color: Colors.black),
                           decoration: InputDecoration(
                             hintText: 'Email',
-                            hintStyle: TextStyle(color: Colors.white70),
+                            hintStyle: TextStyle(color: Colors.black),
                             border: InputBorder.none,
-                            icon: Icon(Icons.email, color: Colors.white),
+                            icon: Icon(Icons.email, color: Colors.black),
                           ),
                         ),
-                        Divider(color: Colors.white38),
+                        Divider(color: Colors.black),
                         TextField(
                           controller: _Password,
-                          style: TextStyle(color: Colors.white),
+                          style: TextStyle(color: Colors.black),
                           obscureText: true,
                           decoration: InputDecoration(
                             hintText: 'Password',
-                            hintStyle: TextStyle(color: Colors.white70),
+                            hintStyle: TextStyle(color: Colors.black),
                             border: InputBorder.none,
-                            icon: Icon(Icons.lock, color: Colors.white),
+                            icon: Icon(Icons.lock, color: Colors.black),
                           ),
                         ),
                       ],
@@ -145,7 +140,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   Container(
                     padding: EdgeInsets.all(12),
                     decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.2),
+                      color: Colors.black.withOpacity(0.2),
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Text(
@@ -164,7 +159,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.white,
-                    foregroundColor: Color(0xFF8E2DE2),
+                    foregroundColor: Colors.black,
                     padding: EdgeInsets.symmetric(horizontal: 80, vertical: 15),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(30),
@@ -186,32 +181,9 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                 ),
                 SizedBox(height: 20),
-                Text(
-                  "or",
-                  style: TextStyle(color: Colors.white70, fontSize: 16),
-                ),
-                SizedBox(height: 20),
-                ElevatedButton.icon(
-                  onPressed: () {},
-                  icon: Image.asset(
-                    'assets/google.png',
-                    height: 24,
-                    width: 24,
-                  ),
-                  label: Text(
-                    'Sign up with Google',
-                    style: TextStyle(fontSize: 16),
-                  ),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.white,
-                    foregroundColor: Colors.black87,
-                    padding: EdgeInsets.symmetric(horizontal: 20, vertical: 15),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(30),
-                    ),
-                    elevation: 3,
-                  ),
-                ),
+                TextButton(onPressed: (){
+                  Navigator.push(context, MaterialPageRoute(builder: (context) => SignupScreen(),));
+                }, child: Text("Don't have account"))
               ],
             ),
           ),
