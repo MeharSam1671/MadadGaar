@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:madadgaar/Home/showdialog.dart';
 import 'package:madadgaar/Profile/newprofile.dart';
 
+import '../globals.dart';
+
 class Newhome extends StatefulWidget {
   const Newhome({super.key});
 
@@ -12,17 +14,30 @@ class Newhome extends StatefulWidget {
 
 class _NewhomeState extends State<Newhome> {
   @override
+  ImageProvider _profileImage = const AssetImage("assets/my_image.jpg");
+  bool _isLoggedIn = true; // Simulated login state
+
   Widget build(BuildContext context) {
-    final bool login = true; // Prefer lowercase for variable names
-    final args =
-    ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
-    final city = args['City'];
-    final country = args['Country'];
+    bool login = true;
+
+    final args = ModalRoute.of(context)?.settings.arguments;
+
+    String city = 'Unknown City';
+    String country = 'Unknown Country';
+
+    if (args != null && args is Map<String, dynamic>) {
+      city = args['City'] ?? 'Unknown City';
+      country = args['Country'] ?? 'Unknown Country';
+    } else {
+      debugPrint('Route arguments are null or invalid');
+    }
+
     final List<String> queries = [
       "I had an \naccident",
       "I need \nmedical help",
       "I feel \nunsafe",
     ];
+
 
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
@@ -67,17 +82,23 @@ class _NewhomeState extends State<Newhome> {
                       );
                     },
                     child: SafeArea(
-                      child:Container(
-                        width: 40,
-                        height: 40,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(50),
-                          image: const DecorationImage(
-                            image: AssetImage("assets/my_image.jpg"),
-                            fit: BoxFit.cover,
-                          ),
-                        ),
+                      child:ValueListenableBuilder(
+                        valueListenable: profileImageNotifier,
+                        builder: (context, image, _) {
+                          return Container(
+                            width: 40,
+                            height: 40,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(50),
+                              image: DecorationImage(
+                                image: image,
+                                fit: BoxFit.cover,
+                              ),
+                            ),
+                          );
+                        },
                       )
+
 
                     ),
                   ),

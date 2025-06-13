@@ -1,10 +1,14 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:madadgaar/Profile/profile.dart';
 import 'package:madadgaar/login/signup/login.dart';
 import 'package:provider/provider.dart';
-import '../main.dart'; // Assuming ThemeProvider is defined here // Create or import your ProfileScreen
+import '../main.dart';
+import 'aboutus.dart';
+import 'appversion.dart';
+import 'changepassword.dart';
+import 'editprofile.dart'; // Make sure EditProfile accepts onImageChanged callback
+import 'package:madadgaar/globals.dart'; // bring in the notifier
 
 class NewProfile extends StatefulWidget {
   const NewProfile({super.key});
@@ -14,20 +18,13 @@ class NewProfile extends StatefulWidget {
 }
 
 class _NewProfileState extends State<NewProfile> {
+
+  void updateUserImage(String imagePath) {
+    profileImageNotifier.value = FileImage(File(imagePath));
+  }
   bool _showCameraButton = false;
   bool _isLoggedIn = true; // Simulated login state
   ImageProvider _profileImage = const AssetImage("assets/my_image.jpg");
-  final ImagePicker _picker = ImagePicker();
-
-  Future<void> _pickImage() async {
-    final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
-    if (image != null) {
-      setState(() {
-        _profileImage = FileImage(File(image.path));
-        _showCameraButton = true;
-      });
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -47,39 +44,19 @@ class _NewProfileState extends State<NewProfile> {
                 onTap: _isLoggedIn
                     ? () => setState(() => _showCameraButton = !_showCameraButton)
                     : null,
-                child: Stack(
-                  alignment: Alignment.center,
-                  children: [
-                    CircleAvatar(
+                child: ValueListenableBuilder(
+                  valueListenable: profileImageNotifier,
+                  builder: (context, image, _) {
+                    return CircleAvatar(
                       radius: 50,
-                      backgroundImage: _isLoggedIn ? _profileImage : null,
+                      backgroundImage: _isLoggedIn ? image : null,
                       child: !_isLoggedIn
                           ? const Icon(Icons.person, size: 50)
                           : null,
-                    ),
-                    if (_isLoggedIn && _showCameraButton)
-                      Positioned(
-                        bottom: 0,
-                        right: 0,
-                        child: InkWell(
-                          onTap: _pickImage,
-                          borderRadius: BorderRadius.circular(25),
-                          child: Container(
-                            decoration: const BoxDecoration(
-                              color: Colors.black54,
-                              shape: BoxShape.circle,
-                            ),
-                            padding: const EdgeInsets.all(8),
-                            child: Icon(
-                              Icons.camera_alt,
-                              color: Theme.of(context).cardColor,
-                              size: 24,
-                            ),
-                          ),
-                        ),
-                      ),
-                  ],
+                    );
+                  },
                 ),
+
               ),
             ),
           ),
@@ -99,24 +76,24 @@ class _NewProfileState extends State<NewProfile> {
             ),
 
           if (_isLoggedIn)
-          Positioned(
-            top: 240,
-            left: 0,
-            right: 0,
-            child: Center(
-              child: Container(
-                padding: const EdgeInsets.all(15),
-                decoration: BoxDecoration(
-                  color: Colors.lightBlue,
-                  borderRadius: BorderRadius.circular(5),
-                ),
-                child: Text(
-                  email,
-                  style: const TextStyle(fontSize: 13, color: Colors.white),
+            Positioned(
+              top: 240,
+              left: 0,
+              right: 0,
+              child: Center(
+                child: Container(
+                  padding: const EdgeInsets.all(15),
+                  decoration: BoxDecoration(
+                    color: Colors.lightBlue,
+                    borderRadius: BorderRadius.circular(5),
+                  ),
+                  child: Text(
+                    email,
+                    style: const TextStyle(fontSize: 13, color: Colors.white),
+                  ),
                 ),
               ),
             ),
-          ),
 
           // Card Options
           Positioned(
@@ -126,12 +103,32 @@ class _NewProfileState extends State<NewProfile> {
             child: Column(
               children: [
                 if (_isLoggedIn) ...[
-                  buildCardTile(context, "Edit Profile", Icons.edit, () {}),
-                  buildCardTile(context, "Change Password", Icons.password, () {}),
+                  buildCardTile(context, "Edit Profile", Icons.edit, () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => EditProfile(
+                          onImageChanged: (String newImagePath) {
+                            updateUserImage(newImagePath);  // ✅ This is the correct global update
+                            setState(() {
+                              _showCameraButton = true;
+                            });
+                          },
+                        ),
 
+                      ),
+                    );
+                  }),
+                  buildCardTile(context, "Change Password", Icons.password, () {
+                    Navigator.push(context, MaterialPageRoute(builder: (context) => ChangePassword()));
+                  }),
                 ],
-                buildCardTile(context, "About Us", Icons.info, () {}),
-                buildCardTile(context, "App Version", Icons.perm_device_info, () {}),
+                buildCardTile(context, "About Us", Icons.info, () {
+                  Navigator.push(context, MaterialPageRoute(builder: (context) => AboutUs()));
+                }),
+                buildCardTile(context, "App Version", Icons.perm_device_info, () {
+                  Navigator.push(context, MaterialPageRoute(builder: (context) => AppVersion()));
+                }),
                 Card(
                   child: ListTile(
                     leading: const Icon(Icons.dark_mode),
@@ -139,8 +136,7 @@ class _NewProfileState extends State<NewProfile> {
                     trailing: Switch(
                       value: Provider.of<ThemeProvider>(context).isDarkMode,
                       onChanged: (value) {
-                        Provider.of<ThemeProvider>(context, listen: false)
-                            .toggleTheme(value);
+                        Provider.of<ThemeProvider>(context, listen: false).toggleTheme(value);
                       },
                     ),
                   ),
@@ -164,9 +160,7 @@ class _NewProfileState extends State<NewProfile> {
                       } else {
                         Navigator.push(
                           context,
-                          MaterialPageRoute(
-                              builder: (context) => LoginScreen(),
-                        )
+                          MaterialPageRoute(builder: (context) => LoginScreen()),
                         );
                       }
                     },
