@@ -18,11 +18,12 @@ class NewProfile extends StatefulWidget {
 }
 
 class _NewProfileState extends State<NewProfile> {
-
   void updateUserImage(String imagePath) {
     profileImageNotifier.value = FileImage(File(imagePath));
   }
+
   bool _showCameraButton = false;
+  String Mode="Dark Mode";
   bool _isLoggedIn = true; // Simulated login state
   ImageProvider _profileImage = const AssetImage("assets/my_image.jpg");
 
@@ -42,7 +43,8 @@ class _NewProfileState extends State<NewProfile> {
             child: Center(
               child: GestureDetector(
                 onTap: _isLoggedIn
-                    ? () => setState(() => _showCameraButton = !_showCameraButton)
+                    ? () =>
+                        setState(() => _showCameraButton = !_showCameraButton)
                     : null,
                 child: ValueListenableBuilder(
                   valueListenable: profileImageNotifier,
@@ -56,7 +58,6 @@ class _NewProfileState extends State<NewProfile> {
                     );
                   },
                 ),
-
               ),
             ),
           ),
@@ -70,7 +71,8 @@ class _NewProfileState extends State<NewProfile> {
               child: Center(
                 child: Text(
                   name,
-                  style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                  style: const TextStyle(
+                      fontSize: 20, fontWeight: FontWeight.bold),
                 ),
               ),
             ),
@@ -109,34 +111,49 @@ class _NewProfileState extends State<NewProfile> {
                       MaterialPageRoute(
                         builder: (context) => EditProfile(
                           onImageChanged: (String newImagePath) {
-                            updateUserImage(newImagePath);  // ✅ This is the correct global update
+                            updateUserImage(
+                                newImagePath); // ✅ This is the correct global update
                             setState(() {
                               _showCameraButton = true;
                             });
                           },
                         ),
-
                       ),
                     );
                   }),
                   buildCardTile(context, "Change Password", Icons.password, () {
-                    Navigator.push(context, MaterialPageRoute(builder: (context) => ChangePassword()));
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => ChangePassword()));
                   }),
                 ],
                 buildCardTile(context, "About Us", Icons.info, () {
-                  Navigator.push(context, MaterialPageRoute(builder: (context) => AboutUs()));
+                  Navigator.push(context,
+                      MaterialPageRoute(builder: (context) => AboutUs()));
                 }),
-                buildCardTile(context, "App Version", Icons.perm_device_info, () {
-                  Navigator.push(context, MaterialPageRoute(builder: (context) => AppVersion()));
+                buildCardTile(context, "App Version", Icons.perm_device_info,
+                    () {
+                  Navigator.push(context,
+                      MaterialPageRoute(builder: (context) => AppVersion()));
                 }),
                 Card(
                   child: ListTile(
                     leading: const Icon(Icons.dark_mode),
-                    title: const Text("Dark Mode"),
+                    title: Text(Mode),
                     trailing: Switch(
                       value: Provider.of<ThemeProvider>(context).isDarkMode,
                       onChanged: (value) {
-                        Provider.of<ThemeProvider>(context, listen: false).toggleTheme(value);
+                        Provider.of<ThemeProvider>(context, listen: false)
+                            .toggleTheme(value);
+
+                        setState(() {
+                          if (value == true) {
+                            Mode = "Light Mode";
+                          }else{
+                            Mode="Dark Mode";
+                          }
+                        });
                       },
                     ),
                   ),
@@ -148,7 +165,8 @@ class _NewProfileState extends State<NewProfile> {
                   child: ListTile(
                     title: Text(
                       _isLoggedIn ? "Logout" : "Login",
-                      style: TextStyle(color: _isLoggedIn ? Colors.red : Colors.green),
+                      style: TextStyle(
+                          color: _isLoggedIn ? Colors.red : Colors.green),
                     ),
                     leading: Icon(
                       _isLoggedIn ? Icons.logout : Icons.login,
@@ -160,7 +178,8 @@ class _NewProfileState extends State<NewProfile> {
                       } else {
                         Navigator.push(
                           context,
-                          MaterialPageRoute(builder: (context) => LoginScreen()),
+                          MaterialPageRoute(
+                              builder: (context) => LoginScreen()),
                         );
                       }
                     },
