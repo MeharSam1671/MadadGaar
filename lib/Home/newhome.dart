@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:madadgaar/Home/history.dart';
 import 'package:madadgaar/Home/showdialog.dart';
 import 'package:madadgaar/Profile/newprofile.dart';
 
@@ -291,6 +292,9 @@ class _NewhomeState extends State<Newhome> {
         onTap: (index) {
           if (index == 0) {
             Navigator.popUntil(context, (route) => route.isFirst);
+          }
+          if(index==1) {
+            Navigator.push(context, MaterialPageRoute(builder: (context) => HistoryPage()));
           }
           // You can add more navigation logic here
         },
