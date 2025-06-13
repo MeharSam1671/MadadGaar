@@ -78,7 +78,6 @@ class MyApp extends StatelessWidget {
       routes: {
         "/maps": (context) => const Maps(),
         "/Home": (context) => const Home(),
-        "/ChatAI": (context) => const ChatAIScreen(),
         "/Signup": (context) => const SignupScreen(),
         '/showProfile': (context) => const ProfileScreen(),
         '/LoginProfile': (context) => LoginScreen(),

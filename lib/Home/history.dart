@@ -15,7 +15,7 @@ class _HistoryPageState extends State<HistoryPage> {
     UserRequest(
       title: "Ambulance Dispatch - City Hospital",
       dateTime: DateTime.now().subtract(Duration(days: 2, hours: 3)),
-      status: RequestStatus.success,
+      status: RequestStatus.completed,
     ),
     UserRequest(
       title: "Ambulance Dispatch - Green Clinic",
@@ -70,10 +70,6 @@ class _HistoryPageState extends State<HistoryPage> {
                 _getStatusIcon(request.status),
                 color: _getStatusColor(request.status),
               ),
-              trailing: const Icon(Icons.arrow_forward_ios),
-              onTap: () {
-                // TODO: Navigate to detailed view or take action
-              },
             ),
           );
         },

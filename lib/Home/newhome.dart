@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:madadgaar/ChatAi/chataiscreen.dart';
 import 'package:madadgaar/Home/history.dart';
 import 'package:madadgaar/Home/showdialog.dart';
 import 'package:madadgaar/Profile/newprofile.dart';
@@ -236,48 +237,57 @@ class _NewhomeState extends State<Newhome> {
                   controller: PageController(viewportFraction: 0.55),
                   itemCount: queries.length,
                   itemBuilder: (context, index) {
-                    return Container(
-                      margin: const EdgeInsets.symmetric(horizontal: 10),
-                      child: Card(
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(16),
-                        ),
-                        elevation: 4,
-                        color: theme.cardColor,
-                        child: Padding(
-                          padding: const EdgeInsets.only(left: 20),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text(
-                                queries[index],
-                                style: TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold,
-                                  color: theme.textTheme.bodyLarge!.color,
-                                ),
-                              ),
-                              const SizedBox(height: 10),
-                              Row(
-                                mainAxisAlignment:
-                                MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Icon(Icons.arrow_forward,
-                                      color: theme.colorScheme.error),
-                                  const SizedBox(width: 8),
-                                  Icon(
-                                    Icons.text_fields,
-                                    color: theme.iconTheme.color!.withOpacity(0.5),
+                    return GestureDetector(
+                      child: Container(
+                        margin: const EdgeInsets.symmetric(horizontal: 10),
+                        child: Card(
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                          elevation: 4,
+                          color: theme.cardColor,
+                          child: Padding(
+                            padding: const EdgeInsets.only(left: 20),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text(
+                                  queries[index],
+                                  style: TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                    color: theme.textTheme.bodyLarge!.color,
                                   ),
-                                  const SizedBox(width: 2),
-                                ],
-                              ),
-                            ],
+                                ),
+                                const SizedBox(height: 10),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Icon(Icons.arrow_forward, color: theme.colorScheme.error),
+                                    const SizedBox(width: 8),
+                                    Icon(
+                                      Icons.text_fields,
+                                      color: theme.iconTheme.color!.withOpacity(0.5),
+                                    ),
+                                    const SizedBox(width: 2),
+                                  ],
+                                ),
+                              ],
+                            ),
                           ),
                         ),
                       ),
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => ChatbotScreen(query: queries[index]),
+                          ),
+                        );
+                      }, // <-- here closing the GestureDetector
                     );
+
                   },
                 ),
               ),

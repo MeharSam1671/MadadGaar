@@ -1,147 +1,90 @@
-// import 'dart:convert';
-
-// import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-// import 'package:dialog_flowtter/dialog_flowtter.dart';
 
-class ChatAIScreen extends StatefulWidget {
-  const ChatAIScreen({super.key});
+class ChatbotScreen extends StatefulWidget {
+  final String query;
+  const ChatbotScreen({super.key, required this.query});
 
   @override
-  State<ChatAIScreen> createState() => _ChatAIScreenState();
+  State<ChatbotScreen> createState() => _ChatbotScreenState();
 }
 
-class _ChatAIScreenState extends State<ChatAIScreen> {
+class _ChatbotScreenState extends State<ChatbotScreen> {
+  final List<ChatMessage> messages = [
+    ChatMessage(text: "What kind of accident?", isUser: false),
+    ChatMessage(text: "My nose is bleeding.\nRuptured blood vessels.", isUser: true),
+  ];
+
   final TextEditingController _controller = TextEditingController();
-  final List<Map<String, dynamic>> _messages = [];
-  // late DialogFlowtter dialogFlowtter;
-  bool _isInitialized = false;
 
-  @override
-  void initState() {
-    super.initState();
-    // _initializeDialogflow();
-  }
+  void _sendMessage() {
+    if (_controller.text.trim().isEmpty) return;
 
-  // Future<void> _initializeDialogflow() async {
-  //   try {
-  //     dialogFlowtter = DialogFlowtter.fromJson({
-  //       "type": "service_account",
-  //       "project_id": "madadgaar-1122",
-  //       "private_key_id": base64
-  //           .decode("ZmEyNDVjMzY2NTYzYWNhNmRhOTAwMzMyM2VjOTZlYjJjNTZjNDNjYg==")
-  //           .toString(),
-  //       "private_key":
-  //           "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQDnJ/KbLttiCiVz\nFPlVFDn1xhJHlg22s1xpKKTewAs4hDbH51xtzIlKiQdNQCz1bSav+lHpMtpXrUeH\n8/Es8KneVIlYA/It5JjjY46SvVlaHEzP7v6ngfRKYGUPBmgnkdu7fQXXZJ1nkmlI\ncmz4zH63lD7Bh0xcJOX2qIDN+0Dc6qvDtf1vmYkPQynpu49DSOoeneN8cHKLnDwk\nn3HVM7zpREqpwa3U7kqqb5KN+mUk6bFi3YwzbFDHeJhGvTLFvn5+tFYCh8d4/mqS\nZ2m1e83rof0XV3TGQJHNfY8giFsOjzidVDHL6o3muMZgeS5bRnSB+WNymxboNLVq\noplC0wmTAgMBAAECggEABICaMJyaiE/TR+kOLDKPKHLZs0xAayEWOTQh9fa+oTSu\nDnm6qqbTu8BshHwuA//Cw6W4B7dGWnPVE1hUh8AORvbVkAHPq0YrFi6/varzfRZV\nBq3Mhv24gORcw4yn5bFpGr9GKFpc2IIZC+Cyr6voAfJgwIs+mQLc+c9xZtGwgz0D\nbW+wLslk+vd9KCS1D17sMkmna3EJc7PbWDrra8cFQoxTpLswa8doFsHVLQWqofrN\nE0076oDKnH4xCpZWkkFp2ftQIYzHgdMRXcd5lUFQbUyROUaO3HY+1Cv276ov6Qi1\nfDaJhf+F7dt3umO/SA20/WjxKM/DJM9gP3wTJJS1hQKBgQD6lAuPkbHMY7US8jrJ\nqbbEE0VXA3duo1O2Hg0YU/ZaOSUmuZQ0f8SxYHtWV4o8DU+iDFQVB5wvCoN8mkwi\nRcOpZBmrlee2wKU5sBSN7OUdAbfH4UW382e5zFZky8Nv81EXG8m8aGW+S9jRDtDA\nGI3P1XBhNbkZqFOtI9cayP0BPQKBgQDsKFKQqr/5kHy3rgd/5Meuea1wehWdYQ1A\nhKniPUP/AGyDfOVYplGiezRS51p4YTdhCneSsvDmBJe+9t6INWD9iRLFhp0/BqXD\nHVEUyx25UGVwtI8NilPSZ+AMn7/jvfa7V58q+mwOzTuxKUCc0+usknpBKL5M8/eu\nwnfwqDFDDwKBgQCmR1F4nuTOTafd/7G1GpK2gFc2C43YdDdblYt5BlZmvp8BmIpZ\nYCPE1NJjlEmd2fNrBCVToy4oJSDlsXouD/9ry4ohS6NsqV+67TZmi7npyrcKw1lB\nXRsKtybpUjHJezvnSsBO7zP82FXzPJKXtnN8ZBVj3IONHB8SuMLH+nGxvQKBgFre\nFQ7nNKERcHu4sdgLLq460Xqi7yg0TMYThc6wpjY7coWRjCn1LRoo7/QqYwxI0+c6\nANJomfrXr4/iK7QbXeuQT7HDX0P+CdAuuqEWmqRQhAe+4gBixmgCYhpZaZt237Ys\nO+lsnCGB5MMBTYRKorcvUW07ASZZBWewGjh2byYPAoGAMqIesK+bNp33QSDUS/SY\noErvphzLUgA1Z4U/+uezq/jHl6056SA0zr8wVhaUn9g3rHXoSwiyBuhbqtH9sUJ3\nifZaH3arLYRoyCNYyNdH9Z8U8xWes5WfxPrx5CNtSSxhI1AJ921TFfQ0VxFzxkIK\nMQbSXIwmuh4sMr1FgjmXOYs=\n-----END PRIVATE KEY-----\n",
-  //       "client_email": "chatbot@madadgaar-1122.iam.gserviceaccount.com",
-  //       "client_id": "107095263874509379007",
-  //       "auth_uri": "https://accounts.google.com/o/oauth2/auth",
-  //       "token_uri": "https://oauth2.googleapis.com/token",
-  //       "auth_provider_x509_cert_url":
-  //           "https://www.googleapis.com/oauth2/v1/certs",
-  //       "client_x509_cert_url":
-  //           "https://www.googleapis.com/robot/v1/metadata/x509/chatbot%40madadgaar-1122.iam.gserviceaccount.com",
-  //       "universe_domain": "googleapis.com"
-  //     });
-  //     setState(() => _isInitialized = true);
-  //   } catch (e) {
-  //     if (kDebugMode) {
-  //       print('Error initializing Dialogflow: $e');
-  //     }
-  //     // Handle initialization error
-  //   }
-  // }
+    setState(() {
+      messages.add(ChatMessage(text: _controller.text.trim(), isUser: true));
+      _controller.clear();
 
-  Future<void> _sendMessage() async {
-    if (_controller.text.trim().isNotEmpty && _isInitialized) {
-      String userMessage = _controller.text.trim();
-
-      // Add user message to the list
-      setState(() {
-        _messages.add({
-          'message': userMessage,
-          'isUserMessage': true,
+      // Simulate bot response (optional)
+      Future.delayed(const Duration(seconds: 1), () {
+        setState(() {
+          messages.add(ChatMessage(text: "Thank you for the info. Help is on the way.", isUser: false));
         });
       });
-
-      // Get response from Dialogflow
-      // try {
-      //   DetectIntentResponse response = await dialogFlowtter.detectIntent(
-      //     queryInput: QueryInput(text: TextInput(text: userMessage)),
-      //   );
-
-      //   if (response.message != null) {
-      //     setState(() {
-      //       _messages.add({
-      //         'message': response.message?.text?.text?[0] ?? 'No response',
-      //         'isUserMessage': false,
-      //       });
-      //     });
-      //   }
-      // } catch (e) {
-      //   if (kDebugMode) {
-      //     print('Error getting Dialogflow response: $e');
-      //   }
-      //   setState(() {
-      //     _messages.add({
-      //       'message': 'Sorry, there was an error processing your request.',
-      //       'isUserMessage': false,
-      //     });
-      //   });
-      // }
-
-      setState(() {
-        _messages.add({
-          'message': 'Sorry, there was an error processing your request.',
-          'isUserMessage': false,
-        });
-        _controller.clear();
-      });
-    }
-  }
-
-  @override
-  void dispose() {
-    // dialogFlowtter.dispose();
-    super.dispose();
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.grey.shade100,
       appBar: AppBar(
-        title: const Text("Chat AI"),
+        backgroundColor: Colors.grey.shade100,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.black87),
+          onPressed: () => Navigator.of(context).pop(),
+        ),
+        centerTitle: true,
+        title: const Text(
+          "Chatbot",
+          style: TextStyle(color: Colors.black87, fontWeight: FontWeight.bold),
+        ),
       ),
       body: Column(
         children: [
           Expanded(
             child: ListView.builder(
-              reverse: true,
-              itemCount: _messages.length,
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+              itemCount: messages.length,
               itemBuilder: (context, index) {
-                final messageData = _messages[_messages.length - 1 - index];
+                final message = messages[index];
                 return Align(
-                  alignment: messageData['isUserMessage']
-                      ? Alignment.centerRight
-                      : Alignment.centerLeft,
+                  alignment:
+                  message.isUser ? Alignment.centerRight : Alignment.centerLeft,
                   child: Container(
-                    margin: const EdgeInsets.symmetric(
-                      vertical: 5,
-                      horizontal: 10,
-                    ),
+                    margin: const EdgeInsets.symmetric(vertical: 6),
                     padding: const EdgeInsets.all(12),
+                    constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.7),
                     decoration: BoxDecoration(
-                      color: messageData['isUserMessage']
-                          ? Colors.blue
-                          : Colors.grey[300],
-                      borderRadius: BorderRadius.circular(10),
+                      color: message.isUser ? Colors.red.shade400 : Colors.white,
+                      borderRadius: BorderRadius.only(
+                        topLeft: const Radius.circular(15),
+                        topRight: const Radius.circular(15),
+                        bottomLeft: Radius.circular(message.isUser ? 15 : 0),
+                        bottomRight: Radius.circular(message.isUser ? 0 : 15),
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.1),
+                          blurRadius: 3,
+                          offset: const Offset(0, 1),
+                        ),
+                      ],
                     ),
                     child: Text(
-                      messageData['message'],
+                      widget.query,
                       style: TextStyle(
-                        color: messageData['isUserMessage']
-                            ? Colors.white
-                            : Colors.black,
+                        color: message.isUser ? Colors.white : Colors.black87,
+                        fontSize: 15,
                       ),
                     ),
                   ),
@@ -149,36 +92,46 @@ class _ChatAIScreenState extends State<ChatAIScreen> {
               },
             ),
           ),
-          Container(
-            padding: const EdgeInsets.all(10),
+          // Input area
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
             child: Row(
               children: [
                 Expanded(
                   child: TextField(
                     controller: _controller,
                     decoration: InputDecoration(
-                      hintText: "Enter a message...",
+                      hintText: "Type your message...",
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                      filled: true,
+                      fillColor: Colors.white,
                       border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      contentPadding: const EdgeInsets.symmetric(
-                        horizontal: 15,
-                        vertical: 10,
+                        borderRadius: BorderRadius.circular(25),
+                        borderSide: BorderSide.none,
                       ),
                     ),
-                    onSubmitted: (text) => _sendMessage(),
                   ),
                 ),
-                const SizedBox(width: 10),
-                IconButton(
-                  icon: const Icon(Icons.send_sharp, color: Colors.black),
-                  onPressed: _sendMessage,
-                ),
+                const SizedBox(width: 8),
+                CircleAvatar(
+                  backgroundColor: Colors.red.shade400,
+                  child: IconButton(
+                    icon: const Icon(Icons.send, color: Colors.white),
+                    onPressed: _sendMessage,
+                  ),
+                )
               ],
             ),
-          ),
+          )
         ],
       ),
     );
   }
+}
+
+class ChatMessage {
+  final String text;
+  final bool isUser;
+
+  ChatMessage({required this.text, required this.isUser});
 }
