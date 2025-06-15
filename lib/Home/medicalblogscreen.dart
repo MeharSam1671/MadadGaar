@@ -65,7 +65,7 @@ class MedicalBlogScreen extends StatelessWidget {
                     fit: BoxFit.cover,
                   ),
                   Container(
-                    color: Colors.black.withOpacity(0.4),
+                    color: Colors.black.withAlpha(102),
                   ),
                   Padding(
                     padding: const EdgeInsets.all(12.0),

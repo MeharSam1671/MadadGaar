@@ -2,7 +2,7 @@ import 'dart:async';
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:madadgaar/Home/emergency_dialog.dart';
+// import 'package:madadgaar/Home/emergency_dialog.dart';
 import 'package:madadgaar/Profile/profile.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -38,7 +38,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
     "Posted: May 6, 2025",
     "Posted: May 5, 2025",
   ];
-  int _currentIndex = 0;
+  // int _currentIndex = 0;
   Timer? _timer;
   late Alignment beginAlignment;
   late Alignment endAlignment;
@@ -102,33 +102,33 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
     super.dispose();
   }
 
-  void _showCustomDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(15),
-          ),
-          title: const Text(
-            "Emergency Assistance",
-            style: TextStyle(fontWeight: FontWeight.bold),
-          ),
-          content: const EmergencyDialogContent(),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text("Cancel"),
-            ),
-            TextButton(
-              onPressed: () => Navigator.pushNamed(context, "/maps"),
-              child: const Text("Skip"),
-            ),
-          ],
-        );
-      },
-    );
-  }
+  // void _showCustomDialog(BuildContext context) {
+  //   showDialog(
+  //     context: context,
+  //     builder: (BuildContext context) {
+  //       return AlertDialog(
+  //         shape: RoundedRectangleBorder(
+  //           borderRadius: BorderRadius.circular(15),
+  //         ),
+  //         title: const Text(
+  //           "Emergency Assistance",
+  //           style: TextStyle(fontWeight: FontWeight.bold),
+  //         ),
+  //         content: const EmergencyDialogContent(),
+  //         actions: [
+  //           TextButton(
+  //             onPressed: () => Navigator.pop(context),
+  //             child: const Text("Cancel"),
+  //           ),
+  //           TextButton(
+  //             onPressed: () => Navigator.pushNamed(context, "/maps"),
+  //             child: const Text("Skip"),
+  //           ),
+  //         ],
+  //       );
+  //     },
+  //   );
+  // }
 
   void _startAnimation() {
     Future.delayed(const Duration(seconds: 3), () {
@@ -163,7 +163,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
             width: MediaQuery.of(context).size.width,
             decoration: BoxDecoration(
               gradient: LinearGradient(
-                colors: [
+                colors: const [
                   Color(0xFF2E57A5), // Blue
                   Color(0xFF7D3988), // Purple
                   Color(0xFFF45F88), // Pink
@@ -308,7 +308,10 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                         Container(
                           decoration: BoxDecoration(
                             gradient: LinearGradient(
-                              colors: [Colors.black.withOpacity(0.6), Colors.transparent],
+                              colors: [
+                                Colors.black.withAlpha(153),
+                                Colors.transparent
+                              ],
                               begin: Alignment.bottomCenter,
                               end: Alignment.topCenter,
                             ),
@@ -327,7 +330,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                               child: Container(
                                 padding: const EdgeInsets.all(16),
                                 decoration: BoxDecoration(
-                                  color: Colors.white.withOpacity(0.2),
+                                  color: Colors.white.withAlpha(51),
                                   borderRadius: BorderRadius.circular(15),
                                 ),
                                 child: Column(

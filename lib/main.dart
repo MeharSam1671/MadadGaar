@@ -4,10 +4,11 @@ import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
 import 'package:madadgaar/firebase_options.dart';
-import 'package:madadgaar/ChatAi/chataiscreen.dart';
 import 'package:madadgaar/login/signup/signup.dart';
 import 'package:madadgaar/settings/settings.dart';
 import 'package:madadgaar/splashscreen.dart';
+import 'package:madadgaar/utils/api_controller.dart';
+import 'package:madadgaar/utils/socket_client.dart';
 import 'Home/home.dart';
 import 'Maps/maps.dart';
 import 'Profile/profile.dart';
@@ -21,6 +22,12 @@ void main() async {
     DeviceOrientation.portraitUp,
     DeviceOrientation.portraitDown,
   ]).then((_) {
+    ApiController(
+      baseUrl: 'http://10.0.2.2:4000/api', // Replace with your API base URL
+    );
+    SocketClient(
+      baseUrl: 'http://10.0.2.2:4000/api', // Replace with your API base URL
+    );
     runApp(
       ChangeNotifierProvider(
         create: (_) => ThemeProvider(),
@@ -50,7 +57,7 @@ final darkTheme = ThemeData(
   scaffoldBackgroundColor: Colors.black,
   primaryColor: Colors.blueGrey,
   appBarTheme: AppBarTheme(backgroundColor: Colors.grey[900]),
-  colorScheme: ColorScheme.dark(),
+  colorScheme: const ColorScheme.dark(),
 );
 
 // Light Theme
@@ -59,7 +66,7 @@ final lightTheme = ThemeData(
   scaffoldBackgroundColor: Colors.white,
   primaryColor: Colors.blue,
   appBarTheme: const AppBarTheme(backgroundColor: Colors.white),
-  colorScheme: ColorScheme.light(),
+  colorScheme: const ColorScheme.light(),
 );
 
 class MyApp extends StatelessWidget {
@@ -80,11 +87,14 @@ class MyApp extends StatelessWidget {
         "/Home": (context) => const Home(),
         "/Signup": (context) => const SignupScreen(),
         '/showProfile': (context) => const ProfileScreen(),
-        '/LoginProfile': (context) => LoginScreen(),
+        '/LoginProfile': (context) => const LoginScreen(),
         '/Settings': (context) => const SettingsPage(),
-        '/Newhome': (context) => Newhome(),
+        '/Newhome': (context) => const Newhome(),
       },
-      home:  SplashScreen(home: home),
+
+      //home:  SplashScreen(home: home),
+      home: const SplashScreen(home: home),
+      // home: LoginScreen(),
     );
   }
 }

@@ -1,4 +1,5 @@
 import 'dart:math';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
 import 'package:geocoding/geocoding.dart';
@@ -26,7 +27,9 @@ Future<Map<String, String>> _getUserLocation() async {
   }
 
   Position position = await Geolocator.getCurrentPosition(
-    desiredAccuracy: LocationAccuracy.high,
+    locationSettings: const LocationSettings(
+      accuracy: LocationAccuracy.high,
+    ),
   );
 
   List<Placemark> placemarks = await placemarkFromCoordinates(
@@ -47,7 +50,7 @@ Future<Map<String, String>> _getUserLocation() async {
 
 class SplashScreen extends StatefulWidget {
   final String? home;
-  SplashScreen({Key? key, required this.home}) : super(key: key);
+  const SplashScreen({super.key, required this.home});
 
   @override
   State<SplashScreen> createState() => _SplashScreenState();
@@ -79,8 +82,12 @@ class _SplashScreenState extends State<SplashScreen>
           );
         });
       }).catchError((e) {
-        print("Location error: $e");
-        Navigator.of(context).pushReplacementNamed('/Newhome');
+        if (kDebugMode) {
+          print("Location error: $e");
+        }
+        if (mounted) {
+          Navigator.of(context).pushReplacementNamed('/Newhome');
+        }
       });
     }
   }
@@ -143,8 +150,8 @@ class _SplashScreenState extends State<SplashScreen>
     final themeProvider = Provider.of<ThemeProvider>(context);
     final isDark = themeProvider.isDarkMode;
 
-    return WillPopScope(
-      onWillPop: () async => false, // Disable back button on splash screen
+    return PopScope(
+      canPop: false, // Disable back button on splash screen
       child: Scaffold(
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         body: SafeArea(
@@ -161,8 +168,8 @@ class _SplashScreenState extends State<SplashScreen>
                 const SizedBox(height: 20),
                 buildColorfulText(isDark),
                 const SizedBox(height: 30),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 90),
+                const Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 90),
                   child: LinearProgressIndicator(color: Colors.pink),
                 ),
               ],

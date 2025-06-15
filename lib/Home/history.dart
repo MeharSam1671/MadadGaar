@@ -14,29 +14,29 @@ class _HistoryPageState extends State<HistoryPage> {
     // Ambulance requests with status success or cancelled
     UserRequest(
       title: "Ambulance Dispatch - City Hospital",
-      dateTime: DateTime.now().subtract(Duration(days: 2, hours: 3)),
+      dateTime: DateTime.now().subtract(const Duration(days: 2, hours: 3)),
       status: RequestStatus.completed,
     ),
     UserRequest(
       title: "Ambulance Dispatch - Green Clinic",
-      dateTime: DateTime.now().subtract(Duration(days: 5, hours: 1)),
+      dateTime: DateTime.now().subtract(const Duration(days: 5, hours: 1)),
       status: RequestStatus.cancelled,
     ),
 
     // Other user requests
     UserRequest(
       title: "Ambulance Request - City Hospital",
-      dateTime: DateTime.now().subtract(Duration(days: 1, hours: 2)),
+      dateTime: DateTime.now().subtract(const Duration(days: 1, hours: 2)),
       status: RequestStatus.completed,
     ),
     UserRequest(
       title: "Blood Test Appointment",
-      dateTime: DateTime.now().subtract(Duration(days: 3)),
+      dateTime: DateTime.now().subtract(const Duration(days: 3)),
       status: RequestStatus.cancelled,
     ),
     UserRequest(
       title: "Follow-up Consultation",
-      dateTime: DateTime.now().subtract(Duration(hours: 5)),
+      dateTime: DateTime.now().subtract(const Duration(hours: 5)),
       status: RequestStatus.pending,
     ),
   ];

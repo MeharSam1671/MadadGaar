@@ -1,6 +1,6 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:madadgaar/Maps/maps.dart';
-import 'package:madadgaar/splashscreen.dart';
 Map<String,dynamic> selection={
   'ReportEmergency':'set1',
   'Catogery':'set2',
@@ -67,7 +67,7 @@ class _EmergencyReportScreenState extends State<EmergencyReportScreen> {
     final scaleSelected = _selectedScale != null;
     return Scaffold(
       appBar: AppBar(
-        title: Center(child: const Text('Please Select Option:')),
+        title: const Center(child: Text('Please Select Option:')),
         backgroundColor: Colors.transparent,
         foregroundColor: Colors.black,
         // centerTitle: true,
@@ -248,13 +248,19 @@ class _SubcategoryScreenState extends State<SubcategoryScreen> {
             onTap: () {
               setState(() {
                 selection["Subcatogery"]=sub.title;
+                if (kDebugMode) {
                   print(selection["ReportEmergency"]);
                   print(selection["Catogery"]);
                   print(selection["Subcatogery"]);
+                }
                   {/*
                   API Called to send actions
                   */}
-                  Navigator.push(context, MaterialPageRoute(builder: (context) => Maps(),));
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const Maps(),
+                    ));
 
 
               });

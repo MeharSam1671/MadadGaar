@@ -4,7 +4,6 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:madadgaar/splashscreen.dart';
 
-import '../Home/newhome.dart';
 
 Stream<Position> getLocationStream() {
   return Geolocator.getPositionStream(
@@ -98,7 +97,7 @@ class _MapsState extends State<Simplemaps> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: isLoading
-          ? SplashScreen(home: "maps")
+          ? const SplashScreen(home: "maps")
           : Stack(
         children: [
           GoogleMap(
@@ -125,7 +124,7 @@ class _MapsState extends State<Simplemaps> {
                       horizontal: 14, vertical: 34),
                   margin: const EdgeInsets.symmetric(horizontal: 14),
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.95),
+                          color: Colors.white.withAlpha(242),
                     borderRadius: BorderRadius.circular(16),
                     boxShadow: const [
                       BoxShadow(

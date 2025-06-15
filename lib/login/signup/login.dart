@@ -1,11 +1,13 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
+import 'package:madadgaar/utils/api_controller.dart';
 import 'package:madadgaar/login/signup/signup.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginScreen extends StatefulWidget {
+  const LoginScreen({super.key});
+
   @override
   State<LoginScreen> createState() => _LoginScreenState();
 }
@@ -14,20 +16,28 @@ class _LoginScreenState extends State<LoginScreen> {
   String? _errormessage;
   bool _isLoading = false; // 1. Add this
 
-  Future<void> CheckUserCredentail(String Email, String Password) async {
+  final apiController = ApiController();
+
+  Future<void> handleLogin(String email, String password) async {
     setState(() {
       _isLoading = true;
     });
     try {
-      final url = Uri.parse('http://10.0.2.2:4000/api/auth/login');
-      final response = await http.post(
-        url,
-        headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-        body: {
-          "email": Email,
-          "password": Password,
+      final response = await apiController.post(
+        "/auth/login",
+        {
+          "email": email,
+          "password": password,
         },
       );
+      // final response = await http.post(
+      //   url,
+      //   headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+      //   body: {
+      //     "email": Email,
+      //     "password": Password,
+      //   },
+      // );
 
       if (response.statusCode == 201) {
         debugPrint('Logged-in successfully: ${response.body}');
@@ -41,13 +51,15 @@ class _LoginScreenState extends State<LoginScreen> {
           final String? userName = responseData['user']?['firstName'];
 
           final prefs = await SharedPreferences.getInstance();
-          await prefs.setString('accessToken', accessToken);
+          await prefs.setString('auth_token', accessToken);
           await prefs.setString('userName', userName ?? 'User');
           debugPrint('Access token saved to shared preferences.');
-          Navigator.pushReplacementNamed(
-            context,
-            '/Home',
-          ); // Navigate to Home screen
+          if (mounted) {
+            Navigator.pushReplacementNamed(
+              context,
+              '/Home',
+            ); // Navigate to Home screen
+          }
         } else {
           debugPrint('No access token found in response.');
         }
@@ -76,8 +88,8 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
-  TextEditingController _Email = TextEditingController(),
-      _Password = TextEditingController();
+  final TextEditingController _email = TextEditingController(),
+      _password = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -85,15 +97,14 @@ class _LoginScreenState extends State<LoginScreen> {
       body: Container(
         decoration: BoxDecoration(
           color: Theme.of(context).scaffoldBackgroundColor,
-
         ),
         child: Center(
           child: SingleChildScrollView(
-            padding: EdgeInsets.symmetric(horizontal: 30),
+            padding: const EdgeInsets.symmetric(horizontal: 30),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Text(
+                const Text(
                   "Welcome Back",
                   style: TextStyle(
                     fontSize: 32,
@@ -101,30 +112,31 @@ class _LoginScreenState extends State<LoginScreen> {
                     color: Colors.black,
                   ),
                 ),
-                SizedBox(height: 40),
+                const SizedBox(height: 40),
                 ClipRRect(
                   borderRadius: BorderRadius.circular(16),
                   child: Container(
-                    color: Colors.black.withOpacity(0.1),
-                    padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                    color: Colors.black.withAlpha(26),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 20, vertical: 10),
                     child: Column(
                       children: [
                         TextField(
-                          controller: _Email,
-                          style: TextStyle(color: Colors.black),
-                          decoration: InputDecoration(
+                          controller: _email,
+                          style: const TextStyle(color: Colors.black),
+                          decoration: const InputDecoration(
                             hintText: 'Email',
                             hintStyle: TextStyle(color: Colors.black),
                             border: InputBorder.none,
                             icon: Icon(Icons.email, color: Colors.black),
                           ),
                         ),
-                        Divider(color: Colors.black),
+                        const Divider(color: Colors.black),
                         TextField(
-                          controller: _Password,
-                          style: TextStyle(color: Colors.black),
+                          controller: _password,
+                          style: const TextStyle(color: Colors.black),
                           obscureText: true,
-                          decoration: InputDecoration(
+                          decoration: const InputDecoration(
                             hintText: 'Password',
                             hintStyle: TextStyle(color: Colors.black),
                             border: InputBorder.none,
@@ -136,37 +148,39 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                 ),
                 if (_errormessage != null && _errormessage!.isNotEmpty) ...[
-                  SizedBox(height: 20),
+                  const SizedBox(height: 20),
                   Container(
-                    padding: EdgeInsets.all(12),
+                    padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
-                      color: Colors.black.withOpacity(0.2),
+                      color: Colors.black.withAlpha(61),
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Text(
                       _errormessage!,
-                      style: TextStyle(color: Colors.redAccent, fontSize: 14),
+                      style: const TextStyle(
+                          color: Colors.redAccent, fontSize: 14),
                       textAlign: TextAlign.center,
                     ),
                   ),
                 ],
-                SizedBox(height: 30),
+                const SizedBox(height: 30),
                 ElevatedButton(
                   onPressed: _isLoading
                       ? null // 4. Disable button if loading
                       : () {
-                          CheckUserCredentail(_Email.text, _Password.text);
+                          handleLogin(_email.text, _password.text);
                         },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.white,
                     foregroundColor: Colors.black,
-                    padding: EdgeInsets.symmetric(horizontal: 80, vertical: 15),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 80, vertical: 15),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(30),
                     ),
                   ),
                   child: _isLoading
-                      ? SizedBox(
+                      ? const SizedBox(
                           width: 24,
                           height: 24,
                           child: CircularProgressIndicator(
@@ -174,16 +188,22 @@ class _LoginScreenState extends State<LoginScreen> {
                             strokeWidth: 3,
                           ),
                         )
-                      : Text(
+                      : const Text(
                           'Login',
                           style: TextStyle(
                               fontSize: 18, fontWeight: FontWeight.bold),
                         ),
                 ),
-                SizedBox(height: 20),
-                TextButton(onPressed: (){
-                  Navigator.push(context, MaterialPageRoute(builder: (context) => SignupScreen(),));
-                }, child: Text("Don't have account"))
+                const SizedBox(height: 20),
+                TextButton(
+                    onPressed: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const SignupScreen(),
+                          ));
+                    },
+                    child: const Text("Don't have account"))
               ],
             ),
           ),

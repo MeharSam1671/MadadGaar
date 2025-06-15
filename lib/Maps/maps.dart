@@ -5,7 +5,6 @@ import 'package:flutter/services.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
-import 'package:madadgaar/Home/Home.dart';
 import 'package:madadgaar/splashscreen.dart';
 
 Stream<Position> getLocationStream() {
@@ -23,7 +22,16 @@ Future<String> getDarkMapStyle() async =>
 Future<String> getLightMapStyle() async => ""; // Default light style
 
 class Maps extends StatefulWidget {
-  const Maps({super.key});
+  const Maps(
+      {super.key,
+      this.latitude = 0,
+      this.longitude = 0,
+      this.eta = 'N/A',
+      this.distance = 'N/A',
+      this.driverName = 'Unknown'});
+  final double latitude;
+  final double longitude;
+  final String eta, distance, driverName;
 
   @override
   State<Maps> createState() => _MapsState();
@@ -33,17 +41,20 @@ class _MapsState extends State<Maps> {
   late GoogleMapController mapController;
   late BitmapDescriptor ambulanceIcon;
   LatLng initialmaps = const LatLng(0, 0);
-  LatLng initialmaps2 = const LatLng(32.1945477, 74.1994981);
+  late LatLng initialmaps2;
   bool isLoading = true;
   bool isDarkMode = true;
   late StreamSubscription<Position> locationSubscription;
   Set<Polyline> polylines = {};
   String? routeDistance;
   String? routeDuration;
+  String? mapStyle;
+
 
   @override
   void initState() {
     super.initState();
+    initialmaps2 = LatLng(widget.latitude, widget.longitude);
     _loadAmbulanceIcon();
     _initializeLocation();
     locationSubscription = getLocationStream().listen((position) {
@@ -78,7 +89,11 @@ class _MapsState extends State<Maps> {
       });
       _createRoute();
     } catch (e) {
-      _showSnack("Failed to get location: $e");
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Failed to get location: $e")),
+        );
+      }
     }
   }
 
@@ -90,17 +105,19 @@ class _MapsState extends State<Maps> {
       targetHeight: 100,
     );
     final frame = await codec.getNextFrame();
-    final bytes = (await frame.image.toByteData(format: ui.ImageByteFormat.png))!
-        .buffer
-        .asUint8List();
+    final bytes =
+        (await frame.image.toByteData(format: ui.ImageByteFormat.png))!
+            .buffer
+            .asUint8List();
     setState(() {
-      ambulanceIcon = BitmapDescriptor.fromBytes(bytes);
+      ambulanceIcon = BitmapDescriptor.bytes(bytes);
     });
   }
 
   void _showSnack(String message) {
     if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text(message)));
     }
   }
 
@@ -143,8 +160,7 @@ class _MapsState extends State<Maps> {
 
   Future<void> _toggleMapStyle() async {
     isDarkMode = !isDarkMode;
-    final style = isDarkMode ? await getDarkMapStyle() : await getLightMapStyle();
-    mapController.setMapStyle(style);
+    mapStyle = isDarkMode ? await getDarkMapStyle() : await getLightMapStyle();
     setState(() {});
   }
 
@@ -158,8 +174,12 @@ class _MapsState extends State<Maps> {
   Widget build(BuildContext context) {
     final textColor = isDarkMode ? Colors.white : Colors.black;
 
-    return WillPopScope(
-      onWillPop: () async {
+    return PopScope(
+      canPop: true,
+      onPopInvokedWithResult: (didPop, result) async {
+        if (didPop) return;
+
+
         final exit = await showDialog<bool>(
           context: context,
           builder: (context) => AlertDialog(
@@ -168,109 +188,124 @@ class _MapsState extends State<Maps> {
               "Cancelling an ambulance request wastes valuable emergency resources. Are you sure?",
             ),
             actions: [
-              TextButton(onPressed: () => Navigator.pop(context, false), child: const Text("No")),
               TextButton(
-                onPressed: () => Navigator.of(context).popUntil((route) => route.isFirst),
+                  onPressed: () => Navigator.pop(context, false),
+                  child: const Text("No")),
+              TextButton(
+                onPressed: () =>
+                    Navigator.of(context).popUntil((route) => route.isFirst),
                 child: const Text("Yes, Cancel"),
               ),
             ],
           ),
         );
-        return exit ?? false;
+        if (exit == true && context.mounted) {
+          Navigator.of(context).pop();
+        }
       },
       child: Scaffold(
         body: isLoading
-            ? SplashScreen(home: "maps")
+            ? const SplashScreen(home: "maps")
             : Stack(
-          children: [
-            GoogleMap(
-              initialCameraPosition: CameraPosition(target: initialmaps, zoom: 15.5),
-              onMapCreated: (controller) async {
-                mapController = controller;
-                mapController.setMapStyle(await getDarkMapStyle());
-                mapController.animateCamera(CameraUpdate.newLatLng(initialmaps));
-              },
-              markers: {
-                Marker(
-                  markerId: const MarkerId("destination"),
-                  position: initialmaps2,
-                  icon: ambulanceIcon,
-                  infoWindow: const InfoWindow(title: "Ambulance approaching"),
-                )
-              },
-              myLocationEnabled: true,
-              myLocationButtonEnabled: true,
-              polylines: polylines,
-            ),
-
-            if (routeDistance != null && routeDuration != null)
-              Positioned(
-                bottom: 20,
-                left: 16,
-                right: 16,
-                child: Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: isDarkMode
-                        ? Colors.grey[900]!.withOpacity(0.9)
-                        : Colors.white.withOpacity(0.95),
-                    borderRadius: BorderRadius.circular(16),
+                children: [
+                  GoogleMap(
+                    style: mapStyle,
+                    initialCameraPosition:
+                        CameraPosition(target: initialmaps, zoom: 15.5),
+                    onMapCreated: (controller) async {
+                      mapController = controller;
+                      mapStyle = await getDarkMapStyle(); // default style
+                      setState(() {}); // triggers initial style load
+                      mapController
+                          .animateCamera(CameraUpdate.newLatLng(initialmaps));
+                    },
+                    markers: {
+                      Marker(
+                        markerId: const MarkerId("destination"),
+                        position: initialmaps2,
+                        icon: ambulanceIcon,
+                        infoWindow:
+                            const InfoWindow(title: "Ambulance approaching"),
+                      )
+                    },
+                    myLocationEnabled: true,
+                    myLocationButtonEnabled: true,
+                    polylines: polylines,
                   ),
-                  child: Row(
-                    children: [
-                      const CircleAvatar(
-                        radius: 24,
-                        backgroundColor: Colors.blue,
-                        child: Icon(Icons.person, color: Colors.white),
-                      ),
-                      const SizedBox(width: 16),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
+                  if (routeDistance != null && routeDuration != null)
+                    Positioned(
+                      bottom: 20,
+                      left: 16,
+                      right: 16,
+                      child: Container(
+                        padding: const EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: isDarkMode
+                              ? Colors.grey[900]!.withAlpha(230)
+                              : Colors.white.withAlpha(242),
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        child: Row(
                           children: [
-                            Text("Driver Name",
-                                style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    color: Theme.of(context).colorScheme.error)),
-                            const SizedBox(height: 4),
-                            Text("Muhammad Saadullah Zafar", style: TextStyle(color: textColor)),
-                            const SizedBox(height: 8),
-                            Row(
-                              children: [
-                                const Icon(Icons.timer_outlined, color: Colors.blue),
-                                const SizedBox(width: 8),
-                                Text("ETA: $routeDuration", style: TextStyle(color: textColor)),
-                              ],
+                            const CircleAvatar(
+                              radius: 24,
+                              backgroundColor: Colors.blue,
+                              child: Icon(Icons.person, color: Colors.white),
                             ),
-                            Row(
-                              children: [
-                                const Icon(Icons.route, color: Colors.blue),
-                                const SizedBox(width: 8),
-                                Text("Distance: $routeDistance", style: TextStyle(color: textColor)),
-                              ],
+                            const SizedBox(width: 16),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text("Driver Name",
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .error)),
+                                  const SizedBox(height: 4),
+                                  Text("Muhammad Saadullah Zafar",
+                                      style: TextStyle(color: textColor)),
+                                  const SizedBox(height: 8),
+                                  Row(
+                                    children: [
+                                      const Icon(Icons.timer_outlined,
+                                          color: Colors.blue),
+                                      const SizedBox(width: 8),
+                                      Text("ETA: $routeDuration",
+                                          style: TextStyle(color: textColor)),
+                                    ],
+                                  ),
+                                  Row(
+                                    children: [
+                                      const Icon(Icons.route,
+                                          color: Colors.blue),
+                                      const SizedBox(width: 8),
+                                      Text("Distance: $routeDistance",
+                                          style: TextStyle(color: textColor)),
+                                    ],
+                                  ),
+                                ],
+                              ),
                             ),
                           ],
                         ),
                       ),
-                    ],
+                    ),
+                  Positioned(
+                    top: 50,
+                    left: 10,
+                    child: FloatingActionButton(
+                      backgroundColor: Colors.white,
+                      onPressed: _toggleMapStyle,
+                      child: Icon(
+                        isDarkMode ? Icons.light_mode : Icons.dark_mode,
+                        color: Colors.black,
+                      ),
+                    ),
                   ),
-                ),
+                ],
               ),
-
-            Positioned(
-              top: 50,
-              left: 10,
-              child: FloatingActionButton(
-                backgroundColor: Colors.white,
-                onPressed: _toggleMapStyle,
-                child: Icon(
-                  isDarkMode ? Icons.light_mode : Icons.dark_mode,
-                  color: Colors.black,
-                ),
-              ),
-            ),
-          ],
-        ),
       ),
     );
   }

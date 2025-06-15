@@ -1,6 +1,5 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:madadgaar/Profile/profile.dart';
 import 'package:madadgaar/login/signup/login.dart';
 import 'package:provider/provider.dart';
 import '../main.dart';
@@ -23,9 +22,9 @@ class _NewProfileState extends State<NewProfile> {
   }
 
   bool _showCameraButton = false;
-  String Mode="Dark Mode";
+  String mode = "Dark Mode";
   bool _isLoggedIn = true; // Simulated login state
-  ImageProvider _profileImage = const AssetImage("assets/my_image.jpg");
+  // ImageProvider _profileImage = const AssetImage("assets/my_image.jpg");
 
   @override
   Widget build(BuildContext context) {
@@ -125,22 +124,23 @@ class _NewProfileState extends State<NewProfile> {
                     Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) => ChangePassword()));
+                            builder: (context) => const ChangePassword()));
                   }),
                 ],
                 buildCardTile(context, "About Us", Icons.info, () {
                   Navigator.push(context,
-                      MaterialPageRoute(builder: (context) => AboutUs()));
+                      MaterialPageRoute(builder: (context) => const AboutUs()));
                 }),
                 buildCardTile(context, "App Version", Icons.perm_device_info,
                     () {
                   Navigator.push(context,
-                      MaterialPageRoute(builder: (context) => AppVersion()));
+                      MaterialPageRoute(
+                          builder: (context) => const AppVersion()));
                 }),
                 Card(
                   child: ListTile(
                     leading: const Icon(Icons.dark_mode),
-                    title: Text(Mode),
+                    title: Text(mode),
                     trailing: Switch(
                       value: Provider.of<ThemeProvider>(context).isDarkMode,
                       onChanged: (value) {
@@ -149,9 +149,9 @@ class _NewProfileState extends State<NewProfile> {
 
                         setState(() {
                           if (value == true) {
-                            Mode = "Light Mode";
+                            mode = "Light Mode";
                           }else{
-                            Mode="Dark Mode";
+                            mode = "Dark Mode";
                           }
                         });
                       },
@@ -179,7 +179,7 @@ class _NewProfileState extends State<NewProfile> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (context) => LoginScreen()),
+                              builder: (context) => const LoginScreen()),
                         );
                       }
                     },

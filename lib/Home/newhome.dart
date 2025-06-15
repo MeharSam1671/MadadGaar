@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:madadgaar/ChatAi/chataiscreen.dart';
 import 'package:madadgaar/Home/history.dart';
@@ -15,12 +14,12 @@ class Newhome extends StatefulWidget {
 }
 
 class _NewhomeState extends State<Newhome> {
-  @override
-  ImageProvider _profileImage = const AssetImage("assets/my_image.jpg");
-  bool _isLoggedIn = true; // Simulated login state
+  // ImageProvider _profileImage = const AssetImage("assets/my_image.jpg");
+  // bool _isLoggedIn = true; // Simulated login state
 
+  @override
   Widget build(BuildContext context) {
-    bool login = true;
+    // bool login = true;
 
     final args = ModalRoute.of(context)?.settings.arguments;
 
@@ -39,7 +38,6 @@ class _NewhomeState extends State<Newhome> {
       "I need \nmedical help",
       "I feel \nunsafe",
     ];
-
 
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
@@ -84,25 +82,22 @@ class _NewhomeState extends State<Newhome> {
                       );
                     },
                     child: SafeArea(
-                      child:ValueListenableBuilder(
-                        valueListenable: profileImageNotifier,
-                        builder: (context, image, _) {
-                          return Container(
-                            width: 40,
-                            height: 40,
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(50),
-                              image: DecorationImage(
-                                image: image,
-                                fit: BoxFit.cover,
-                              ),
+                        child: ValueListenableBuilder(
+                      valueListenable: profileImageNotifier,
+                      builder: (context, image, _) {
+                        return Container(
+                          width: 40,
+                          height: 40,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(50),
+                            image: DecorationImage(
+                              image: image,
+                              fit: BoxFit.cover,
                             ),
-                          );
-                        },
-                      )
-
-
-                    ),
+                          ),
+                        );
+                      },
+                    )),
                   ),
                 ],
               ),
@@ -151,7 +146,7 @@ class _NewhomeState extends State<Newhome> {
                         BoxShadow(
                           color: isDark
                               ? Colors.black54
-                              : Colors.grey.withOpacity(0.6),
+                              : Colors.grey.withAlpha(153),
                           blurRadius: 10,
                           offset: const Offset(0, 4),
                         ),
@@ -177,8 +172,8 @@ class _NewhomeState extends State<Newhome> {
                         boxShadow: [
                           BoxShadow(
                             color: isDark
-                                ? Colors.redAccent.withOpacity(0.3)
-                                : Colors.redAccent.withOpacity(0.5),
+                                ? Colors.redAccent.withAlpha(77)
+                                : Colors.redAccent.withAlpha(128),
                             blurRadius: 30,
                             spreadRadius: 6,
                             offset: const Offset(0, 12),
@@ -186,8 +181,8 @@ class _NewhomeState extends State<Newhome> {
                         ],
                       ),
                       child: IconButton(
-                        icon:
-                        const Icon(Icons.sos, size: 50, color: Colors.white),
+                        icon: const Icon(Icons.sos,
+                            size: 50, color: Colors.white),
                         onPressed: () {
                           showScaleDialog(context);
                         },
@@ -262,13 +257,16 @@ class _NewhomeState extends State<Newhome> {
                                 ),
                                 const SizedBox(height: 10),
                                 Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
                                   children: [
-                                    Icon(Icons.arrow_forward, color: theme.colorScheme.error),
+                                    Icon(Icons.arrow_forward,
+                                        color: theme.colorScheme.error),
                                     const SizedBox(width: 8),
                                     Icon(
                                       Icons.text_fields,
-                                      color: theme.iconTheme.color!.withOpacity(0.5),
+                                      color: theme.iconTheme.color!
+                                          .withAlpha(128),
                                     ),
                                     const SizedBox(width: 2),
                                   ],
@@ -282,12 +280,12 @@ class _NewhomeState extends State<Newhome> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => ChatbotScreen(query: queries[index]),
+                            builder: (context) =>
+                                ChatbotScreen(query: queries[index]),
                           ),
                         );
                       }, // <-- here closing the GestureDetector
                     );
-
                   },
                 ),
               ),
@@ -295,7 +293,6 @@ class _NewhomeState extends State<Newhome> {
           ],
         ),
       ),
-
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: 0,
         selectedItemColor: theme.colorScheme.error,
@@ -303,8 +300,9 @@ class _NewhomeState extends State<Newhome> {
           if (index == 0) {
             Navigator.popUntil(context, (route) => route.isFirst);
           }
-          if(index==1) {
-            Navigator.push(context, MaterialPageRoute(builder: (context) => HistoryPage()));
+          if (index == 1) {
+            Navigator.push(context,
+                MaterialPageRoute(builder: (context) => const HistoryPage()));
           }
           // You can add more navigation logic here
         },

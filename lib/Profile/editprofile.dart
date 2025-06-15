@@ -5,7 +5,7 @@ import 'package:image_picker/image_picker.dart';
 class EditProfile extends StatefulWidget {
   final Function(String)? onImageChanged;  // callback for image path
 
-  const EditProfile({Key? key, this.onImageChanged}) : super(key: key);
+  const EditProfile({super.key, this.onImageChanged});
 
   @override
   State<EditProfile> createState() => _EditProfileState();
@@ -162,8 +162,7 @@ class InfoRow extends StatelessWidget {
   final String label;
   final String value;
 
-  const InfoRow({Key? key, required this.label, required this.value})
-      : super(key: key);
+  const InfoRow({super.key, required this.label, required this.value});
 
   @override
   Widget build(BuildContext context) {

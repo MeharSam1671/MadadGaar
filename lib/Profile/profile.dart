@@ -59,7 +59,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                      // Push text to center by taking left space
-                    Text(
+                    const Text(
                       "Profile",
                       style: TextStyle(
                         fontSize: 25,
@@ -103,7 +103,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           CircleAvatar(
                             radius: 50,
                             backgroundColor: Colors.blue.shade100,
-                            backgroundImage: AssetImage("assets/my_image.jpg"),
+                            backgroundImage:
+                                const AssetImage("assets/my_image.jpg"),
                           ),
                           const SizedBox(height: 20),
                           isEditing

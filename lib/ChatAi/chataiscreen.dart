@@ -74,7 +74,7 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
                       ),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withOpacity(0.1),
+                          color: Colors.black.withAlpha(26),
                           blurRadius: 3,
                           offset: const Offset(0, 1),
                         ),

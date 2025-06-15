@@ -2,9 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:shared_preferences/shared_preferences.dart';
 
-import 'login.dart';
 
 class SignupScreen extends StatefulWidget {
   const SignupScreen({super.key});
@@ -15,7 +13,8 @@ class SignupScreen extends StatefulWidget {
 
 class _SignupScreenState extends State<SignupScreen> {
 
-  Future<void> SignupApiCall(String FirstNM, String LastNM, String Email, String Password) async {
+  Future<void> signupApiCall(
+      String firstName, String lastName, String email, String password) async {
     try {
       final url = Uri.parse("https://madadgaar.centralindia.cloudapp.azure.com/api/auth/register");
 
@@ -23,10 +22,10 @@ class _SignupScreenState extends State<SignupScreen> {
         url,
         headers: {'Content-Type': 'application/json'}, // ✅ JSON header
         body: jsonEncode({ // ✅ JSON body
-          "firstName": FirstNM,
-          "lastName": LastNM,
-          "email": Email,
-          "password": Password,
+          "firstName": firstName,
+          "lastName": lastName,
+          "email": email,
+          "password": password,
           "userId": "" // If required, otherwise you can remove it
         }),
       );
@@ -40,11 +39,11 @@ class _SignupScreenState extends State<SignupScreen> {
       debugPrint('Error sending Credential value: $e');
     }
   }
-  TextEditingController _FirstName = TextEditingController(),
-      _LastName = TextEditingController(),
-      _Email = TextEditingController(),
-      _Password = TextEditingController(),
-      _CheckPassword = TextEditingController();
+  final TextEditingController _firstName = TextEditingController(),
+      _lastName = TextEditingController(),
+      _email = TextEditingController(),
+      _password = TextEditingController(),
+      _checkPassword = TextEditingController();
 
   bool buttonenabled = false;
 
@@ -57,23 +56,23 @@ class _SignupScreenState extends State<SignupScreen> {
   void _checkFormValid() {
     setState(() {
       buttonenabled =
-          _FirstName.text.isNotEmpty &&
-              _LastName.text.isNotEmpty &&
-              _Email.text.isNotEmpty &&
-              isValidEmail(_Email.text) &&
-              _Password.text.isNotEmpty &&
-              _CheckPassword.text.isNotEmpty &&
-              _Password.text == _CheckPassword.text;
+          _firstName.text.isNotEmpty &&
+          _lastName.text.isNotEmpty &&
+          _email.text.isNotEmpty &&
+          isValidEmail(_email.text) &&
+          _password.text.isNotEmpty &&
+          _checkPassword.text.isNotEmpty &&
+          _password.text == _checkPassword.text;
     });
   }
 
   @override
   void dispose() {
-    _FirstName.dispose();
-    _LastName.dispose();
-    _Email.dispose();
-    _Password.dispose();
-    _CheckPassword.dispose();
+    _firstName.dispose();
+    _lastName.dispose();
+    _email.dispose();
+    _password.dispose();
+    _checkPassword.dispose();
     super.dispose();
   }
 
@@ -104,16 +103,16 @@ class _SignupScreenState extends State<SignupScreen> {
                 ClipRRect(
                   borderRadius: BorderRadius.circular(16),
                   child: Container(
-                    color: Colors.black.withOpacity(0.1),
+                    color: Colors.black.withAlpha(26),
                     padding:
                     const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                     child: Column(
                       children: [
                         TextField(
                           style: const TextStyle(color: Colors.black),
-                          controller: _FirstName,
+                          controller: _firstName,
                           onChanged: (_) => _checkFormValid(),
-                          decoration: InputDecoration(
+                          decoration: const InputDecoration(
                             hintText: 'First Name',
                             hintStyle: TextStyle(color: Colors.black),
                             border: InputBorder.none,
@@ -123,9 +122,9 @@ class _SignupScreenState extends State<SignupScreen> {
                         const Divider(color: Colors.black),
                         TextField(
                           style: const TextStyle(color: Colors.black),
-                          controller: _LastName,
+                          controller: _lastName,
                           onChanged: (_) => _checkFormValid(),
-                          decoration: InputDecoration(
+                          decoration: const InputDecoration(
                             hintText: 'Last Name',
                             hintStyle: TextStyle(color: Colors.black),
                             border: InputBorder.none,
@@ -138,17 +137,17 @@ class _SignupScreenState extends State<SignupScreen> {
                           children: [
                             TextField(
                               style: const TextStyle(color: Colors.black),
-                              controller: _Email,
+                              controller: _email,
                               onChanged: (_) => _checkFormValid(),
-                              decoration: InputDecoration(
+                              decoration: const InputDecoration(
                                 hintText: 'Email',
                                 hintStyle: TextStyle(color: Colors.black),
                                 border: InputBorder.none,
                                 icon: Icon(Icons.email, color: Colors.black),
                               ),
                             ),
-                            if (_Email.text.isNotEmpty &&
-                                !isValidEmail(_Email.text))
+                            if (_email.text.isNotEmpty &&
+                                !isValidEmail(_email.text))
                               const Padding(
                                 padding: EdgeInsets.only(left: 40, top: 4),
                                 child: Row(
@@ -167,10 +166,10 @@ class _SignupScreenState extends State<SignupScreen> {
                         const Divider(color: Colors.black),
                         TextField(
                           obscureText: true,
-                          controller: _Password,
+                          controller: _password,
                           style: const TextStyle(color: Colors.black),
                           onChanged: (_) => _checkFormValid(),
-                          decoration: InputDecoration(
+                          decoration: const InputDecoration(
                             hintText: 'Password',
                             hintStyle: TextStyle(color: Colors.black),
                             border: InputBorder.none,
@@ -180,18 +179,18 @@ class _SignupScreenState extends State<SignupScreen> {
                         const Divider(color: Colors.black),
                         TextField(
                           obscureText: true,
-                          controller: _CheckPassword,
+                          controller: _checkPassword,
                           style: const TextStyle(color: Colors.black),
                           onChanged: (_) => _checkFormValid(),
-                          decoration: InputDecoration(
+                          decoration: const InputDecoration(
                             hintText: 'Enter Password again',
                             hintStyle: TextStyle(color: Colors.black),
                             border: InputBorder.none,
                             icon: Icon(Icons.lock, color: Colors.black),
                           ),
                         ),
-                        if (_Password.text != _CheckPassword.text &&
-                            _CheckPassword.text.isNotEmpty)
+                        if (_password.text != _checkPassword.text &&
+                            _checkPassword.text.isNotEmpty)
                           const Padding(
                             padding: EdgeInsets.only(left: 40, top: 4),
                             child: Row(
@@ -213,7 +212,8 @@ class _SignupScreenState extends State<SignupScreen> {
                 ElevatedButton(
                   onPressed: buttonenabled
                       ? () {
-                    SignupApiCall(_FirstName.text,_LastName.text,_Email.text,_Password.text);
+                          signupApiCall(_firstName.text, _lastName.text,
+                              _email.text, _password.text);
 
                   }
                       : null,

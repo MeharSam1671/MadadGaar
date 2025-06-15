@@ -36,19 +36,19 @@ class _AboutUsState extends State<AboutUs> {
               style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 15),
-            ListTile(
-              leading: const CircleAvatar(
+            const ListTile(
+              leading: CircleAvatar(
                 child: Text('HS'),
               ),
-              title: const Text('Hafiz Abdul Samad'),
-              subtitle: const Text('Team Member & Developer'),
+              title: Text('Hafiz Abdul Samad'),
+              subtitle: Text('Team Member & Developer'),
             ),
-            ListTile(
-              leading: const CircleAvatar(
+            const ListTile(
+              leading: CircleAvatar(
                 child: Text('MS'),
               ),
-              title: const Text('Muhammad Saadullah Zafar'),
-              subtitle: const Text('Team Member & Developer'),
+              title: Text('Muhammad Saadullah Zafar'),
+              subtitle: Text('Team Member & Developer'),
             ),
             const Spacer(),
             Center(
