@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:madadgaar/login/signup/login.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../main.dart';
 import 'aboutus.dart';
 import 'appversion.dart';
@@ -21,16 +22,53 @@ class _NewProfileState extends State<NewProfile> {
     profileImageNotifier.value = FileImage(File(imagePath));
   }
 
+  String name = "Hafiz Abdul Samad";
+  String email = "samadali1671@gmail.com";
+
   bool _showCameraButton = false;
   String mode = "Dark Mode";
   bool _isLoggedIn = true; // Simulated login state
   // ImageProvider _profileImage = const AssetImage("assets/my_image.jpg");
 
   @override
-  Widget build(BuildContext context) {
-    String name = "Hafiz Abdul Samad";
-    String email = "samadali1671@gmail.com";
+  void initState() {
+    super.initState();
+    _loadProfileData();
+  }
 
+  Future<void> _loadProfileData() async {
+    final sharedPreferences = await SharedPreferences.getInstance();
+    final token = sharedPreferences.getString('auth_token');
+    final userFirstName = sharedPreferences.getString('userFirstName');
+    final userLastName = sharedPreferences.getString('userLastName');
+    final userName = '${userFirstName ?? ''} ${userLastName ?? ''}'.trim();
+    final userEmail = sharedPreferences.getString('userEmail');
+    // Try both possible keys for image path
+    final imagePath = sharedPreferences.getString('profileImagePath') ??
+        sharedPreferences.getString('profileImage');
+    if (token != null && userName.isNotEmpty) {
+      setState(() {
+        _isLoggedIn = true;
+        name = userName;
+        email = userEmail ?? 'N/A';
+        if (imagePath != null &&
+            imagePath.isNotEmpty &&
+            File(imagePath).existsSync()) {
+          profileImageNotifier.value = FileImage(File(imagePath));
+        } else {
+          profileImageNotifier.value = const AssetImage('assets/my_image.jpg');
+        }
+      });
+    } else {
+      setState(() {
+        _isLoggedIn = false;
+        profileImageNotifier.value = const AssetImage('assets/my_image.jpg');
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: Stack(
@@ -48,13 +86,20 @@ class _NewProfileState extends State<NewProfile> {
                 child: ValueListenableBuilder(
                   valueListenable: profileImageNotifier,
                   builder: (context, image, _) {
-                    return CircleAvatar(
-                      radius: 50,
-                      backgroundImage: _isLoggedIn ? image : null,
-                      child: !_isLoggedIn
-                          ? const Icon(Icons.person, size: 50)
-                          : null,
-                    );
+                    if (image is AssetImage) {
+                      // Only avatar icon, no background image
+                      return const CircleAvatar(
+                        radius: 50,
+                        backgroundColor: Colors.grey,
+                        child: Icon(Icons.person, size: 50),
+                      );
+                    } else {
+                      // Show user image
+                      return CircleAvatar(
+                        radius: 50,
+                        backgroundImage: image,
+                      );
+                    }
                   },
                 ),
               ),
@@ -133,7 +178,8 @@ class _NewProfileState extends State<NewProfile> {
                 }),
                 buildCardTile(context, "App Version", Icons.perm_device_info,
                     () {
-                  Navigator.push(context,
+                  Navigator.push(
+                      context,
                       MaterialPageRoute(
                           builder: (context) => const AppVersion()));
                 }),
@@ -150,7 +196,7 @@ class _NewProfileState extends State<NewProfile> {
                         setState(() {
                           if (value == true) {
                             mode = "Light Mode";
-                          }else{
+                          } else {
                             mode = "Dark Mode";
                           }
                         });
@@ -172,8 +218,37 @@ class _NewProfileState extends State<NewProfile> {
                       _isLoggedIn ? Icons.logout : Icons.login,
                       color: _isLoggedIn ? Colors.red : Colors.green,
                     ),
-                    onTap: () {
+                    onTap: () async {
                       if (_isLoggedIn) {
+                        final sharedPreferences =
+                            await SharedPreferences.getInstance();
+                        // Remove all auth-related keys
+                        await sharedPreferences.remove('auth_token');
+                        await sharedPreferences.remove('userName');
+                        await sharedPreferences.remove('userFirstName');
+                        await sharedPreferences.remove('userLastName');
+                        await sharedPreferences.remove('userEmail');
+                        await sharedPreferences.remove('userPhone');
+                        await sharedPreferences.remove('userDob');
+                        // Remove profile image file if exists
+                        final imagePath =
+                            sharedPreferences.getString('profileImagePath') ??
+                                sharedPreferences.getString('profileImage');
+                        if (imagePath != null && imagePath.isNotEmpty) {
+                          final file = File(imagePath);
+                          if (file.existsSync()) {
+                            try {
+                              file.deleteSync();
+                            } catch (e) {
+                              // Ignore file deletion errors
+                            }
+                          }
+                        }
+                        await sharedPreferences.remove('profileImagePath');
+                        await sharedPreferences.remove('profileImage');
+                        // Reset notifier to default avatar
+                        profileImageNotifier.value =
+                            const AssetImage('assets/my_image.jpg');
                         setState(() => _isLoggedIn = false);
                       } else {
                         Navigator.push(

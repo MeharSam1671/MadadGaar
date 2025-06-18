@@ -5,6 +5,7 @@ import 'dart:async';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'main.dart';
 
@@ -59,43 +60,90 @@ class SplashScreen extends StatefulWidget {
 class _SplashScreenState extends State<SplashScreen>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
+  late final bool isAuthenticated;
+  bool loading = true;
+  String authToken = '', userName = '', profileImage = '';
+
+  Future<void> checkAuthentication() async {
+    final sharedPreferences = await SharedPreferences.getInstance();
+    final token = sharedPreferences.getString('auth_token');
+    final userFirstName = sharedPreferences.getString('userFirstName');
+    final userLastName = sharedPreferences.getString('userLastName');
+    final userName = '$userFirstName $userLastName';
+
+    if (token != null && userName.isNotEmpty) {
+      setState(() {
+        authToken = token;
+        this.userName = userName;
+        profileImage = sharedPreferences.getString('profileImage') ?? '';
+      });
+    } else {
+      setState(() {
+        authToken = '';
+        this.userName = '';
+        profileImage = '';
+      });
+    }
+    setState(() {
+      loading = false;
+    });
+  }
 
   @override
   void initState() {
     super.initState();
-
     _controller = AnimationController(
       duration: const Duration(seconds: 1),
       vsync: this,
     )..repeat(reverse: true);
+    // Start authentication check
+    checkAuthenticationAndNavigate();
+  }
 
-    if (widget.home == "home") {
-      _getUserLocation().then((location) {
-        // After fetching location, wait then navigate
-        Timer(const Duration(seconds: 2), () {
+  Future<void> checkAuthenticationAndNavigate() async {
+    setState(() {
+      loading = true;
+    });
+    final sharedPreferences = await SharedPreferences.getInstance();
+    final token = sharedPreferences.getString('auth_token');
+    final userFirstName = sharedPreferences.getString('userFirstName');
+    final userLastName = sharedPreferences.getString('userLastName');
+    final userName = '$userFirstName $userLastName';
+    if (token != null && userName.isNotEmpty) {
+      // Authenticated, get location and go to home
+      try {
+        final location = await _getUserLocation();
+        await Future.delayed(const Duration(seconds: 2));
+        if (mounted) {
           Navigator.of(context).pushReplacementNamed(
             '/Newhome',
             arguments: {
               'City': location['city'],
               'Country': location['country'],
+              'profileImage': profileImage,
             },
           );
-        });
-      }).catchError((e) {
+        }
+      } catch (e) {
         if (kDebugMode) {
-          print("Location error: $e");
+          print("Error getting location: $e");
         }
         if (mounted) {
           Navigator.of(context).pushReplacementNamed('/Newhome');
         }
+      }
+    } else {
+      // Not authenticated, go to login
+      await Future.delayed(const Duration(seconds: 2));
+      if (mounted) {
+        Navigator.of(context).pushReplacementNamed('/LoginProfile');
+      }
+    }
+    if (mounted) {
+      setState(() {
+        loading = false;
       });
     }
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
   }
 
   Widget buildColorfulText(bool isDark) {
@@ -179,4 +227,11 @@ class _SplashScreenState extends State<SplashScreen>
       ),
     );
   }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
 }

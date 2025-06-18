@@ -23,10 +23,12 @@ void main() async {
     DeviceOrientation.portraitDown,
   ]).then((_) {
     ApiController(
-      baseUrl: 'http://10.0.2.2:4000/api', // Replace with your API base URL
+      baseUrl:
+          'https://madadgaar-rcet.centralindia.cloudapp.azure.com/api', // Replace with your API base URL
     );
     SocketClient(
-      baseUrl: 'http://10.0.2.2:4000/api', // Replace with your API base URL
+      baseUrl:
+          'https://madadgaar-rcet.centralindia.cloudapp.azure.com/api', // Replace with your API base URL
     );
     runApp(
       ChangeNotifierProvider(

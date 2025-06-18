@@ -1,8 +1,10 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:madadgaar/ChatAi/chataiscreen.dart';
 import 'package:madadgaar/Home/history.dart';
 import 'package:madadgaar/Home/showdialog.dart';
 import 'package:madadgaar/Profile/newprofile.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../globals.dart';
 
@@ -16,6 +18,31 @@ class Newhome extends StatefulWidget {
 class _NewhomeState extends State<Newhome> {
   // ImageProvider _profileImage = const AssetImage("assets/my_image.jpg");
   // bool _isLoggedIn = true; // Simulated login state
+
+  @override
+  void initState() {
+    super.initState();
+    _loadProfileImage();
+  }
+
+  Future<void> _loadProfileImage() async {
+    final sharedPreferences = await SharedPreferences.getInstance();
+    final imagePath = sharedPreferences.getString('profileImagePath') ??
+        sharedPreferences.getString('profileImage');
+    if (imagePath != null && imagePath.isNotEmpty && mounted) {
+      setState(() {
+        if (imagePath.isNotEmpty && File(imagePath).existsSync()) {
+          profileImageNotifier.value = FileImage(File(imagePath));
+        } else {
+          profileImageNotifier.value = const AssetImage('assets/my_image.jpg');
+        }
+      });
+    } else if (mounted) {
+      setState(() {
+        profileImageNotifier.value = const AssetImage('assets/my_image.jpg');
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -85,17 +112,27 @@ class _NewhomeState extends State<Newhome> {
                         child: ValueListenableBuilder(
                       valueListenable: profileImageNotifier,
                       builder: (context, image, _) {
-                        return Container(
-                          width: 40,
-                          height: 40,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(50),
-                            image: DecorationImage(
-                              image: image,
-                              fit: BoxFit.cover,
+                        if (image is AssetImage) {
+                          // Only avatar icon, no background image
+                          return const CircleAvatar(
+                            radius: 20,
+                            backgroundColor: Colors.grey,
+                            child: Icon(Icons.person, size: 20),
+                          );
+                        } else {
+                          // Show user image
+                          return Container(
+                            width: 40,
+                            height: 40,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(50),
+                              image: DecorationImage(
+                                image: image,
+                                fit: BoxFit.cover,
+                              ),
                             ),
-                          ),
-                        );
+                          );
+                        }
                       },
                     )),
                   ),

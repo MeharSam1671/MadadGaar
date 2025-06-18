@@ -1,8 +1,11 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:madadgaar/main.dart';
+import 'package:madadgaar/splashscreen.dart';
 import 'package:madadgaar/utils/api_controller.dart';
 import 'package:madadgaar/login/signup/signup.dart';
+import 'package:madadgaar/utils/image_downloader.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -18,6 +21,11 @@ class _LoginScreenState extends State<LoginScreen> {
 
   final apiController = ApiController();
 
+  final TextEditingController _email = TextEditingController(),
+      _password = TextEditingController();
+
+  bool isEnabled = false;
+
   Future<void> handleLogin(String email, String password) async {
     setState(() {
       _isLoading = true;
@@ -30,34 +38,57 @@ class _LoginScreenState extends State<LoginScreen> {
           "password": password,
         },
       );
-      // final response = await http.post(
-      //   url,
-      //   headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-      //   body: {
-      //     "email": Email,
-      //     "password": Password,
-      //   },
-      // );
-
       if (response.statusCode == 201) {
-        debugPrint('Logged-in successfully: ${response.body}');
-        // Parse the response and save access token
+        debugPrint('Logged-in successfully: \\${response.body}');
         final Map<String, dynamic> responseData = json.decode(response.body);
         final String? accessToken =
             responseData['access_token'] ?? responseData['token'];
         if (accessToken != null) {
-          // Save token in shared preferences
-
-          final String? userName = responseData['user']?['firstName'];
+          final String? firstName = responseData['user']?['firstName'] ?? '';
+          final String? lastName = responseData['user']?['lastName'] ?? '';
+          final String userName = (('$firstName $lastName').trim().isEmpty)
+              ? 'User'
+              : '$firstName $lastName';
+          final String? userEmail = responseData['user']?['email'];
+          final String? userPhone = responseData['user']?['phone'];
+          final String? userDob = responseData['user']?['dateOfBirth'];
 
           final prefs = await SharedPreferences.getInstance();
           await prefs.setString('auth_token', accessToken);
-          await prefs.setString('userName', userName ?? 'User');
+          // await prefs.setString('userName', userName);
+          await prefs.setString('userFirstName', firstName ?? 'N/A');
+          await prefs.setString('userLastName', lastName ?? 'N/A');
+          await prefs.setString('userEmail', userEmail ?? 'N/A');
+          await prefs.setString('userPhone', userPhone ?? '');
+          await prefs.setString('userDob', userDob ?? '');
+
+          // --- Profile Image Download Logic ---
+          final String? profileImageUrl =
+              responseData['user']?['profilePicture'];
+          if (profileImageUrl != null && profileImageUrl.startsWith('http')) {
+            const String fileName = 'profile_image.jpg';
+            final String? localPath =
+                await downloadAndSaveImage(profileImageUrl, fileName);
+            if (localPath != null) {
+              await prefs.setString('profileImagePath', localPath);
+              debugPrint('Profile image saved locally at: $localPath');
+            } else {
+              debugPrint('Failed to download profile image.');
+            }
+          } else {
+            debugPrint('No profile image URL found in response.');
+          }
+          // --- End Profile Image Download Logic ---
+
+          debugPrint('User data saved: $userName, $userEmail');
           debugPrint('Access token saved to shared preferences.');
           if (mounted) {
-            Navigator.pushReplacementNamed(
+            Navigator.pushReplacement(
               context,
-              '/Home',
+              MaterialPageRoute(
+                builder: (context) => const SplashScreen(
+                    home: MyApp.home), // Replace with your Home screen
+              ),
             ); // Navigate to Home screen
           }
         } else {
@@ -75,9 +106,9 @@ class _LoginScreenState extends State<LoginScreen> {
       } else {
         setState(() {
           _errormessage =
-              "Error: ${response.statusCode} - ${response.reasonPhrase}";
+              "Error: \\${response.statusCode} - \\${response.reasonPhrase}";
         });
-        debugPrint('Failed to send Credential value: ${response.statusCode}');
+        debugPrint('Failed to send Credential value: \\${response.statusCode}');
       }
     } catch (e) {
       debugPrint('Error sending Credential value: $e');
@@ -88,127 +119,166 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
-  final TextEditingController _email = TextEditingController(),
-      _password = TextEditingController();
+  @override
+  void initState() {
+    _email.addListener(() {
+      setState(() {
+        isEnabled = _email.text.isNotEmpty && _password.text.isNotEmpty;
+      });
+    });
+    _password.addListener(() {
+      setState(() {
+        isEnabled = _email.text.isNotEmpty && _password.text.isNotEmpty;
+      });
+    });
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
-        decoration: BoxDecoration(
-          color: Theme.of(context).scaffoldBackgroundColor,
-        ),
-        child: Center(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(horizontal: 30),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Text(
-                  "Welcome Back",
-                  style: TextStyle(
-                    fontSize: 32,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black,
-                  ),
-                ),
-                const SizedBox(height: 40),
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(16),
-                  child: Container(
-                    color: Colors.black.withAlpha(26),
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 20, vertical: 10),
-                    child: Column(
-                      children: [
-                        TextField(
-                          controller: _email,
-                          style: const TextStyle(color: Colors.black),
-                          decoration: const InputDecoration(
-                            hintText: 'Email',
-                            hintStyle: TextStyle(color: Colors.black),
-                            border: InputBorder.none,
-                            icon: Icon(Icons.email, color: Colors.black),
-                          ),
+      body: Stack(
+        children: [
+          Container(
+            decoration: BoxDecoration(
+              color: Theme.of(context).scaffoldBackgroundColor,
+            ),
+            child: Center(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.symmetric(horizontal: 30),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Text(
+                      "Welcome Back",
+                      style: TextStyle(
+                        fontSize: 32,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black,
+                      ),
+                    ),
+                    const SizedBox(height: 40),
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(16),
+                      child: Container(
+                        color: Colors.black.withAlpha(26),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 20, vertical: 10),
+                        child: Column(
+                          children: [
+                            TextField(
+                              controller: _email,
+                              style: const TextStyle(color: Colors.black),
+                              onChanged: (_) {
+                                if (_errormessage != null &&
+                                    _errormessage!.isNotEmpty) {
+                                  setState(() {
+                                    _errormessage = null;
+                                  });
+                                }
+                              },
+                              decoration: const InputDecoration(
+                                hintText: 'Email',
+                                hintStyle: TextStyle(color: Colors.black),
+                                border: InputBorder.none,
+                                icon: Icon(Icons.email, color: Colors.black),
+                              ),
+                            ),
+                            const Divider(color: Colors.black),
+                            TextField(
+                              controller: _password,
+                              style: const TextStyle(color: Colors.black),
+                              obscureText: true,
+                              onChanged: (_) {
+                                if (_errormessage != null &&
+                                    _errormessage!.isNotEmpty) {
+                                  setState(() {
+                                    _errormessage = null;
+                                  });
+                                }
+                              },
+                              decoration: const InputDecoration(
+                                hintText: 'Password',
+                                hintStyle: TextStyle(color: Colors.black),
+                                border: InputBorder.none,
+                                icon: Icon(Icons.lock, color: Colors.black),
+                              ),
+                            ),
+                          ],
                         ),
-                        const Divider(color: Colors.black),
-                        TextField(
-                          controller: _password,
-                          style: const TextStyle(color: Colors.black),
-                          obscureText: true,
-                          decoration: const InputDecoration(
-                            hintText: 'Password',
-                            hintStyle: TextStyle(color: Colors.black),
-                            border: InputBorder.none,
-                            icon: Icon(Icons.lock, color: Colors.black),
-                          ),
+                      ),
+                    ),
+                    if (_errormessage != null && _errormessage!.isNotEmpty) ...[
+                      const SizedBox(height: 20),
+                      Container(
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: Colors.black.withAlpha(61),
+                          borderRadius: BorderRadius.circular(8),
                         ),
-                      ],
+                        child: Text(
+                          _errormessage!,
+                          style: const TextStyle(
+                              color: Colors.redAccent, fontSize: 14),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                    ],
+                    const SizedBox(height: 30),
+                    ElevatedButton(
+                      onPressed: _isLoading
+                          ? null // 4. Disable button if loading
+                          : _email.text == '' || _password.text == ''
+                              ? null
+                              : () {
+                                  handleLogin(_email.text, _password.text);
+                                },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.black,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 80, vertical: 15),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(30),
+                        ),
+                      ),
+                      child: const Text(
+                        'Login',
+                        style: TextStyle(
+                            fontSize: 18, fontWeight: FontWeight.bold),
+                      ),
                     ),
-                  ),
-                ),
-                if (_errormessage != null && _errormessage!.isNotEmpty) ...[
-                  const SizedBox(height: 20),
-                  Container(
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: Colors.black.withAlpha(61),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Text(
-                      _errormessage!,
-                      style: const TextStyle(
-                          color: Colors.redAccent, fontSize: 14),
-                      textAlign: TextAlign.center,
-                    ),
-                  ),
-                ],
-                const SizedBox(height: 30),
-                ElevatedButton(
-                  onPressed: _isLoading
-                      ? null // 4. Disable button if loading
-                      : () {
-                          handleLogin(_email.text, _password.text);
+                    const SizedBox(height: 20),
+                    TextButton(
+                        onPressed: () {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const SignupScreen(),
+                              ));
                         },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.white,
-                    foregroundColor: Colors.black,
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 80, vertical: 15),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(30),
-                    ),
-                  ),
-                  child: _isLoading
-                      ? const SizedBox(
-                          width: 24,
-                          height: 24,
-                          child: CircularProgressIndicator(
-                            color: Color(0xFF8E2DE2),
-                            strokeWidth: 3,
-                          ),
-                        )
-                      : const Text(
-                          'Login',
-                          style: TextStyle(
-                              fontSize: 18, fontWeight: FontWeight.bold),
-                        ),
+                        child: const Text("Don't have account"))
+                  ],
                 ),
-                const SizedBox(height: 20),
-                TextButton(
-                    onPressed: () {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const SignupScreen(),
-                          ));
-                    },
-                    child: const Text("Don't have account"))
-              ],
+              ),
             ),
           ),
-        ),
+          if (_isLoading)
+            Container(
+              color: Colors.black.withAlpha(77),
+              child: const Center(
+                child: CircularProgressIndicator(),
+              ),
+            ),
+        ],
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    _email.dispose();
+    _password.dispose();
+    super.dispose();
   }
 }
